@@ -1,0 +1,24 @@
+{% extends 'uzzutv/layout.html' %}
+
+{% block body %}
+<!-- trending movie -->
+{% for trending in trendingMovie %}
+<img style="height: 100px;" src="https://image.tmdb.org/t/p/w500{{ trending.poster_path }}">
+<h3>{{trending.title}}</h3>
+{% endfor %}
+
+<!-- popular movies -->
+<h1>Popular Movies</h1>
+{% for popular in popularMovie %}
+<img style="height: 100px;" src="https://image.tmdb.org/t/p/w500{{ popular.poster_path }}">
+<h3>{{popular.title}}</h3>
+{% endfor %}
+
+<!-- top rated movies -->
+<h1>Top Rated Movies</h1>
+{% for top in toprated %}
+<img style="height: 100px;" src="https://image.tmdb.org/t/p/w500{{ top.poster_path }}">
+<h3>{{top.title}}</h3>
+{% endfor %}
+
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends 'uzzutv/layout.html'%}
+
+{% block body%}
+
+{% for trending in trendingtv %}
+<a href="{% url 'watchtv' trending.id %}">
+<img style="height: 100px;" src="https://image.tmdb.org/t/p/w500{{ trending.poster_path }}">
+<h3>{{trending.id}}</h3>
+</a>
+{% endfor %}
+
+
+
+
+<!-- popular movies -->
+<h1>Popular Series</h1>
+{% for popular in populartv %}
+<img style="height: 100px;" src="https://image.tmdb.org/t/p/w500{{ popular.poster_path }}">
+<h3>{{popular.name}}</h3>
+{% endfor %}
+
+<!-- top rated movies -->
+<h1>Top Rated Series</h1>
+{% for top in topratedtv %}
+<img style="height: 100px;" src="https://image.tmdb.org/t/p/w500{{ top.poster_path }}">
+<h3>{{top.name}}</h3>
+{% endfor %}
+{% endblock %}

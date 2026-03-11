@@ -1,0 +1,208 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
+<title>AniStream</title>
+
+<style>
+
+*{
+box-sizing:border-box;
+}
+.card{
+background:#020617;
+border-radius:10px;
+overflow:hidden;
+transition:0.25s;
+cursor:pointer;
+}
+
+.card:hover{
+transform:translateY(-6px) scale(1.02);
+box-shadow:0 15px 30px rgba(0,0,0,0.6);
+}
+body{
+margin:0;
+font-family:'Bangers', cursive;
+height:100vh;
+background-image:url("https://images.pexels.com/photos/16516/pexels-photo.jpg");
+background-size:cover;
+background-position:center;
+background-repeat:no-repeat;
+}
+body{
+min-height:100vh;
+}
+/* dark overlay */
+.overlay{
+min-height:100vh;
+}
+.overlay{
+height:100vh;
+background:rgba(0,0,0,0.65);
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+text-align:center;
+padding:20px;
+color:white;
+}
+
+h1{
+font-size:100px;
+line-break: loose;
+letter-spacing:3px;
+line-height: 1;
+background: linear-gradient(90deg,#22c55e,#4ade80);
+-webkit-background-clip:text;
+color:transparent;
+text-shadow:
+0 0 1px #22c55e,
+0 0 2px #22c55e;
+}
+
+h4{
+font-size: 30px;
+line-height: 1;
+line-break: auto;
+color:#e5e7eb;
+margin-bottom:20px;
+}
+#glow{
+color:#22c55e;
+margin:0 10px;
+font-size:30px;
+text-shadow:
+0 0 1px #22c55e,
+0 0 2px #22c55e;
+letter-spacing:1px;
+}
+p{
+font-size: 20px;
+max-width:800px;
+line-height:2;
+color:#d1d5db;
+}
+
+button{
+font-family: 'Bangers', cursive;
+line-height: 2;
+line-break: auto;
+margin-top:30px;
+padding:14px 30px;
+font-size:20px;
+border:none;
+border-radius:6px;
+background:#22c55e;
+color:white;
+cursor:pointer;
+transition:0.3s;
+box-shadow:0 5px 20px rgba(34,197,94,0.5);
+}
+
+button:hover{
+background:#16a34a;
+transform:scale(1.05);
+}
+
+.overlay{
+animation:fadeIn 1.2s ease;
+}
+
+@keyframes fadeIn{
+from{
+opacity:0;
+transform:translateY(20px);
+}
+to{
+opacity:1;
+transform:translateY(0);
+}
+}
+
+/* Tablet */
+@media (max-width: 900px){
+
+h1{
+font-size:70px;
+}
+
+h4{
+font-size:24px;
+}
+
+p{
+font-size:18px;
+max-width:600px;
+line-height:1.7;
+}
+
+button{
+font-size:18px;
+padding:12px 24px;
+}
+
+}
+
+/* Mobile */
+@media (max-width: 600px){
+
+.overlay{
+padding:30px 20px;
+}
+
+h1{
+font-size:50px;
+}
+
+h4{
+font-size:20px;
+margin-bottom:15px;
+}
+
+p{
+font-size:16px;
+max-width:90%;
+line-height:1.6;
+}
+
+button{
+font-size:16px;
+padding:10px 22px;
+margin-top:20px;
+}
+
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="overlay">
+
+<h1>AniCluster</h1>
+
+<h4>Laugh  <span id="glow">Watch</span>  Repeat</h4>
+
+<p>
+
+
+<span id="glow">AniCluster</span> is a modern streaming platform built for <span id="glow">anime fans</span> who want instant access to their <span>favorite series and movies</span>. From timeless classics to the latest seasonal releases, AniCluster brings together a vast collection of anime in one place.
+
+<span id="glow">Discover</span> trending shows, explore different genres, and dive into immersive stories filled with <span id="glow">action, adventure, fantasy, and emotion.</span>
+</p>
+
+<button><a style="text-decoration: none; color: white;" href="{% url 'home'%}">View Full Site</a></button>
+
+</div>
+
+</body>
+</html>
