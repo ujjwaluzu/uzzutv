@@ -1,5 +1,6 @@
 from django.shortcuts import render
-
+from django.http import HttpResponse
+from django.shortcuts import redirect
 
 
 
@@ -117,8 +118,79 @@ def watchtv(request, tv_id):
     return render(request, "uzzutv/watchtv.html", {
         "id": tv_id,
         "url": stream_url,
+        "imdb":imdb,
         "seasons": seasons,
         "episodes": episodes,
         "current_season": int(season),
         "current_episode": int(episode)
     })
+
+
+def superembed(request):
+
+    video_id = request.GET.get("video_id")
+    season = request.GET.get("s", 0)
+    episode = request.GET.get("e", 0)
+
+    if not video_id:
+        return HttpResponse("Missing video_id")
+
+    request_url = f"https://getsuperembed.link/?video_id={video_id}&season={season}&episode={episode}"
+
+    r = requests.get(
+        request_url,
+        headers={"User-Agent": "Mozilla/5.0"},
+        timeout=10
+    )
+
+    player_url = r.text.strip()
+
+    if player_url.startswith("https://"):
+
+        return HttpResponse(f"""
+        <html>
+        <body style="margin:0">
+        <iframe src="{player_url}"
+        width="100%"
+        height="100%"
+        frameborder="0"
+        allowfullscreen>
+        </iframe>
+        </body>
+        </html>
+        """)
+
+    return HttpResponse(player_url)
+
+
+
+# def superembed(request):
+
+#     video_id = request.GET.get("video_id")
+#     season = request.GET.get("s", 0)
+#     episode = request.GET.get("e", 0)
+
+#     if not video_id:
+#         return HttpResponse("Missing video_id")
+
+#     request_url = f"https://getsuperembed.link/?video_id={video_id}&season={season}&episode={episode}"
+
+#     try:
+#         r = requests.get(
+#             request_url,
+#             headers={
+#                 "User-Agent": "Mozilla/5.0",
+#                 "Referer": "https://getsuperembed.link/"
+#             },
+#             timeout=7
+#         )
+
+#         player_url = r.text.strip()
+
+#         if player_url.startswith("https://"):
+#             return redirect(player_url)
+#         else:
+#             return HttpResponse(player_url)
+
+#     except Exception as e:
+#         return HttpResponse("Server error")
