@@ -1,0 +1,68 @@
+{% extends 'uzzutv/layout.html' %}
+
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'uzzutv/watchtv.css' %}">
+{% endblock %}
+
+
+{%block body%}
+<div class="container">
+
+<div class="player">
+
+<iframe src="{{url}}"
+style="width:100%; height:80vh; border-radius:10px;"
+frameborder="0"
+allowfullscreen>
+</iframe>
+
+</div>
+
+
+<div class="sidebar">
+
+<form method="GET">
+
+<select name="season" onchange="this.form.submit()" style="width:100%; padding:8px; margin-bottom:15px;">
+
+{% for season in seasons %}
+
+{% if season.season_number != 0 %}
+
+<option value="{{ season.season_number }}"
+{% if season.season_number == current_season %}selected{% endif %}>
+
+Season {{ season.season_number }}
+
+</option>
+
+{% endif %}
+
+{% endfor %}
+
+</select>
+
+</form>
+
+
+{% for ep in episodes %}
+
+<div class="episode {% if ep.episode_number == current_episode %}active{% endif %}">
+
+<a href="?season={{current_season}}&episode={{ep.episode_number}}">
+
+<b>{{ ep.episode_number }}.</b> {{ ep.name }}
+
+</a>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+</div>
+
+{% endblock %}

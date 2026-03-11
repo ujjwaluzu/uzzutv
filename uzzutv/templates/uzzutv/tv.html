@@ -1,13 +1,37 @@
 {% extends 'uzzutv/layout.html'%}
+{% load static %}
 
+{% block css %}
+<link rel="stylesheet" href="{% static 'uzzutv/tv.css' %}">
+{% endblock %}
 {% block body%}
 
-{% for trending in trendingtv %}
-<a href="{% url 'watchtv' trending.id %}">
-<img style="height: 100px;" src="https://image.tmdb.org/t/p/w500{{ trending.poster_path }}">
-<h3>{{trending.id}}</h3>
+<div class="hero-slider">
+
+{% for tv in trendingtv|slice:":5" %}
+
+<div class="hero-slide">
+
+<img class="hero-bg"
+src="https://image.tmdb.org/t/p/original{{ tv.backdrop_path }}">
+
+<div class="hero-content">
+
+<h1>{{ tv.name }}</h1>
+
+<p>{{ tv.overview|truncatewords:25 }}</p>
+
+<a class="watch-btn" href="{% url 'watchtv' tv.id %}">
+ Watch Now
 </a>
+
+</div>
+
+</div>
+
 {% endfor %}
+
+</div>
 
 
 
@@ -15,14 +39,40 @@
 <!-- popular movies -->
 <h1>Popular Series</h1>
 {% for popular in populartv %}
+<a href="{% url 'watchtv' popular.id %}">
 <img style="height: 100px;" src="https://image.tmdb.org/t/p/w500{{ popular.poster_path }}">
 <h3>{{popular.name}}</h3>
+</a>
 {% endfor %}
 
 <!-- top rated movies -->
 <h1>Top Rated Series</h1>
 {% for top in topratedtv %}
+<a href="{% url 'watchtv' top.id %}">
 <img style="height: 100px;" src="https://image.tmdb.org/t/p/w500{{ top.poster_path }}">
 <h3>{{top.name}}</h3>
+</a>
 {% endfor %}
+<script>
+
+let slides = document.querySelectorAll(".hero-slide");
+let index = 0;
+
+slides[0].classList.add("active");
+
+function showSlide(){
+slides.forEach(slide => slide.classList.remove("active"));
+
+slides[index].classList.add("active");
+
+index++;
+
+if(index >= slides.length){
+index = 0;
+}
+}
+
+setInterval(showSlide, 5000);
+
+</script>
 {% endblock %}

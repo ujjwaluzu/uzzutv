@@ -78,7 +78,47 @@ def tv(request):
         "trendingtv": trending_tv(),
         "topratedtv": toprated_tv()
     })
+import requests
+
 def watchtv(request, tv_id):
-    return render(request, "uzzutv/watchtv.html",{
-        "id": tv_id
+
+    season = request.GET.get("season", 1)
+    episode = request.GET.get("episode", 1)
+
+    params = {"api_key": API_KEY}
+
+    # get imdb id
+    external = requests.get(
+        f"https://api.themoviedb.org/3/tv/{tv_id}/external_ids",
+        params=params
+    ).json()
+
+    imdb = external["imdb_id"]
+
+    # tv details
+    tv = requests.get(
+        f"https://api.themoviedb.org/3/tv/{tv_id}",
+        params=params
+    ).json()
+
+    seasons = tv["seasons"]
+
+    # season episodes
+    season_data = requests.get(
+        f"https://api.themoviedb.org/3/tv/{tv_id}/season/{season}",
+        params=params
+    ).json()
+
+    episodes = season_data["episodes"]
+
+    # player
+    stream_url = f"https://vidsrcme.ru/embed/tv?imdb={imdb}&season={season}&episode={episode}"
+
+    return render(request, "uzzutv/watchtv.html", {
+        "id": tv_id,
+        "url": stream_url,
+        "seasons": seasons,
+        "episodes": episodes,
+        "current_season": int(season),
+        "current_episode": int(episode)
     })
