@@ -1,24 +1,183 @@
 {% extends 'uzzutv/layout.html' %}
+{% load static %}
 
+{% block css %}
+<link rel="stylesheet" href="{% static 'uzzutv/movie.css' %}">
+{% endblock %}
 {% block body %}
-<!-- trending movie -->
-{% for trending in trendingMovie %}
-<img style="height: 100px;" src="https://image.tmdb.org/t/p/w500{{ trending.poster_path }}">
-<h3>{{trending.title}}</h3>
+<style>
+    body{
+    font-family: 'banger', cursive;
+    background:#242428;
+    color: white;
+}
+</style>
+<!-- hero slider for trending movie -->
+
+<div class="hero-slider">
+
+{% for movie in trendingMovie|slice:":8" %}
+
+<div class="hero-slide">
+
+<img class="hero-bg"
+src="https://image.tmdb.org/t/p/original{{ movie.backdrop_path }}">
+
+<div class="hero-content">
+{% if movie.logo %}
+<img class="hero-logo" src="https://image.tmdb.org/t/p/original{{ movie.logo }}">
+{% else %}
+<h4>{{movie.title}}</h4>
+{% endif %}
+<p>{{ movie.overview|truncatewords:25 }}</p>
+
+<a class="watch-btn" href="{% url 'watchmov' movie.id %}">
+ Watch Now
+</a>
+
+</div>
+
+</div>
+
 {% endfor %}
 
-<!-- popular movies -->
-<h1>Popular Movies</h1>
+</div>
+
+<!-- try -->
+<h2 class="section-title">Popular Movie</h2>
+
+<div class="slider-wrapper">
+
+<div class="slider" id="popular-slider">
+
 {% for popular in popularMovie %}
-<img style="height: 100px;" src="https://image.tmdb.org/t/p/w500{{ popular.poster_path }}">
-<h3>{{popular.title}}</h3>
+
+<a href="{% url 'watchmov' popular.id %}" class="movie-link">
+
+<div class="movie-card">
+
+<div class="movie-header"
+style="background-image:url('https://image.tmdb.org/t/p/w500{{ popular.poster_path }}');">
+
+<div class="header-icon-container">
+<i class="material-icons header-icon">play_arrow</i>
+</div>
+
+</div>
+
+<div class="movie-content">
+
+<h3 class="movie-title">{{ popular.title|truncatewords:2 }}</h3>
+
+<div class="movie-info">
+<span>⭐ {{ popular.vote_average }}</span>
+<span>{{ popular.release_date }}</span>
+</div>
+
+</div>
+
+</div>
+
+</a>
+
 {% endfor %}
+
+</div>
+
+<button class="slide-btn right" onclick="slideRight()">❯</button>
+<button class="slide-btn left" onclick="slideLeft()">❮</button>
+
+</div>
+
 
 <!-- top rated movies -->
-<h1>Top Rated Movies</h1>
+<h2 class="section-title">Top Rated Movies</h2>
+
+<div class="slider-wrapper">
+
+<div class="slider" id="top-slider">
+
 {% for top in toprated %}
-<img style="height: 100px;" src="https://image.tmdb.org/t/p/w500{{ top.poster_path }}">
-<h3>{{top.title}}</h3>
+
+<a href="{% url 'watchmov' top.id %}" class="movie-link">
+
+<div class="movie-card">
+
+<div class="movie-header"
+style="background-image:url('https://image.tmdb.org/t/p/w500{{ top.poster_path }}');">
+
+<div class="header-icon-container">
+<i class="material-icons header-icon">play_arrow</i>
+</div>
+
+</div>
+
+<div class="movie-content">
+
+<h3 class="movie-title">{{ top.title|truncatewords:2 }}</h3>
+
+<div class="movie-info">
+<span>⭐ {{ top.vote_average }}</span>
+<span>{{ top.release_date }}</span>
+</div>
+
+</div>
+
+</div>
+
+</a>
+
 {% endfor %}
 
+</div>
+
+<button class="slide-btn right" onclick="slideRightTop()">❯</button>
+<button class="slide-btn left" onclick="slideLeftTop()">❮</button>
+
+</div>
+<script>
+function slideLeft(){
+document.getElementById("popular-slider")
+.scrollBy({left:-400, behavior:"smooth"});
+}
+
+function slideRight(){
+document.getElementById("popular-slider")
+.scrollBy({left:400, behavior:"smooth"});
+}
+
+
+function slideLeftTop(){
+document.getElementById("top-slider")
+.scrollBy({left:-400, behavior:"smooth"});
+}
+
+function slideRightTop(){
+document.getElementById("top-slider")
+.scrollBy({left:400, behavior:"smooth"});
+}
+
+
+let slides = document.querySelectorAll(".hero-slide");
+let index = 0;
+
+slides[0].classList.add("active");
+
+function showSlide(){
+slides.forEach(slide => slide.classList.remove("active"));
+
+slides[index].classList.add("active");
+
+index++;
+
+if(index >= slides.length){
+index = 0;
+}
+}
+
+setInterval(showSlide, 5000);
+
+
+
+</script>
 {% endblock %}
