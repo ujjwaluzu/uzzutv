@@ -1,0 +1,257 @@
+{% extends "uzzutv/layout.html" %}
+
+{% block body %}
+<style>
+
+    body{
+    font-family: 'banger', cursive;
+    background:#242428;
+    color: white;
+}
+h1,h2,h3,h4,h5,h5,p{
+    font-family: 'banger', cursive;
+    color: white;
+
+}
+.section-title{
+font-size:22px;
+font-weight:600;
+margin:30px 0 15px 10px;
+
+}
+
+/* wrapper */
+.slider-wrapper{
+position:relative;
+margin-bottom:40px;
+padding:0 30px;
+}
+
+/* slider row */
+.slider{
+display:flex;
+gap:20px;
+overflow-x:auto;
+scroll-behavior:smooth;
+padding:20px;
+}
+
+.slider::-webkit-scrollbar{
+display:none;
+}
+
+/* link */
+.movie-link{
+text-decoration:none;
+color:inherit;
+flex:0 0 auto;
+}
+
+/* movie card */
+.movie-card{
+background:#ffffff;
+box-shadow:0 6px 18px rgba(0,0,0,0.4);
+width:260px;
+border-radius:10px;
+overflow:hidden;
+transition:transform .25s;
+}
+
+.movie-card:hover{
+transform:scale(1.05);
+}
+
+/* poster */
+.movie-header{
+height:340px;
+background-size:cover;
+background-position:center;
+}
+
+/* play icon */
+.header-icon-container{
+position:relative;
+height:100%;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+.header-icon{
+font-size:48px;
+color:white;
+opacity:0;
+transition:0.3s;
+}
+
+.movie-card:hover .header-icon{
+opacity:1;
+}
+
+/* content */
+.movie-content{
+padding:15px;
+background:#fff;
+}
+
+.movie-title{
+font-size:18px;
+margin:0;
+color:#000;
+}
+
+.movie-info{
+display:flex;
+justify-content:space-between;
+margin-top:10px;
+font-size:12px;
+color:#555;
+}
+
+/* arrows */
+.slide-btn{
+position:absolute;
+top:40%;
+transform:translateY(-50%);
+background:#242428;
+border:none;
+color:white;
+font-size:22px;
+cursor:pointer;
+padding:10px 14px;
+border-radius:6px;
+z-index:10;
+}
+
+.slide-btn.left{
+left:0;
+}
+
+.slide-btn.right{
+right:0;
+}
+</style>
+<h2>Search results for "{{query}}"</h2>
+
+<h2 class="section-title">Movies</h2>
+
+<div class="slider-wrapper">
+
+<div class="slider" id="popular-tv-slider">
+
+{% for movie in movies %}
+
+<a href="{% url 'watchmov' movie.id %}" class="movie-link">
+
+<div class="movie-card">
+
+<div class="movie-header"
+style="background-image:url('https://image.tmdb.org/t/p/w500{{ movie.poster_path }}');">
+
+<div class="header-icon-container">
+<i class="material-icons header-icon">play_arrow</i>
+</div>
+
+</div>
+
+<div class="movie-content">
+
+<h3 class="movie-title">{{ movie.title|truncatewords:2 }}</h3>
+
+<div class="movie-info">
+<span>⭐ {{ movie.vote_average }}</span>
+<span>{{ movie.first_air_date }}</span>
+</div>
+
+</div>
+
+</div>
+
+</a>
+
+{% endfor %}
+
+</div>
+
+<button class="slide-btn right" onclick="slideRightPopularTV()">❯</button>
+<button class="slide-btn left" onclick="slideLeftPopularTV()">❮</button>
+
+</div>
+
+
+
+<h2 class="section-title">Tv Show</h2>
+
+<div class="slider-wrapper">
+
+<div class="slider" id="top-tv-slider">
+
+{% for show in tvshows %}
+
+<a href="{% url 'watchtv' show.id %}" class="movie-link">
+
+<div class="movie-card">
+
+<div class="movie-header"
+style="background-image:url('https://image.tmdb.org/t/p/w500{{ show.poster_path }}');">
+
+<div class="header-icon-container">
+<i class="material-icons header-icon">play_arrow</i>
+</div>
+
+</div>
+
+<div class="movie-content">
+
+<h3 class="movie-title">{{ show.name|truncatewords:2 }}</h3>
+
+<div class="movie-info">
+<span>⭐ {{ show.vote_average }}</span>
+<span>{{ show.first_air_date }}</span>
+</div>
+
+</div>
+
+</div>
+
+</a>
+
+{% endfor %}
+
+</div>
+
+<button class="slide-btn right" onclick="slideRightTopTV()">❯</button>
+<button class="slide-btn left" onclick="slideLeftTopTV()">❮</button>
+
+</div>
+
+
+
+
+
+
+
+
+
+<script>
+function slideLeftPopularTV(){
+document.getElementById("popular-tv-slider")
+.scrollBy({left:-400, behavior:"smooth"});
+}
+
+function slideRightPopularTV(){
+document.getElementById("popular-tv-slider")
+.scrollBy({left:400, behavior:"smooth"});
+}
+
+function slideLeftTopTV(){
+document.getElementById("top-tv-slider")
+.scrollBy({left:-400, behavior:"smooth"});
+}
+
+function slideRightTopTV(){
+document.getElementById("top-tv-slider")
+.scrollBy({left:400, behavior:"smooth"});
+}
+</script>
+{% endblock %}

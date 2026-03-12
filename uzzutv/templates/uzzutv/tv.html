@@ -5,7 +5,17 @@
 <link rel="stylesheet" href="{% static 'uzzutv/tv.css' %}">
 {% endblock %}
 {% block body%}
+<style>
+    body{
+    font-family: 'banger', cursive;
+    background:#242428;
+    color: white;
+}
+h1,h2,h3,h4,h5,h5,p,span{
+    font-family: 'banger', cursive;
 
+}
+</style>
 <!-- hero slider for trending shows -->
 
 <div class="hero-slider">
@@ -39,23 +49,118 @@ src="https://image.tmdb.org/t/p/original{{ tv.backdrop_path }}">
 
 
 <!-- popular movies -->
-<h1>Popular Series</h1>
+<h2 style="color: white;" class="section-title">Popular Series</h2>
+
+<div class="slider-wrapper">
+
+<div class="slider" id="popular-tv-slider">
+
 {% for popular in populartv %}
-<a href="{% url 'watchtv' popular.id %}">
-<img style="height: 100px;" src="https://image.tmdb.org/t/p/w500{{ popular.poster_path }}">
-<h3>{{popular.name}}</h3>
+
+<a href="{% url 'watchtv' popular.id %}" class="movie-link">
+
+<div class="movie-card">
+
+<div class="movie-header"
+style="background-image:url('https://image.tmdb.org/t/p/w500{{ popular.poster_path }}');">
+
+<div class="header-icon-container">
+<i class="material-icons header-icon">play_arrow</i>
+</div>
+
+</div>
+
+<div class="movie-content">
+
+<h3 class="movie-title">{{ popular.name|truncatewords:2 }}</h3>
+
+<div class="movie-info">
+<span>⭐ {{ popular.vote_average }}</span>
+<span>{{ popular.first_air_date }}</span>
+</div>
+
+</div>
+
+</div>
+
 </a>
+
 {% endfor %}
 
+</div>
+
+<button class="slide-btn right" onclick="slideRightPopularTV()">❯</button>
+<button class="slide-btn left" onclick="slideLeftPopularTV()">❮</button>
+
+</div>
+
 <!-- top rated movies -->
-<h1>Top Rated Series</h1>
+<h2 style="color: white;" class="section-title">Top Rated Series</h2>
+
+<div class="slider-wrapper">
+
+<div class="slider" id="top-tv-slider">
+
 {% for top in topratedtv %}
-<a href="{% url 'watchtv' top.id %}">
-<img style="height: 100px;" src="https://image.tmdb.org/t/p/w500{{ top.poster_path }}">
-<h3>{{top.name}}</h3>
+
+<a href="{% url 'watchtv' top.id %}" class="movie-link">
+
+<div class="movie-card">
+
+<div class="movie-header"
+style="background-image:url('https://image.tmdb.org/t/p/w500{{ top.poster_path }}');">
+
+<div class="header-icon-container">
+<i class="material-icons header-icon">play_arrow</i>
+</div>
+
+</div>
+
+<div class="movie-content">
+
+<h3 class="movie-title">{{ top.name|truncatewords:2 }}</h3>
+
+<div class="movie-info">
+<span>⭐ {{ top.vote_average }}</span>
+<span>{{ top.first_air_date }}</span>
+</div>
+
+</div>
+
+</div>
+
 </a>
+
 {% endfor %}
+
+</div>
+
+<button class="slide-btn right" onclick="slideRightTopTV()">❯</button>
+<button class="slide-btn left" onclick="slideLeftTopTV()">❮</button>
+
+</div>
+
 <script>
+
+function slideLeftPopularTV(){
+document.getElementById("popular-tv-slider")
+.scrollBy({left:-400, behavior:"smooth"});
+}
+
+function slideRightPopularTV(){
+document.getElementById("popular-tv-slider")
+.scrollBy({left:400, behavior:"smooth"});
+}
+
+function slideLeftTopTV(){
+document.getElementById("top-tv-slider")
+.scrollBy({left:-400, behavior:"smooth"});
+}
+
+function slideRightTopTV(){
+document.getElementById("top-tv-slider")
+.scrollBy({left:400, behavior:"smooth"});
+}
 
 let slides = document.querySelectorAll(".hero-slide");
 let index = 0;

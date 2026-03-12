@@ -2,8 +2,11 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.core.cache import cache
 import requests
+import os
+from dotenv import load_dotenv
 
-API_KEY = "4d04b1722277e2f2e0119b4c6cdaa1d6"
+load_dotenv()
+API_KEY = os.getenv("TMDB_KEY")
 BASE_URL = "https://api.themoviedb.org/3"
 
 def load_homepage_data():
@@ -450,4 +453,26 @@ def watchmov(request, movie_id):
 
     return render(request, "uzzutv/watchmov.html", {
         "url": stream_url
+    })
+
+
+
+def search(request):
+
+    query = request.GET.get("q")
+
+    movies = []
+    tv = []
+
+    if query:
+        movie_url = f"https://api.themoviedb.org/3/search/movie?api_key={API_KEY}&query={query}"
+        tv_url = f"https://api.themoviedb.org/3/search/tv?api_key={API_KEY}&query={query}"
+
+        movies = requests.get(movie_url).json().get("results", [])
+        tv = requests.get(tv_url).json().get("results", [])
+
+    return render(request,"uzzutv/search.html",{
+        "query":query,
+        "movies":movies,
+        "tvshows":tv
     })

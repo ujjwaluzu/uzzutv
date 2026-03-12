@@ -3,6 +3,7 @@
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'uzzutv/movie.css' %}">
+
 {% endblock %}
 {% block body %}
 <style>
@@ -10,6 +11,10 @@
     font-family: 'banger', cursive;
     background:#242428;
     color: white;
+}
+h1,h2,h3,h4,h5,h5,p,span{
+    font-family: 'banger', cursive;
+
 }
 </style>
 <!-- hero slider for trending movie -->
@@ -44,7 +49,7 @@ src="https://image.tmdb.org/t/p/original{{ movie.backdrop_path }}">
 </div>
 
 <!-- try -->
-<h2 class="section-title">Popular Movie</h2>
+<h2 style="color: white;" class="section-title">Popular Movie</h2>
 
 <div class="slider-wrapper">
 
@@ -91,7 +96,7 @@ style="background-image:url('https://image.tmdb.org/t/p/w500{{ popular.poster_pa
 
 
 <!-- top rated movies -->
-<h2 class="section-title">Top Rated Movies</h2>
+<h2 style="color: white;" class="section-title">Top Rated Movies</h2>
 
 <div class="slider-wrapper">
 

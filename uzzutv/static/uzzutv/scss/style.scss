@@ -1,0 +1,297 @@
+@import 'bootstrap/bootstrap';
+@import 'bootstrap/variables';
+@import 'bootstrap/mixins';
+
+$font-primary: 'Poppins',Arial, sans-serif;
+$primary: #ff6768	;
+
+@mixin translateX($translatex) {
+	-moz-transform: translateX($translatex);
+	-webkit-transform: translateX($translatex);
+	-ms-transform: translateX($translatex);
+	-o-transform: translateX($translatex);
+	transform: translateX($translatex);
+}
+
+body{
+	font-family: $font-primary;
+	font-size: 16px;
+	line-height: 1.8;
+	font-weight: normal;
+	background: #fafafa;
+	color: lighten($black,50%);
+	&.offcanvas {
+		overflow-x: hidden;
+		#colorlib-aside {
+			@include translateX(0);
+			width: 270px;
+			background: $white;
+			z-index: 999;
+			position: fixed;
+		}
+		#colorlib-main, .colorlib-nav-toggle {
+			top: 0;
+			@include translateX(270px);
+		}
+	}
+}
+a {
+	transition: .3s all ease;
+	color: $primary;
+	&:hover, &:focus {
+		text-decoration: none !important;
+		outline: none !important;
+		box-shadow: none;
+	}
+}
+h1, h2, h3, h4, h5,
+.h1, .h2, .h3, .h4, .h5 {
+	line-height: 1.5;
+	font-weight: 400;
+	font-family: $font-primary;
+	color: $black;
+}
+
+.bg-primary{
+	background: $primary !important;
+}
+
+.ftco-section{
+	padding: 7em 0;
+}
+
+.ftco-no-pt{
+	padding-top: 0;
+}
+.ftco-no-pb{
+	padding-bottom: 0;
+}
+//HEADING SECTION
+.heading-section{
+	font-size: 28px;
+	color: $black;
+}
+
+//COVER BG
+.img{
+	background-size: cover;
+	background-repeat: no-repeat;
+	background-position: center center;
+}
+
+#colorlib-page {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+
+#colorlib-aside {
+	padding-top: 3em;
+	padding-bottom: 40px;
+	padding-left: 3em;
+	padding-right: 3em;
+	width: 20%;
+	position: fixed;
+	bottom: 0;
+	top: 0;
+	left: 0;
+	right: 0;
+	overflow-y: hidden;
+	z-index: 1001;
+	background: $white;
+	@include transition(.5s);
+	@include media-breakpoint-up(lg){
+		width: 20%;
+	}
+	@include media-breakpoint-down(md){
+		width: 270px;
+		@include translateX(-270px);
+		padding-top: 2em;
+		background: rgba(0,0,0,.04);
+	}
+	#colorlib-main-menu {
+		ul {
+			margin: 0;
+			padding: 0;
+			li {
+				margin: 0 0 10px 0;
+				padding: 0;
+				list-style: none;
+				font-size: 22px;
+				font-weight: 500;
+				line-height: 1.5;
+				a {
+					color: rgba(0,0,0,1);
+					text-decoration: none;
+					position: relative;
+					padding: 10px 0;
+					font-family: $font-primary;
+					@include transition(.3s);
+					&:after {
+						content: "";
+						position: absolute;
+						height: 2px;
+						bottom: 7px;
+						left: 0;
+						right: 0;
+						background-color: $primary;
+						visibility: hidden;
+						-webkit-transform: scaleX(0);
+						-moz-transform: scaleX(0);
+						-ms-transform: scaleX(0);
+						-o-transform: scaleX(0);
+						transform: scaleX(0);
+						-webkit-transition: all .3s cubic-bezier(.175, .885, .32, 1.275);
+						-moz-transition: all .3s cubic-bezier(.175, .885, .32, 1.275);
+						-ms-transition: all .3s cubic-bezier(.175, .885, .32, 1.275);
+						-o-transition: all .3s cubic-bezier(.175, .885, .32, 1.275);
+						transition: all .3s cubic-bezier(.175, .885, .32, 1.275);
+					}
+					&:hover {
+						text-decoration: none;
+						color: rgba(0,0,0,1);
+						
+						&:after {
+							visibility: visible;
+							-webkit-transform: scaleX(1);
+							-moz-transform: scaleX(1);
+							-ms-transform: scaleX(1);
+							-o-transform: scaleX(1);
+							transform: scaleX(1);
+						}
+					}
+				}
+				&.colorlib-active {
+					a {
+						color: $primary;
+						&:after {
+							visibility: visible;
+							-webkit-transform: scaleX(1);
+							-moz-transform: scaleX(1);
+							-ms-transform: scaleX(1);
+							-o-transform: scaleX(1);
+							transform: scaleX(1);
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+#colorlib-main {
+	width: 100%;
+	float: right;
+	@include transition(.5s);
+	padding: 40px;
+	@include media-breakpoint-up(lg){
+		width: 80%;
+	}
+}
+
+
+// Burger Menu
+.colorlib-nav-toggle {
+  cursor: pointer;
+  text-decoration: none;
+  &.active i {
+		&::before, &::after {
+			background: $black;
+		}
+  }
+  &.dark {
+  	&.active i {
+			&::before, &::after {
+				background: $black;
+			}
+	  }
+  }
+  &:hover, &:focus, &:active {
+  	outline: none;
+  	border-bottom: none!important;
+  }
+  i {
+  	position: relative;
+	  display: inline-block;
+	  width: 30px;
+	  height: 2px;
+	  color: $black;
+	  font:bold 14px/.4 Helvetica;
+	  text-transform: uppercase;
+	  text-indent:-55px;
+	  background: $black;
+	  transition: all .2s ease-out;
+		 &::before, &::after {
+	  	  content:'';
+		  width: 30px;
+		  height: 2px;
+		  background: $black;
+		  position: absolute;
+		  left:0;
+		  @include transition(.2s);
+	  }
+  }
+  &.dark {
+  	i {
+	  	position: relative;
+		  color: $black;
+		  background: $black;
+		  transition: all .2s ease-out;
+			 &::before, &::after {
+			  background: $black;
+			  @include transition(.2s);
+		  }
+	  }
+  }
+}
+
+.colorlib-nav-toggle i::before {
+  top: -7px;
+}
+.colorlib-nav-toggle i::after {
+  bottom: -7px;
+}
+.colorlib-nav-toggle:hover i::before {
+  top: -10px;
+}
+.colorlib-nav-toggle:hover i::after {
+  bottom: -10px;
+}
+.colorlib-nav-toggle.active i {
+	background: transparent;
+}
+.colorlib-nav-toggle.active i::before {
+  top:0;
+  -webkit-transform: rotateZ(45deg);
+     -moz-transform: rotateZ(45deg);
+      -ms-transform: rotateZ(45deg);
+       -o-transform: rotateZ(45deg);
+          transform: rotateZ(45deg);
+}
+.colorlib-nav-toggle.active i::after {
+  bottom:0;
+  -webkit-transform: rotateZ(-45deg);
+     -moz-transform: rotateZ(-45deg);
+      -ms-transform: rotateZ(-45deg);
+       -o-transform: rotateZ(-45deg);
+          transform: rotateZ(-45deg);
+}
+.colorlib-nav-toggle {
+	position: fixed;
+	left: -12px;
+	top: 0px;
+	z-index: 9999;
+	cursor: pointer;
+	opacity: 1;
+	visibility: hidden;
+	padding: 20px;
+	@include transition(.5s);
+	@include media-breakpoint-down(md){
+		opacity: 1;
+		visibility: visible;
+	}
+  
+}
+
+
