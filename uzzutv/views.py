@@ -113,9 +113,19 @@ def get_movie_logo(movie_id):
     data = response.json()
     logos = data.get("logos", [])
 
-    logo = logos[0]["file_path"] if logos else None
+    logo = None
 
-    cache.set(cache_key, logo, 86400)
+    # Prefer English logos
+    for l in logos:
+        if l.get("iso_639_1") == "en":
+            logo = l["file_path"]
+            break
+
+    # fallback to any logo
+    if not logo and logos:
+        logo = logos[0]["file_path"]
+
+    cache.set(cache_key, logo, 5000)
 
     return logo
 
@@ -143,9 +153,17 @@ def get_tv_logo(tv_id):
     data = response.json()
     logos = data.get("logos", [])
 
-    logo = logos[0]["file_path"] if logos else None
+    logo = None
 
-    cache.set(cache_key, logo, 86400)
+    for l in logos:
+        if l.get("iso_639_1") == "en":
+            logo = l["file_path"]
+            break
+
+    if not logo and logos:
+        logo = logos[0]["file_path"]
+
+    cache.set(cache_key, logo, 5000)
 
     return logo
 

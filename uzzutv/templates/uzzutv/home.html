@@ -19,7 +19,7 @@
 
 <div class="hero-slider">
 
-{% for item in hero|slice:":8" %}
+{% for item in hero|slice:"10:" %}
 
 <div class="hero-slide">
 
@@ -29,10 +29,10 @@ src="https://image.tmdb.org/t/p/original{{ item.backdrop_path }}">
 <div class="hero-content">
 
 {% if item.logo %}
-<img class="hero-logo" src="https://image.tmdb.org/t/p/original{{ item.logo }}">
+<img class="hero-logo" src="https://image.tmdb.org/t/p/w500{{ item.logo }}">
 {% else %}
-<h2>
-{% if item.title %}{{ item.title }}{% else %}{{ item.name }}{% endif %}
+<h2 style="font-family: 'Passero One', sans-serif; font-size: 4rem;">
+{% if item.title %}{{ item.title|truncatewords:3 }}{% else %}{{ item.name|truncatewords:3 }}{% endif %}
 </h2>
 {% endif %}
 
