@@ -1,8 +1,8 @@
-
 .hero-slider{
-position:relative;
-height:70vh;
-overflow:hidden;
+position: relative;
+height: 90vh;
+margin-top: 0;
+padding-top: 0;
 }
 
 .hero-slide{

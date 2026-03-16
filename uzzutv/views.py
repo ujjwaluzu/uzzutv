@@ -306,11 +306,11 @@ def toprated_tv():
 # PAGES
 # ----------------------------
 
-def home(request):
+def movie(request):
 
     data = load_homepage_data()
 
-    return render(request, "uzzutv/home.html", {
+    return render(request, "uzzutv/movie.html", {
         "trendingMovie": data["trending_movies"],
         "popularMovie": data["popular_movies"],
         "toprated": data["top_movies"]
@@ -475,4 +475,94 @@ def search(request):
         "query":query,
         "movies":movies,
         "tvshows":tv
+    })
+
+
+def discover_mix(movie_genre, tv_genre, cache_key):
+
+    data = cache.get(cache_key)
+
+    if data:
+        return data
+
+    params = {"api_key": API_KEY}
+
+    movie = requests.get(
+        f"{BASE_URL}/discover/movie",
+        params={**params, "with_genres": movie_genre},
+        timeout=10
+    ).json().get("results", [])
+
+    tv = requests.get(
+        f"{BASE_URL}/discover/tv",
+        params={**params, "with_genres": tv_genre},
+        timeout=10
+    ).json().get("results", [])
+
+    for m in movie:
+        m["media_type"] = "movie"
+
+    for t in tv:
+        t["media_type"] = "tv"
+
+    mixed = movie + tv
+
+    cache.set(cache_key, mixed, 3600)
+
+    return mixed
+
+def load_homepage_data2():
+
+    cache_key = "homepage_data_mix"
+    data = cache.get(cache_key)
+
+    if data:
+        return data
+
+    params = {"api_key": API_KEY}
+
+    # MIXED trending (movie + tv)
+    trending = requests.get(
+        f"{BASE_URL}/trending/all/day",
+        params=params,
+        timeout=10
+    ).json().get("results", [])
+
+    # add logos for hero
+    for item in trending[:5]:
+
+        if item["media_type"] == "movie":
+            item["logo"] = get_movie_logo(item["id"])
+
+        elif item["media_type"] == "tv":
+            item["logo"] = get_tv_logo(item["id"])
+
+    # GENRE ROWS
+    action = discover_mix(28, 10759, "genre_action")
+    romance = discover_mix(10749, 10749, "genre_romance")
+    comedy = discover_mix(35, 35, "genre_comedy")
+
+    data = {
+        "hero": trending,
+        "top10": trending[:10],
+        "action": action,
+        "romance": romance,
+        "comedy": comedy
+    }
+
+    cache.set(cache_key, data, 21600)
+
+    return data
+
+
+def home(request):
+
+    data = load_homepage_data2()
+
+    return render(request, "uzzutv/home.html", {
+        "hero": data["hero"],
+        "top10": data["top10"],
+        "action": data["action"],
+        "romance": data["romance"],
+        "comedy": data["comedy"]
     })

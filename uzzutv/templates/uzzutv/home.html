@@ -2,43 +2,52 @@
 {% load static %}
 
 {% block css %}
-<link rel="stylesheet" href="{% static 'uzzutv/movie.css' %}">
+<link rel="stylesheet" href="{% static 'uzzutv/home.css' %}">
 
 {% endblock %}
-{% block body %}
 <style>
-    body{
-    font-family: 'banger', cursive;
-    background:#242428;
-    color: white;
+.hero_slider{
+    height: 90vh !important;
 }
-h1,h2,h3,h4,h5,h5,p,span{
-    font-family: 'banger', cursive;
 
-}
 </style>
-<!-- hero slider for trending movie -->
-
+{% block body %}
 <div class="hero-slider">
 
-{% for movie in trendingMovie|slice:":8" %}
+{% for item in hero|slice:":8" %}
 
 <div class="hero-slide">
 
 <img class="hero-bg"
-src="https://image.tmdb.org/t/p/original{{ movie.backdrop_path }}">
+src="https://image.tmdb.org/t/p/original{{ item.backdrop_path }}">
 
 <div class="hero-content">
-{% if movie.logo %}
-<img class="hero-logo" src="https://image.tmdb.org/t/p/original{{ movie.logo }}">
+
+{% if item.logo %}
+<img class="hero-logo" src="https://image.tmdb.org/t/p/original{{ item.logo }}">
 {% else %}
-<h4>{{movie.title}}</h4>
+<h2>
+{% if item.title %}{{ item.title }}{% else %}{{ item.name }}{% endif %}
+</h2>
 {% endif %}
-<p>{{ movie.overview|truncatewords:25 }}</p>
 
-<a class="watch-btn" href="{% url 'watchmov' movie.id %}">
- Watch Now
-</a>
+<div class="hero-meta">
+⭐ {{ item.vote_average }} · {{ item.release_date }}
+</div>
+
+<p>{{ item.overview|truncatewords:25 }}</p>
+
+<div class="hero-buttons">
+
+{% if item.media_type == "movie" %}
+<a class="watch-btn" href="{% url 'watchmov' item.id %}">▶ Watch Now</a>
+{% else %}
+<a class="watch-btn" href="{% url 'watchtv' item.id %}">▶ Watch Now</a>
+{% endif %}
+
+<a class="info-btn" href="#">More Info</a>
+
+</div>
 
 </div>
 
@@ -48,127 +57,60 @@ src="https://image.tmdb.org/t/p/original{{ movie.backdrop_path }}">
 
 </div>
 
-<!-- try -->
-<h2 style="color: white;" class="section-title">Popular Movie</h2>
+<div class="slider-header">
 
-<div class="slider-wrapper">
+<h2 class="section-title">Latest & Trending</h2>
 
-<div class="slider" id="popular-slider">
-
-{% for popular in popularMovie %}
-
-<a href="{% url 'watchmov' popular.id %}" class="movie-link">
-
-<div class="movie-card">
-
-<div class="movie-header"
-style="background-image:url('https://image.tmdb.org/t/p/w500{{ popular.poster_path }}');">
-
-<div class="header-icon-container">
-<i class="material-icons header-icon">play_arrow</i>
+<div class="slider-controls">
+<button onclick="slideLeftTop()"><span class="material-icons">chevron_left</span></button>
+<button onclick="slideRightTop()"><span class="material-icons">chevron_right</span></button>
 </div>
 
 </div>
 
-<div class="movie-content">
+<div class="top10-row" id="top10-slider">
 
-<h3 class="movie-title">{{ popular.title|truncatewords:2 }}</h3>
+{% for item in top10 %}
 
-<div class="movie-info">
-<span>⭐ {{ popular.vote_average }}</span>
-<span>{{ popular.release_date }}</span>
-</div>
+<div class="top10-card">
 
-</div>
+<span class="rank">{{ forloop.counter }}</span>
 
-</div>
+{% if item.media_type == "movie" %}
+<a href="{% url 'watchmov' item.id %}">
+{% else %}
+<a href="{% url 'watchtv' item.id %}">
+{% endif %}
+
+<img src="https://image.tmdb.org/t/p/w500{{ item.poster_path }}">
 
 </a>
+
+</div>
 
 {% endfor %}
 
 </div>
 
-<button class="slide-btn right" onclick="slideRight()">❯</button>
-<button class="slide-btn left" onclick="slideLeft()">❮</button>
 
-</div>
-
-
-<!-- top rated movies -->
-<h2 style="color: white;" class="section-title">Top Rated Movies</h2>
-
-<div class="slider-wrapper">
-
-<div class="slider" id="top-slider">
-
-{% for top in toprated %}
-
-<a href="{% url 'watchmov' top.id %}" class="movie-link">
-
-<div class="movie-card">
-
-<div class="movie-header"
-style="background-image:url('https://image.tmdb.org/t/p/w500{{ top.poster_path }}');">
-
-<div class="header-icon-container">
-<i class="material-icons header-icon">play_arrow</i>
-</div>
-
-</div>
-
-<div class="movie-content">
-
-<h3 class="movie-title">{{ top.title|truncatewords:2 }}</h3>
-
-<div class="movie-info">
-<span>⭐ {{ top.vote_average }}</span>
-<span>{{ top.release_date }}</span>
-</div>
-
-</div>
-
-</div>
-
-</a>
-
-{% endfor %}
-
-</div>
-
-<button class="slide-btn right" onclick="slideRightTop()">❯</button>
-<button class="slide-btn left" onclick="slideLeftTop()">❮</button>
-
-</div>
 <script>
-function slideLeft(){
-document.getElementById("popular-slider")
-.scrollBy({left:-400, behavior:"smooth"});
-}
-
-function slideRight(){
-document.getElementById("popular-slider")
-.scrollBy({left:400, behavior:"smooth"});
-}
-
 
 function slideLeftTop(){
-document.getElementById("top-slider")
-.scrollBy({left:-400, behavior:"smooth"});
+document.getElementById("top10-slider")
+.scrollBy({left:-600, behavior:"smooth"});
 }
 
 function slideRightTop(){
-document.getElementById("top-slider")
-.scrollBy({left:400, behavior:"smooth"});
+document.getElementById("top10-slider")
+.scrollBy({left:600, behavior:"smooth"});
 }
-
-
 let slides = document.querySelectorAll(".hero-slide");
 let index = 0;
 
 slides[0].classList.add("active");
 
 function showSlide(){
+
 slides.forEach(slide => slide.classList.remove("active"));
 
 slides[index].classList.add("active");
@@ -178,11 +120,9 @@ index++;
 if(index >= slides.length){
 index = 0;
 }
+
 }
 
 setInterval(showSlide, 5000);
-
-
-
 </script>
-{% endblock %}
+{% endblock%}
