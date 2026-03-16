@@ -2,7 +2,9 @@ body{
     font-family: "Inter", sans-serif !important;
     overflow-x:hidden;
 }
-
+.hero-title{
+    font-size: 4rem;
+}
 .container-fluid{
 max-width:100%;
 overflow-x:hidden;
@@ -281,7 +283,12 @@ max-width:100%;
 .hero-wrapper{
 height:65vh;
 }
-
+.hero-title{
+    font-size: 2rem;
+}
+.p-mobile{
+    display: none;
+}
 .hero-slider{
 height:65vh;
 }

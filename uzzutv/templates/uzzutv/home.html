@@ -31,7 +31,7 @@ src="https://image.tmdb.org/t/p/original{{ item.backdrop_path }}">
 {% if item.logo %}
 <img class="hero-logo" src="https://image.tmdb.org/t/p/w500{{ item.logo }}">
 {% else %}
-<h2 style="font-family: 'Passero One', sans-serif; font-size: 4rem;">
+<h2 class="hero-title" style="font-family: 'Passero One', sans-serif;">
 {% if item.title %}{{ item.title|truncatewords:3 }}{% else %}{{ item.name|truncatewords:3 }}{% endif %}
 </h2>
 {% endif %}
@@ -40,7 +40,7 @@ src="https://image.tmdb.org/t/p/original{{ item.backdrop_path }}">
 ⭐ {{ item.vote_average }} · {{ item.media_type.capitalize }} 
 </div>
 
-<p>{{ item.overview|truncatewords:25 }}</p>
+<p class="p-mobile">{{ item.overview|truncatewords:25 }}</p>
 
 <div class="hero-buttons">
 

@@ -75,20 +75,11 @@ z-index:-1;
         <li class="nav-item">
           <a class="nav-link" href="{% url 'tv'%}">Series</a>
         </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Category
-          </a>
-          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <li><a class="dropdown-item" href="#">Action</a></li>
-            <li><a class="dropdown-item" href="#">Romance</a></li>
-            <li><a class="dropdown-item" href="#">Comedy</a></li>
-          </ul>
-        </li>
+
       </ul>
-      <form class="d-flex">
-        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-        <button class="btn btn-outline-success" type="submit">Search</button>
+      <form method="get" action="/search" class="d-flex">
+        <input style="color: white;" class="form-control me-2 bg-transparent" type="search" placeholder="Search" aria-label="Search" name="q">
+        <button class="btn btn-outline-light" type="submit">Search</button>
       </form>
     </div>
   </div>
