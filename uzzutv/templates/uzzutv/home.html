@@ -6,12 +6,17 @@
 
 {% endblock %}
 <style>
-.hero_slider{
-    height: 90vh !important;
-}
+
 
 </style>
 {% block body %}
+
+
+
+
+
+<div class="hero-wrapper">
+
 <div class="hero-slider">
 
 {% for item in hero|slice:":8" %}
@@ -32,7 +37,7 @@ src="https://image.tmdb.org/t/p/original{{ item.backdrop_path }}">
 {% endif %}
 
 <div class="hero-meta">
-⭐ {{ item.vote_average }} · {{ item.release_date }}
+⭐ {{ item.vote_average }} · {{ item.media_type.capitalize }} 
 </div>
 
 <p>{{ item.overview|truncatewords:25 }}</p>
@@ -57,13 +62,24 @@ src="https://image.tmdb.org/t/p/original{{ item.backdrop_path }}">
 
 </div>
 
+
+
+
+
+
+
+
+
+<!-- trending -->
+ <div class="trending-section">
+
 <div class="slider-header">
 
 <h2 class="section-title">Latest & Trending</h2>
 
 <div class="slider-controls">
-<button onclick="slideLeftTop()"><span class="material-icons">chevron_left</span></button>
-<button onclick="slideRightTop()"><span class="material-icons">chevron_right</span></button>
+<button onclick="slideLeft('top10-slider')"><span class="material-icons">chevron_left</span></button>
+<button onclick="slideRight('top10-slider')"><span class="material-icons">chevron_right</span></button>
 </div>
 
 </div>
@@ -89,6 +105,144 @@ src="https://image.tmdb.org/t/p/original{{ item.backdrop_path }}">
 </div>
 
 {% endfor %}
+</div>
+</div>
+</div>
+
+
+<h4 style="color: #111111 ;">by Rashan Gang</h4>
+
+<!-- action -->
+
+
+<div style="margin-top: 220px;" class="content-section">
+
+<div class="slider-header">
+
+<h2 class="section-title">Action</h2>
+
+<div class="slider-controls">
+<button onclick="slideLeft('action-slider')">
+<span class="material-icons">chevron_left</span>
+</button>
+
+<button onclick="slideRight('action-slider')">
+<span class="material-icons">chevron_right</span>
+</button>
+</div>
+
+</div>
+
+<div class="movie-row" id="action-slider">
+
+{% for item in action %}
+
+<div class="movie-card">
+
+{% if item.media_type == "movie" %}
+<a href="{% url 'watchmov' item.id %}">
+{% else %}
+<a href="{% url 'watchtv' item.id %}">
+{% endif %}
+
+<img src="https://image.tmdb.org/t/p/w500{{ item.poster_path }}">
+
+</a>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+</div>
+
+
+
+<!-- romance -->
+
+<div class="content-section">
+
+<div class="slider-header">
+
+<h2 class="section-title">Romance</h2>
+
+<div class="slider-controls">
+<button onclick="slideLeft('romance-slider')">
+<span class="material-icons">chevron_left</span>
+</button>
+
+<button onclick="slideRight('romance-slider')">
+<span class="material-icons">chevron_right</span>
+</button>
+</div>
+
+</div>
+
+<div class="movie-row" id="romance-slider">
+
+{% for item in romance %}
+
+<div class="movie-card">
+
+{% if item.media_type == "movie" %}
+<a href="{% url 'watchmov' item.id %}">
+{% else %}
+<a href="{% url 'watchtv' item.id %}">
+{% endif %}
+
+<img src="https://image.tmdb.org/t/p/w500{{ item.poster_path }}">
+
+</a>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+</div>
+
+<!-- comedy -->
+<div class="content-section">
+
+<div class="slider-header">
+
+<h2 class="section-title">Comedy</h2>
+
+<div class="slider-controls">
+<button onclick="slideLeft('comedy-slider')">
+<span class="material-icons">chevron_left</span>
+</button>
+
+<button onclick="slideRight('comedy-slider')">
+<span class="material-icons">chevron_right</span>
+</button>
+</div>
+
+</div>
+
+<div class="movie-row" id="comedy-slider">
+
+{% for item in comedy %}
+
+<div class="movie-card">
+
+{% if item.media_type == "movie" %}
+<a href="{% url 'watchmov' item.id %}">
+{% else %}
+<a href="{% url 'watchtv' item.id %}">
+{% endif %}
+
+<img src="https://image.tmdb.org/t/p/w500{{ item.poster_path }}">
+
+</a>
+
+</div>
+
+{% endfor %}
+
+</div>
 
 </div>
 
@@ -124,5 +278,19 @@ index = 0;
 }
 
 setInterval(showSlide, 5000);
+
+function slideLeft(id){
+const slider = document.getElementById(id);
+if(slider){
+slider.scrollBy({left:-600, behavior:"smooth"});
+}
+}
+
+function slideRight(id){
+const slider = document.getElementById(id);
+if(slider){
+slider.scrollBy({left:600, behavior:"smooth"});
+}
+}
 </script>
 {% endblock%}
