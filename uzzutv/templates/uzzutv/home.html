@@ -6,11 +6,43 @@
 
 {% endblock %}
 <style>
+#loader{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:#0f172a; /* same as your site */
+display:flex;
+align-items:center;
+justify-content:center;
+z-index:9999;
+}
+#loader.fade-out{
+opacity:0;
+transition:0.4s ease;
+pointer-events:none;
+}
+/* Spinner */
 
+.spinner{
+width:50px;
+height:50px;
+border:5px solid rgba(255,255,255,0.2);
+border-top:5px solid white;
+border-radius:50%;
+animation:spin 1s linear infinite;
+}
+
+@keyframes spin{
+to{ transform:rotate(360deg); }
+}
 
 </style>
 {% block body %}
-
+<div id="loader">
+  <div class="spinner"></div>
+</div>
 
 
 
@@ -50,8 +82,12 @@ src="https://image.tmdb.org/t/p/original{{ item.backdrop_path }}">
 <a class="watch-btn" href="{% url 'watchtv' item.id %}">▶ Watch Now</a>
 {% endif %}
 
-<a class="info-btn" href="#">More Info</a>
 
+{% if item.media_type == "movie" %}
+<a class="info-btn" href="{% url 'detail' 'movie' item.id %}">More Info</a>
+{% else %}
+<a class="info-btn" href="{% url 'detail' 'tv' item.id %}">More Info</a>
+{% endif %}
 </div>
 
 </div>
@@ -93,9 +129,9 @@ src="https://image.tmdb.org/t/p/original{{ item.backdrop_path }}">
 <span class="rank">{{ forloop.counter }}</span>
 
 {% if item.media_type == "movie" %}
-<a href="{% url 'watchmov' item.id %}">
+<a href="{% url 'detail' 'movie' item.id %}">
 {% else %}
-<a href="{% url 'watchtv' item.id %}">
+<a href="{% url 'detail' 'tv' item.id %}">
 {% endif %}
 
 <img src="https://image.tmdb.org/t/p/w500{{ item.poster_path }}">
@@ -140,9 +176,9 @@ src="https://image.tmdb.org/t/p/original{{ item.backdrop_path }}">
 <div class="movie-card">
 
 {% if item.media_type == "movie" %}
-<a href="{% url 'watchmov' item.id %}">
+<a href="{% url 'detail' 'movie' item.id %}">
 {% else %}
-<a href="{% url 'watchtv' item.id %}">
+<a href="{% url 'detail' 'tv' item.id %}">
 {% endif %}
 
 <img src="https://image.tmdb.org/t/p/w500{{ item.poster_path }}">
@@ -186,9 +222,9 @@ src="https://image.tmdb.org/t/p/original{{ item.backdrop_path }}">
 <div class="movie-card">
 
 {% if item.media_type == "movie" %}
-<a href="{% url 'watchmov' item.id %}">
+<a href="{% url 'detail' 'movie' item.id %}">
 {% else %}
-<a href="{% url 'watchtv' item.id %}">
+<a href="{% url 'detail' 'tv' item.id %}">
 {% endif %}
 
 <img src="https://image.tmdb.org/t/p/w500{{ item.poster_path }}">
@@ -229,9 +265,9 @@ src="https://image.tmdb.org/t/p/original{{ item.backdrop_path }}">
 <div class="movie-card">
 
 {% if item.media_type == "movie" %}
-<a href="{% url 'watchmov' item.id %}">
+<a href="{% url 'detail' 'movie' item.id %}">
 {% else %}
-<a href="{% url 'watchtv' item.id %}">
+<a href="{% url 'detail' 'tv' item.id %}">
 {% endif %}
 
 <img src="https://image.tmdb.org/t/p/w500{{ item.poster_path }}">
@@ -246,6 +282,70 @@ src="https://image.tmdb.org/t/p/original{{ item.backdrop_path }}">
 
 </div>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="content-section">
+
+<div class="slider-header">
+
+<h2 class="section-title">Animation</h2>
+
+<div class="slider-controls">
+<button onclick="slideLeft('anime-slider')">
+<span class="material-icons">chevron_left</span>
+</button>
+
+<button onclick="slideRight('anime-slider')">
+<span class="material-icons">chevron_right</span>
+</button>
+</div>
+
+</div>
+
+<div class="movie-row" id="anime-slider">
+
+{% for item in anime %}
+
+<div class="movie-card">
+
+{% if item.media_type == "movie" %}
+<a href="{% url 'detail' 'movie' item.id %}">
+{% else %}
+<a href="{% url 'detail' 'tv' item.id %}">
+{% endif %}
+
+<img src="https://image.tmdb.org/t/p/w500{{ item.poster_path }}">
+
+</a>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+</div>
 
 <script>
 
@@ -292,5 +392,19 @@ if(slider){
 slider.scrollBy({left:600, behavior:"smooth"});
 }
 }
+
+
+
+
+window.addEventListener("load", function(){
+const loader = document.getElementById("loader");
+loader.classList.add("fade-out");
+
+setTimeout(() => {
+loader.style.display = "none";
+}, 400);
+});
+
+
 </script>
 {% endblock%}

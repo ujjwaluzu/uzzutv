@@ -1,81 +1,221 @@
 {% extends 'uzzutv/layout.html' %}
-
 {% load static %}
 
-{% block css %}
-<link rel="stylesheet" href="{% static 'uzzutv/watchtv.css' %}">
-{% endblock %}
+{% block body %}
 
-
-{%block body%}
 <style>
-        body{
-    font-family: 'banger', cursive;
+body{
     background:#242428;
-    color: white;
+    color:white;
+    overflow-x:hidden;
 }
+
+/* Player */
+
+.player{
+    position:relative;
+    width:100%;
+    aspect-ratio:16/9;
+    background:#000;
+    border-radius:12px;
+    overflow:hidden;
+    box-shadow:0 10px 40px rgba(0,0,0,0.6);
+}
+
+.player iframe{
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    border:none;
+}
+
+/* Sidebar */
+
+.sidebar{
+    background:#111;
+    padding:15px;
+    border-radius:10px;
+    max-height:80vh;
+    overflow-y:auto;
+}
+
+.episode{
+    padding:10px;
+    border-bottom:1px solid #333;
+}
+
+.episode a{
+    text-decoration:none;
+    color:white;
+    display:block;
+}
+
+.episode:hover{
+    background:#1f1f1f;
+}
+
+.active{
+    background:#2b2b2b;
+}
+
+/* Server */
+
+.server-section{
+    margin-top:15px;
+}
+
+.server-title{
+    font-size:16px;
+    margin-bottom:10px;
+}
+
+.server-list{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+.server-btn{
+    padding:8px 14px;
+    border-radius:8px;
+    border:none;
+    background:#1f2937;
+    color:white;
+    cursor:pointer;
+    font-size:13px;
+}
+
+.server-btn.active{
+    background:white;
+    color:black;
+    font-weight:600;
+}
+
+/* MOBILE ORDER */
+
+@media (max-width:768px){
+
+/* Order control */
+.server-col{ order:1; }
+.player-col{ order:2; }
+.sidebar-col{ order:3; }
+
+/* Sidebar smaller */
+.sidebar{
+    max-height:300px;
+}
+
+.server-list{
+    justify-content:center;
+}
+.mobile{
+    font-size: 1rem;
+}
+}
+
 </style>
-<div class="container">
+<h1 class="mobile" style="color: #111111;">{{imdb}}: Season:{{current_season}}Episode{{current_episode}}</h1>
+<div class="container mt-5">
 
-<div class="player">
+<div class="row g-3">
 
-<iframe id="player" src="{{url}}"
-style="width:100%; height:80vh; border-radius:10px;"
-frameborder="0"
-allowfullscreen>
-</iframe>
+    <!-- SERVER (TOP on mobile, below player on desktop) -->
+    <div class="col-12 d-md-none server-col">
 
+        <div class="server-section">
+            <h3 class="server-title">Servers</h3>
+
+            <div class="server-list">
+                <button class="server-btn active" onclick="changeServer('{{url}}', this)">Vidfast</button>
+                <button class="server-btn" onclick="changeServer('{{url2}}', this)">Vidnest</button>
+                <button class="server-btn" onclick="changeServer('{{url3}}', this)">Vidsrc</button>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- SIDEBAR (LEFT on desktop) -->
+    <div class="col-md-3 sidebar-col">
+
+        <div class="sidebar">
+
+            <form method="GET">
+
+                <select name="season" onchange="this.form.submit()" class="form-select mb-3">
+
+                    {% for season in seasons %}
+                    {% if season.season_number != 0 %}
+
+                    <option value="{{ season.season_number }}"
+                    {% if season.season_number == current_season %}selected{% endif %}>
+
+                    Season {{ season.season_number }}
+
+                    </option>
+
+                    {% endif %}
+                    {% endfor %}
+
+                </select>
+
+            </form>
+
+            {% for ep in episodes %}
+
+            <div class="episode {% if ep.episode_number == current_episode %}active{% endif %}">
+                <a href="?season={{current_season}}&episode={{ep.episode_number}}">
+                    <b>{{ ep.episode_number }}.</b> {{ ep.name }}
+                </a>
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+
+    <!-- PLAYER + SERVER -->
+    <div class="col-md-9 player-col">
+
+        <!-- PLAYER -->
+        <div class="player mb-3">
+            <iframe id="player" src="{{url}}" allowfullscreen></iframe>
+        </div>
+
+        <!-- SERVER (DESKTOP BELOW PLAYER) -->
+        <div class="server-section d-none d-md-block">
+
+            <h3 class="server-title">Servers</h3>
+
+            <div class="server-list">
+                <button class="server-btn active" onclick="changeServer('{{url}}', this)">Vidfast</button>
+                <button class="server-btn" onclick="changeServer('{{url2}}', this)">Vidnest</button>
+                <button class="server-btn" onclick="changeServer('{{url3}}', this)">Vidsrc</button>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
 </div>
 
 
-<div class="sidebar">
+<script>
+function changeServer(url, btn){
 
-<form method="GET">
+    document.getElementById("player").src = url;
 
-<select name="season" onchange="this.form.submit()" style="width:100%; padding:8px; margin-bottom:15px;">
+    document.querySelectorAll(".server-btn").forEach(b => {
+        b.classList.remove("active");
+    });
 
-{% for season in seasons %}
-
-{% if season.season_number != 0 %}
-
-<option value="{{ season.season_number }}"
-{% if season.season_number == current_season %}selected{% endif %}>
-
-Season {{ season.season_number }}
-
-</option>
-
-{% endif %}
-
-{% endfor %}
-
-</select>
-
-</form>
-
-
-{% for ep in episodes %}
-
-<div class="episode {% if ep.episode_number == current_episode %}active{% endif %}">
-
-<a href="?season={{current_season}}&episode={{ep.episode_number}}">
-
-<b>{{ ep.episode_number }}.</b> {{ ep.name }}
-
-</a>
-
-</div>
-
-{% endfor %}
-
-</div>
-
-</div>
-
-
-
-
-
-
+    btn.classList.add("active");
+}
+</script>
 
 {% endblock %}

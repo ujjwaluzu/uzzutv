@@ -419,12 +419,15 @@ def watchtv(request, tv_id):
     # -----------------------------
     # PLAYER URL
     # -----------------------------
-
-    stream_url = f"https://vidsrcme.ru/embed/tv?imdb={imdb}&season={season}&episode={episode}&ds_lang=en&autoplay=1"
+    url = f"https://vidfast.pro/tv/{imdb}/{season}/{episode}?autoPlay=true?sub=en"
+    url2 = f"https://vidnest.fun/tv/{tv_id}/{season}/{episode}"
+    url3 = f"https://vidsrcme.ru/embed/tv?imdb={imdb}&season={season}&episode={episode}&ds_lang=en&autoplay=1"
 
     return render(request, "uzzutv/watchtv.html", {
         "id": tv_id,
-        "url": stream_url,
+        "url":url,
+        "url2":url2,
+        "url3": url3,
         "imdb": imdb,
         "seasons": seasons,
         "episodes": episodes,
@@ -466,11 +469,14 @@ def watchmov(request, movie_id):
     # -----------------------------
     # PLAYER URL
     # -----------------------------
-
-    stream_url = f"https://vidsrcme.ru/embed/movie?imdb={imdb}&ds_lang=en&autoplay=1"
-
+    url2 = f"https://vidnest.fun/movie/{movie_id}"
+    url3 = f"https://vidsrcme.ru/embed/movie?imdb={imdb}&ds_lang=en&autoplay=1"
+    url = f"https://vidfast.pro/movie/{imdb}?autoPlay=true?sub=en"
     return render(request, "uzzutv/watchmov.html", {
-        "url": stream_url
+        "url": url,
+        "url2": url2,
+        "url3": url3,
+        "id":imdb
     })
 
 
@@ -559,13 +565,15 @@ def load_homepage_data2():
     action = discover_mix(28, 10759, "genre_action")
     romance = discover_mix(10749, 10749, "genre_romance")
     comedy = discover_mix(35, 35, "genre_comedy")
+    anime = discover_mix(16, 16, "anime")
 
     data = {
         "hero": trending,
         "top10": trending[:10],
         "action": action,
         "romance": romance,
-        "comedy": comedy
+        "comedy": comedy,
+        "anime": anime
     }
 
     cache.set(cache_key, data, 21600)
@@ -582,5 +590,25 @@ def home(request):
         "top10": data["top10"],
         "action": data["action"],
         "romance": data["romance"],
-        "comedy": data["comedy"]
+        "comedy": data["comedy"],
+        "anime": data["anime"]
     })
+
+
+
+
+
+def detail(request, type, id):
+
+    url = f"https://api.themoviedb.org/3/{type}/{id}?api_key={API_KEY}&append_to_response=credits,recommendations"
+
+    data = requests.get(url).json()
+
+    context = {
+        "data": data,
+        "type": type,
+        "cast": data["credits"]["cast"][:12],
+        "recommendations": data["recommendations"]["results"][:14]
+    }
+
+    return render(request, "uzzutv/detail.html", context)

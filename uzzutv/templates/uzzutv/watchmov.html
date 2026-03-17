@@ -1,72 +1,193 @@
 {% extends 'uzzutv/layout.html' %}
-
 {% load static %}
 
-{% block css %}
-<link rel="stylesheet" href="{% static 'uzzutv/watchtv.css' %}">
-{% endblock %}
+{% block body %}
 
-
-{%block body%}
 <style>
-    body{
-    font-family: 'banger', cursive;
-    background:#242428;
-    color: white;
+
+body{
+    background:#111111 !important;
+    margin:0;
+    font-family: "Inter", sans-serif;
+    color:white;
+}
+
+/* Container */
+
+.container{
+    max-width:1000px;
+    margin:auto;
+    padding:20px;
+}
+
+/* Title */
+
+.video-title{
+    font-size:24px;
+    margin-bottom:15px;
+    font-weight:600;
+}
+
+/* Player wrapper */
+
+.player{
+    position:relative;
+    width:100%;
+    aspect-ratio:16/9;
+    border-radius:12px;
+    overflow:hidden;
+    background:#000;
+    box-shadow:0 10px 40px rgba(0,0,0,0.6);
+}
+
+/* iframe */
+
+.player iframe{
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    border:none;
+}
+
+/* Tablet */
+
+@media (max-width: 900px){
+
+.video-title{
+    font-size:20px;
+}
+
+}
+
+/* Mobile */
+
+@media (max-width: 600px){
+
+.container{
+    padding:10px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;   /* ✅ centers player */
+    margin-top: 200px;
+}
+
+.video-title{
+    font-size:18px;
+    text-align:center;   /* ✅ center title */
+}
+
+/* Make player slightly smaller + centered */
+
+.player{
+    width:100%;
+    max-width:100%;
+}
+
+}
+.video-title{
+margin-bottom:20px;
+}
+
+
+/* Server Section */
+
+.server-section{
+margin-top:25px;
+}
+
+.server-title{
+font-size:18px;
+margin-bottom:10px;
+}
+
+/* Buttons */
+
+.server-list{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+}
+
+.server-btn{
+padding:10px 18px;
+border-radius:8px;
+border:none;
+background:#1f2937;
+color:white;
+cursor:pointer;
+font-size:14px;
+transition:0.2s;
+}
+
+/* Hover */
+
+.server-btn:hover{
+background:#374151;
+}
+
+/* Active server */
+
+.server-btn.active{
+background:white;
+color:black;
+font-weight:600;
+}
+
+/* Mobile */
+
+@media (max-width:600px){
+
+.server-list{
+justify-content:center;
+}
+
+.server-btn{
+padding:8px 14px;
+font-size:13px;
+}
+
 }
 </style>
+
 <div class="container">
+
+<h1 class="video-title">{{id}}</h1>
 
 <div class="player">
 
 <iframe id="player" src="{{url}}"
-style="width:100%; height:80vh; border-radius:10px;"
 frameborder="0"
-allowfullscreen>
+allowfullscreen
+allow="encrypted-media">
 </iframe>
 
 </div>
 
-
-<!-- <div class="sidebar">
-
-<form method="GET">
-
-<select name="season" onchange="this.form.submit()" style="width:100%; padding:8px; margin-bottom:15px;">
-
-{% for season in seasons %}
-
-{% if season.season_number != 0 %}
-
-<option value="{{ season.season_number }}"
-{% if season.season_number == current_season %}selected{% endif %}>
-
-Season {{ season.season_number }}
-
-</option>
-
-{% endif %}
-
-{% endfor %}
-
-</select>
-
-</form> -->
-
-
-{% for ep in episodes %}
-
-<div class="episode {% if ep.episode_number == current_episode %}active{% endif %}">
-
-<a href="?season={{current_season}}&episode={{ep.episode_number}}">
-
-<b>{{ ep.episode_number }}.</b> {{ ep.name }}
-
-</a>
-
 </div>
 
-{% endfor %}
+
+<div class="server-section">
+
+<h3 class="server-title">Servers</h3>
+
+<div class="server-list">
+
+<button class="server-btn active"
+onclick="changeServer('{{url}}', this)">
+Vidfast
+</button>
+
+<button class="server-btn"
+onclick="changeServer('{{url2}}', this)">
+Vidnest
+</button>
+
+<button class="server-btn"
+onclick="changeServer('{{url3}}', this)">
+Vidsrc
+</button>
 
 </div>
 
@@ -74,8 +195,24 @@ Season {{ season.season_number }}
 
 
 
+<script>
 
 
+function changeServer(url, btn){
 
+// change iframe source
+document.getElementById("player").src = url;
+
+// remove active from all
+document.querySelectorAll(".server-btn").forEach(b => {
+    b.classList.remove("active");
+});
+
+// add active to clicked
+btn.classList.add("active");
+
+}
+
+</script>
 
 {% endblock %}

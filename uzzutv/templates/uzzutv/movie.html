@@ -2,29 +2,24 @@
 {% load static %}
 
 {% block css %}
-<link rel="stylesheet" href="{% static 'uzzutv/movie.css' %}">
+<link rel="stylesheet" href="{% static 'uzzutv/home.css' %}">
 
 {% endblock %}
-{% block body %}
 <style>
-    body{
-    font-family: 'banger', cursive;
-    background:#242428;
-    color: white;
-}
-h1,h2,h3,h4,h5,h5,p,span{
-    font-family: 'banger', cursive;
 
-}
-.hero-slider{
-    height: 90vh !important;
-}
+
 </style>
-<!-- hero slider for trending movie -->
+{% block body %}
+
+
+
+
+
+<div class="hero-wrapper">
 
 <div class="hero-slider">
 
-{% for movie in trendingMovie|slice:":8" %}
+{% for movie in trendingMovie|slice:":5" %}
 
 <div class="hero-slide">
 
@@ -32,16 +27,28 @@ h1,h2,h3,h4,h5,h5,p,span{
 src="https://image.tmdb.org/t/p/original{{ movie.backdrop_path }}">
 
 <div class="hero-content">
-{% if movie.logo %}
-<img class="hero-logo" src="https://image.tmdb.org/t/p/original{{ movie.logo }}">
-{% else %}
-<h4>{{movie.title}}</h4>
-{% endif %}
-<p>{{ movie.overview|truncatewords:25 }}</p>
 
-<a class="watch-btn" href="{% url 'watchmov' movie.id %}">
- Watch Now
-</a>
+
+<h2 class="hero-title" style="font-family: 'Passero One', sans-serif;">
+{{ movie.title|truncatewords:3 }}
+</h2>
+
+
+<div class="hero-meta">
+⭐ {{ movie.vote_average }} · {{ movie.media_type.capitalize }} 
+</div>
+
+<p class="p-mobile">{{ movie.overview|truncatewords:25 }}</p>
+
+<div class="hero-buttons">
+
+
+<a class="watch-btn" href="{% url 'watchmov' movie.id %}">▶ Watch Now</a>
+
+
+<a class="info-btn" href="{% url 'detail' 'movie' movie.id %}">More Info</a>
+
+</div>
 
 </div>
 
@@ -51,127 +58,122 @@ src="https://image.tmdb.org/t/p/original{{ movie.backdrop_path }}">
 
 </div>
 
-<!-- try -->
-<h2 style="color: white;" class="section-title">Popular Movie</h2>
 
-<div class="slider-wrapper">
 
-<div class="slider" id="popular-slider">
 
-{% for popular in popularMovie %}
 
-<a href="{% url 'watchmov' popular.id %}" class="movie-link">
 
-<div class="movie-card">
 
-<div class="movie-header"
-style="background-image:url('https://image.tmdb.org/t/p/w500{{ popular.poster_path }}');">
 
-<div class="header-icon-container">
-<i class="material-icons header-icon">play_arrow</i>
+
+<!-- trending -->
+ <div class="trending-section">
+
+<div class="slider-header">
+
+<h2 class="section-title">Popular</h2>
+
+<div class="slider-controls">
+<button onclick="slideLeft('top10-slider')"><span class="material-icons">chevron_left</span></button>
+<button onclick="slideRight('top10-slider')"><span class="material-icons">chevron_right</span></button>
 </div>
 
 </div>
 
-<div class="movie-content">
+<div class="top10-row" id="top10-slider">
 
-<h3 class="movie-title">{{ popular.title|truncatewords:2 }}</h3>
+{% for popular in popularMovie|slice:":10" %}
 
-<div class="movie-info">
-<span>⭐ {{ popular.vote_average }}</span>
-<span>{{ popular.release_date }}</span>
-</div>
+<div class="top10-card">
 
-</div>
+<span class="rank">{{ forloop.counter }}</span>
 
-</div>
+
+<a href="{% url 'detail' 'movie' popular.id %}">
+
+
+<img src="https://image.tmdb.org/t/p/w500{{ popular.poster_path }}">
 
 </a>
 
+</div>
+
 {% endfor %}
-
 </div>
-
-<button class="slide-btn right" onclick="slideRight()">❯</button>
-<button class="slide-btn left" onclick="slideLeft()">❮</button>
-
+</div>
 </div>
 
 
-<!-- top rated movies -->
-<h2 style="color: white;" class="section-title">Top Rated Movies</h2>
+<h4 style="color: #111111 ;">by Rashan Gang</h4>
 
-<div class="slider-wrapper">
 
-<div class="slider" id="top-slider">
+
+<!-- action -->
+
+
+<div style="margin-top: 220px;" class="content-section">
+
+<div class="slider-header">
+
+<h2 class="section-title">Top Rated</h2>
+
+<div class="slider-controls">
+<button onclick="slideLeft('action-slider')">
+<span class="material-icons">chevron_left</span>
+</button>
+
+<button onclick="slideRight('action-slider')">
+<span class="material-icons">chevron_right</span>
+</button>
+</div>
+
+</div>
+
+<div class="movie-row" id="action-slider">
 
 {% for top in toprated %}
 
-<a href="{% url 'watchmov' top.id %}" class="movie-link">
-
 <div class="movie-card">
 
-<div class="movie-header"
-style="background-image:url('https://image.tmdb.org/t/p/w500{{ top.poster_path }}');">
 
-<div class="header-icon-container">
-<i class="material-icons header-icon">play_arrow</i>
-</div>
+<a href="{% url 'detail' 'movie' top.id %}">
 
-</div>
 
-<div class="movie-content">
-
-<h3 class="movie-title">{{ top.title|truncatewords:2 }}</h3>
-
-<div class="movie-info">
-<span>⭐ {{ top.vote_average }}</span>
-<span>{{ top.release_date }}</span>
-</div>
-
-</div>
-
-</div>
+<img src="https://image.tmdb.org/t/p/w500{{ top.poster_path }}">
 
 </a>
+
+</div>
 
 {% endfor %}
 
 </div>
 
-<button class="slide-btn right" onclick="slideRightTop()">❯</button>
-<button class="slide-btn left" onclick="slideLeftTop()">❮</button>
-
 </div>
+
+
+
+
+
+
 <script>
-function slideLeft(){
-document.getElementById("popular-slider")
-.scrollBy({left:-400, behavior:"smooth"});
-}
-
-function slideRight(){
-document.getElementById("popular-slider")
-.scrollBy({left:400, behavior:"smooth"});
-}
-
 
 function slideLeftTop(){
-document.getElementById("top-slider")
-.scrollBy({left:-400, behavior:"smooth"});
+document.getElementById("top10-slider")
+.scrollBy({left:-600, behavior:"smooth"});
 }
 
 function slideRightTop(){
-document.getElementById("top-slider")
-.scrollBy({left:400, behavior:"smooth"});
+document.getElementById("top10-slider")
+.scrollBy({left:600, behavior:"smooth"});
 }
-
-
 let slides = document.querySelectorAll(".hero-slide");
 let index = 0;
 
 slides[0].classList.add("active");
 
 function showSlide(){
+
 slides.forEach(slide => slide.classList.remove("active"));
 
 slides[index].classList.add("active");
@@ -181,11 +183,62 @@ index++;
 if(index >= slides.length){
 index = 0;
 }
+
 }
 
 setInterval(showSlide, 5000);
 
+function slideLeft(id){
+const slider = document.getElementById(id);
+if(slider){
+slider.scrollBy({left:-600, behavior:"smooth"});
+}
+}
 
-
+function slideRight(id){
+const slider = document.getElementById(id);
+if(slider){
+slider.scrollBy({left:600, behavior:"smooth"});
+}
+}
 </script>
-{% endblock %}
+{% endblock%}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
