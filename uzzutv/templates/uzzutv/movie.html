@@ -19,7 +19,9 @@
 
 <div class="hero-slider">
 
-{% for movie in trendingMovie|slice:":5" %}
+{% for movie in trendingMovie|slice:":8" %}
+
+{% if movie.vote_average > 0 %}
 
 <div class="hero-slide">
 
@@ -28,11 +30,9 @@ src="https://image.tmdb.org/t/p/original{{ movie.backdrop_path }}">
 
 <div class="hero-content">
 
-
 <h2 class="hero-title" style="font-family: 'Passero One', sans-serif;">
 {{ movie.title|truncatewords:3 }}
 </h2>
-
 
 <div class="hero-meta">
 ⭐ {{ movie.vote_average }} · {{ movie.media_type.capitalize }} 
@@ -42,9 +42,12 @@ src="https://image.tmdb.org/t/p/original{{ movie.backdrop_path }}">
 
 <div class="hero-buttons">
 
+<a href="{% url 'watchmov' movie.id %}"
+onclick="saveContinue('{{movie.id}}','movie','{{movie.poster_path}}')">
 
-<a class="watch-btn" href="{% url 'watchmov' movie.id %}">▶ Watch Now</a>
+<button class="watch-btn">▶ Watch Now</button>
 
+</a>
 
 <a class="info-btn" href="{% url 'detail' 'movie' movie.id %}">More Info</a>
 
@@ -53,6 +56,8 @@ src="https://image.tmdb.org/t/p/original{{ movie.backdrop_path }}">
 </div>
 
 </div>
+
+{% endif %}
 
 {% endfor %}
 
@@ -111,7 +116,7 @@ src="https://image.tmdb.org/t/p/original{{ movie.backdrop_path }}">
 <!-- action -->
 
 
-<div style="margin-top: 220px;" class="content-section">
+<div id="mobile-fix" class="content-section">
 
 <div class="slider-header">
 
@@ -150,14 +155,16 @@ src="https://image.tmdb.org/t/p/original{{ movie.backdrop_path }}">
 </div>
 
 </div>
-
+<div id="continue-movie"></div>
 
 
 
 
 
 <script>
-
+window.addEventListener("DOMContentLoaded", () => {
+renderContinueMovies("continue-movie");
+});
 function slideLeftTop(){
 document.getElementById("top10-slider")
 .scrollBy({left:-600, behavior:"smooth"});
@@ -201,16 +208,99 @@ if(slider){
 slider.scrollBy({left:600, behavior:"smooth"});
 }
 }
+
+
+
+
+
+
+
+function renderContinueMovies(containerId){
+
+let list = getContinue();
+
+/* only movies */
+list = list.filter(item => item.type === "movie");
+
+if(list.length === 0){
+document.getElementById(containerId).innerHTML = "";
+return;
+}
+
+document.getElementById(containerId).innerHTML = `
+
+<div class="content-section">
+
+<div class="slider-header">
+
+<h2 class="section-title">Continue Watching</h2>
+
+<div class="slider-controls">
+<button onclick="slideLeft('${containerId}-slider')">
+<span class="material-icons">chevron_left</span>
+</button>
+
+<button onclick="slideRight('${containerId}-slider')">
+<span class="material-icons">chevron_right</span>
+</button>
+</div>
+
+</div>
+
+<div class="movie-row" id="${containerId}-slider">
+
+${list.map(item => `
+<div class="movie-card" style="position:relative;">
+
+<!-- DELETE BUTTON -->
+<button onclick="removeContinue('${item.id}','${item.type}')"
+style="
+position:absolute;
+top:6px;
+right:6px;
+background:rgba(0,0,0,0.7);
+border:none;
+color:white;
+font-size:14px;
+width:24px;
+height:24px;
+border-radius:50%;
+cursor:pointer;
+z-index:10;
+">
+<span class="material-icons">close</span>
+</button>
+
+<a href="/movie/${item.id}/watch">
+<img src="https://image.tmdb.org/t/p/w500${item.poster}">
+</a>
+
+</div>
+`).join("")}
+
+</div>
+
+</div>
+`;
+}
+
+
+
+function removeContinue(id, type){
+
+let list = getContinue();
+
+/* remove selected */
+list = list.filter(item => !(item.id == id && item.type == type));
+
+localStorage.setItem("continueWatching", JSON.stringify(list));
+
+/* re-render */
+renderContinueMovies("continue-movie");
+
+}
 </script>
 {% endblock%}
-
-
-
-
-
-
-
-
 
 
 

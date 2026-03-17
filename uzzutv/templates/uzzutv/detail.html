@@ -123,6 +123,7 @@ color:white;
 .section-title{
 margin-top:40px;
 margin-bottom:20px;
+margin-left: 5px;
 }
 
 .cast-row{
@@ -275,7 +276,10 @@ font-size:14px;
 /* ===== PHONES ===== */
 
 @media (max-width: 600px){
-
+#mobile{
+    display: block !important;
+    margin: 12px;
+}
 .hero{
 height:60vh;
 background-position:center;
@@ -314,6 +318,7 @@ font-size:13px;
 font-size:13px;
 line-height:1.4;
 margin-top:10px;
+display: none;
 }
 
 .section-title{
@@ -386,6 +391,10 @@ background:#2a2a2a;
 .slider-controls button:first-child{
 border-right:1px solid #333;
 }
+
+#mobile{
+    display: none;
+}
 </style>
 
 
@@ -432,11 +441,23 @@ style="background-image:url('https://image.tmdb.org/t/p/original{{data.backdrop_
 
 <div class="hero-buttons">
 {% if type == "movie" %}
-<a href="{% url 'watchmov' data.id %}"><button class="watch-btn">▶ Watch Now</button></a>
+<a href="{% url 'watchmov' data.id %}"
+onclick="saveContinue('{{data.id}}','movie','{{data.poster_path}}')">
+
+<button class="watch-btn">▶ Watch Now</button>
+
+</a>
 {% else %}
 <a href="{% url 'watchtv' data.id %}"><button class="watch-btn">▶ Watch Now</button></a>
 {% endif %}
-<button class="watchlist-btn">＋ Add Watchlist</button>
+
+<button class="watchlist-btn"
+data-id="{{data.id}}"
+data-type="{{type}}"
+data-title="{% if type == 'movie' %}{{data.title}}{% else %}{{data.name}}{% endif %}"
+data-poster="{{data.poster_path}}">
+＋ Add Watchlist
+</button>
 
 </div>
 
@@ -459,7 +480,11 @@ style="background-image:url('https://image.tmdb.org/t/p/original{{data.backdrop_
 
 
 <!-- CAST -->
+<p id="mobile" class="desc">
 
+{{data.overview}}
+
+</p>
 <h2 class="section-title">Top Cast</h2>
 
 <div class="cast-row">
@@ -561,5 +586,65 @@ behavior: "smooth"
 });
 }
 
+
+
+
+
+
+
+
+
+
+const btn = document.querySelector(".watchlist-btn");
+
+const id = btn.dataset.id;
+const type = btn.dataset.type;
+const title = btn.dataset.title;
+const poster = btn.dataset.poster;
+
+/* Get watchlist */
+function getWatchlist(){
+return JSON.parse(localStorage.getItem("watchlist")) || [];
+}
+
+/* Save watchlist */
+function saveWatchlist(list){
+localStorage.setItem("watchlist", JSON.stringify(list));
+}
+
+/* Check if exists */
+function isInWatchlist(){
+return getWatchlist().some(item => item.id == id && item.type == type);
+}
+
+/* Update button text */
+function updateButton(){
+if(isInWatchlist()){
+btn.textContent = "✓ In Watchlist";
+} else {
+btn.textContent = "＋ Add Watchlist";
+}
+}
+
+/* Toggle */
+btn.addEventListener("click", () => {
+
+let list = getWatchlist();
+
+if(isInWatchlist()){
+// remove
+list = list.filter(item => !(item.id == id && item.type == type));
+} else {
+// add
+list.push({ id, type, title, poster });
+}
+
+saveWatchlist(list);
+updateButton();
+
+});
+
+/* Initial check */
+updateButton();
 </script>
 {% endblock %}

@@ -353,7 +353,6 @@ def watchtv(request, tv_id):
 
     season = request.GET.get("season", 1)
     episode = request.GET.get("episode", 1)
-
     params = {"api_key": API_KEY}
 
     # -----------------------------
@@ -415,16 +414,17 @@ def watchtv(request, tv_id):
         cache.set(season_cache_key, season_data, 86400)
 
     episodes = season_data.get("episodes", [])
-
+    poster = tv.get("poster_path")
     # -----------------------------
     # PLAYER URL
     # -----------------------------
-    url = f"https://vidfast.pro/tv/{imdb}/{season}/{episode}?autoPlay=true?sub=en"
+    url = f"https://vidfast.pro/tv/{imdb}/{season}/{episode}?autoPlay=true&sub=en&mute=false"
     url2 = f"https://vidnest.fun/tv/{tv_id}/{season}/{episode}"
     url3 = f"https://vidsrcme.ru/embed/tv?imdb={imdb}&season={season}&episode={episode}&ds_lang=en&autoplay=1"
 
     return render(request, "uzzutv/watchtv.html", {
         "id": tv_id,
+        "poster": poster,
         "url":url,
         "url2":url2,
         "url3": url3,
@@ -469,7 +469,7 @@ def watchmov(request, movie_id):
     # -----------------------------
     # PLAYER URL
     # -----------------------------
-    url2 = f"https://vidnest.fun/movie/{movie_id}"
+    url2 = f"https://vidnest.fun/movie/{movie_id}?autoPlay=true&sub=en"
     url3 = f"https://vidsrcme.ru/embed/movie?imdb={imdb}&ds_lang=en&autoplay=1"
     url = f"https://vidfast.pro/movie/{imdb}?autoPlay=true?sub=en"
     return render(request, "uzzutv/watchmov.html", {
@@ -612,3 +612,12 @@ def detail(request, type, id):
     }
 
     return render(request, "uzzutv/detail.html", context)
+
+def watchlist(request):
+    return render(request, "uzzutv/watchlist.html")
+
+def terms(request):
+    return render(request, "uzzutv/terms.html")
+
+def dmca(request):
+    return render(request, "uzzutv/dmca.html")

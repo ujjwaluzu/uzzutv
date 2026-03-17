@@ -45,13 +45,13 @@ to{ transform:rotate(360deg); }
 </div>
 
 
-
-
 <div class="hero-wrapper">
 
 <div class="hero-slider">
 
 {% for item in hero|slice:"10:" %}
+
+{% if item.vote_average > 0 %}
 
 <div class="hero-slide">
 
@@ -77,31 +77,31 @@ src="https://image.tmdb.org/t/p/original{{ item.backdrop_path }}">
 <div class="hero-buttons">
 
 {% if item.media_type == "movie" %}
-<a class="watch-btn" href="{% url 'watchmov' item.id %}">▶ Watch Now</a>
+<a href="{% url 'watchmov' item.id %}"
+onclick="saveContinue('{{item.id}}','movie','{{item.poster_path}}')">
+<button class="watch-btn">▶ Watch Now</button>
+</a>
 {% else %}
 <a class="watch-btn" href="{% url 'watchtv' item.id %}">▶ Watch Now</a>
 {% endif %}
-
 
 {% if item.media_type == "movie" %}
 <a class="info-btn" href="{% url 'detail' 'movie' item.id %}">More Info</a>
 {% else %}
 <a class="info-btn" href="{% url 'detail' 'tv' item.id %}">More Info</a>
 {% endif %}
-</div>
 
 </div>
 
 </div>
+
+</div>
+
+{% endif %}
 
 {% endfor %}
 
 </div>
-
-
-
-
-
 
 
 
@@ -151,7 +151,7 @@ src="https://image.tmdb.org/t/p/original{{ item.backdrop_path }}">
 <!-- action -->
 
 
-<div style="margin-top: 220px;" class="content-section">
+<div id="mobile-fix" class="content-section">
 
 <div class="slider-header">
 
@@ -194,7 +194,7 @@ src="https://image.tmdb.org/t/p/original{{ item.backdrop_path }}">
 </div>
 
 
-
+<div id="continue-home"></div>
 <!-- romance -->
 
 <div class="content-section">
@@ -290,21 +290,6 @@ src="https://image.tmdb.org/t/p/original{{ item.backdrop_path }}">
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <div class="content-section">
 
 <div class="slider-header">
@@ -347,7 +332,15 @@ src="https://image.tmdb.org/t/p/original{{ item.backdrop_path }}">
 
 </div>
 
+
+
+
 <script>
+window.addEventListener("DOMContentLoaded", () => {
+renderContinueHome("continue-home");
+});
+
+
 
 function slideLeftTop(){
 document.getElementById("top10-slider")

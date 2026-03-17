@@ -183,7 +183,7 @@ body{
 
         <!-- PLAYER -->
         <div class="player mb-3">
-            <iframe id="player" src="{{url}}" allowfullscreen></iframe>
+            <iframe id="player" src="{{url}}" allowfullscreen allow="encrypted-media"></iframe>
         </div>
 
         <!-- SERVER (DESKTOP BELOW PLAYER) -->
@@ -216,6 +216,30 @@ function changeServer(url, btn){
 
     btn.classList.add("active");
 }
+
+
+
+
+window.addEventListener("DOMContentLoaded", () => {
+
+console.log("ID:", "{{id}}");
+console.log("POSTER:", "{{poster}}");
+console.log("SEASON:", "{{current_season}}");
+console.log("EP:", "{{current_episode}}");
+
+saveContinueTV(
+"{{id}}",
+"{{poster}}",
+"{{current_season}}",
+"{{current_episode}}"
+);
+
+});
+
+
+
+
+
 </script>
 
 {% endblock %}

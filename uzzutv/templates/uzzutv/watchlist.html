@@ -1,0 +1,101 @@
+{% extends "uzzutv/layout.html" %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'uzzutv/home.css' %}">
+{% endblock %}
+
+{% block body %}
+
+<h2 style="margin-top:60px; margin-left: 5px; color:white;">My Watchlist</h2>
+
+<div id="watchlist-container"></div>
+
+<script>
+
+/* Get watchlist */
+function getWatchlist(){
+return JSON.parse(localStorage.getItem("watchlist")) || [];
+}
+
+/* Render UI */
+function renderWatchlist(){
+
+const container = document.getElementById("watchlist-container");
+const list = getWatchlist();
+
+if(list.length === 0){
+container.innerHTML = `
+<h3 style="text-align:center; margin-top:50px; color:white;">
+Your watchlist is empty 
+</h3>`;
+return;
+}
+
+/* Separate movies & tv */
+const movies = list.filter(item => item.type === "movie");
+const tvshows = list.filter(item => item.type === "tv");
+
+/* Build section function */
+function createSection(title, items, sliderId){
+
+if(items.length === 0) return "";
+
+return `
+<div class="content-section">
+
+<div class="slider-header">
+
+<h2 class="section-title">${title}</h2>
+
+<div class="slider-controls">
+<button onclick="slideLeft('${sliderId}')">
+<span class="material-icons">chevron_left</span>
+</button>
+
+<button onclick="slideRight('${sliderId}')">
+<span class="material-icons">chevron_right</span>
+</button>
+</div>
+
+</div>
+
+<div class="movie-row" id="${sliderId}">
+
+${items.map(item => `
+<div class="movie-card">
+
+<a href="/${item.type}/${item.id}">
+<img src="https://image.tmdb.org/t/p/w500${item.poster}">
+</a>
+
+</div>
+`).join("")}
+
+</div>
+
+</div>
+`;
+}
+
+/* Render both sections */
+container.innerHTML =
+createSection("Movies", movies, "movie-watchlist") +
+createSection("TV Shows", tvshows, "tv-watchlist");
+
+}
+
+/* Slider */
+function slideLeft(id){
+document.getElementById(id).scrollBy({left:-600, behavior:"smooth"});
+}
+
+function slideRight(id){
+document.getElementById(id).scrollBy({left:600, behavior:"smooth"});
+}
+
+/* Init */
+renderWatchlist();
+</script>
+
+{% endblock %}

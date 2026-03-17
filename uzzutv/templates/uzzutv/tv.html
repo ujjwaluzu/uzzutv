@@ -40,10 +40,6 @@ to{ transform:rotate(360deg); }
 
 </style>
 {% block body %}
-<div id="loader">
-  <div class="spinner"></div>
-</div>
-
 
 
 
@@ -51,7 +47,9 @@ to{ transform:rotate(360deg); }
 
 <div class="hero-slider">
 
-{% for tv in trendingtv|slice:":5" %}
+{% for tv in trendingtv|slice:":8" %}
+
+{% if tv.vote_average > 0 %}
 
 <div class="hero-slide">
 
@@ -60,11 +58,9 @@ src="https://image.tmdb.org/t/p/original{{ tv.backdrop_path }}">
 
 <div class="hero-content">
 
-
 <h2 class="hero-title" style="font-family: 'Passero One', sans-serif;">
-{{ tv.name |truncatewords:3 }}
+{{ tv.name|truncatewords:3 }}
 </h2>
-
 
 <div class="hero-meta">
 ⭐ {{ tv.vote_average }} · {{ tv.media_type.capitalize }} 
@@ -74,17 +70,17 @@ src="https://image.tmdb.org/t/p/original{{ tv.backdrop_path }}">
 
 <div class="hero-buttons">
 
-
 <a class="watch-btn" href="{% url 'watchtv' tv.id %}">▶ Watch Now</a>
 
-
-<a class="info-btn" href="{% url 'detail' 'tv' tv.id%}">More Info</a>
-
-</div>
+<a class="info-btn" href="{% url 'detail' 'tv' tv.id %}">More Info</a>
 
 </div>
 
 </div>
+
+</div>
+
+{% endif %}
 
 {% endfor %}
 
@@ -143,7 +139,7 @@ src="https://image.tmdb.org/t/p/original{{ tv.backdrop_path }}">
 <!-- action -->
 
 
-<div style="margin-top: 220px;" class="content-section">
+<div id="mobile-fix" class="content-section">
 
 <div class="slider-header">
 
@@ -184,19 +180,18 @@ src="https://image.tmdb.org/t/p/original{{ tv.backdrop_path }}">
 </div>
 
 
+<div id="continue-tv"></div>
 
 
 
 
 <script>
-window.addEventListener("load", function(){
-const loader = document.getElementById("loader");
-loader.classList.add("fade-out");
-
-setTimeout(() => {
-loader.style.display = "none";
-}, 400);
+window.addEventListener("DOMContentLoaded", () => {
+renderContinueTV("continue-tv");
 });
+
+
+
 function slideLeftTop(){
 document.getElementById("top10-slider")
 .scrollBy({left:-600, behavior:"smooth"});
@@ -209,23 +204,20 @@ document.getElementById("top10-slider")
 let slides = document.querySelectorAll(".hero-slide");
 let index = 0;
 
+if(slides.length > 0){
+
 slides[0].classList.add("active");
 
 function showSlide(){
-
 slides.forEach(slide => slide.classList.remove("active"));
-
 slides[index].classList.add("active");
 
-index++;
-
-if(index >= slides.length){
-index = 0;
-}
-
+index = (index + 1) % slides.length;
 }
 
 setInterval(showSlide, 5000);
+
+}
 
 function slideLeft(id){
 const slider = document.getElementById(id);
@@ -240,6 +232,9 @@ if(slider){
 slider.scrollBy({left:600, behavior:"smooth"});
 }
 }
+
+
+
 </script>
 {% endblock%}
 

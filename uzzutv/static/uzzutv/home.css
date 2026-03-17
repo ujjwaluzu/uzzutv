@@ -314,7 +314,7 @@ line-height:1.4;
 /* BUTTONS STACK */
 
 .hero-buttons{
-flex-direction:column;
+
 gap:10px;
 align-items:center;
 }
@@ -368,4 +368,15 @@ display:none;
 }
 .top10-row{
 -webkit-overflow-scrolling:touch;
+}
+
+
+
+#mobile-fix{
+    margin-top: 220px;
+}
+@media (max-width:768px){
+    #mobile-fix{
+    margin-top: 180px;
+}
 }

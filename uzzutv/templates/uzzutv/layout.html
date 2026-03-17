@@ -4,8 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>uzzutv</title>
+    <title>UzzUTV</title>
     {% block css %}{% endblock %}
+    <link rel="icon" type="image/x-icon" href="https://img.icons8.com/?size=100&id=dpUQB4dX6yQC&format=png&color=000000">
     <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Passero+One&display=swap" rel="stylesheet">
@@ -50,17 +51,168 @@ height:120px;
 background:linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
 z-index:-1;
 }
+
+
+
+/* MOBILE NAV FIX */
+
+@media (max-width:768px){
+
+/* Dropdown background */
+.navbar-collapse{
+    background: rgba(0,0,0,0.95);
+    padding: 15px;
+    margin-top:10px;
+    border-radius:10px;
+}
+
+/* Make links bigger */
+.navbar-nav .nav-link{
+    font-size:18px;
+    padding:10px 0;
+}
+
+/* Search spacing */
+.navbar form{
+    margin-top:10px;
+}
+
+/* Input styling */
+.navbar input{
+    border:1px solid rgba(255,255,255,0.3);
+}
+
+/* Button full width */
+.navbar button{
+
+    margin-top:5px;
+}
+
+}
+
+
+
+
+
+
+
+
+
+/* FOOTER STYLE */
+
+.site-footer{
+  background:#0f172a;
+  color:white;
+  padding:40px 20px;
+  text-align:center;
+  width:100%;
+  max-width:100%;
+  overflow:hidden;
+}
+
+.footer-logo{
+  font-size:24px;
+  font-weight:700;
+  margin-bottom:10px;
+}
+
+.footer-text{
+  opacity:0.7;
+  margin-bottom:20px;
+}
+
+.site-footer{
+  background:#111111;
+  color:white;
+  padding:40px 20px;
+  text-align:center;
+  width:100%;
+  max-width:100%;
+  overflow:hidden;
+}
+
+.footer-links a{
+  color:white;
+  text-decoration:none;
+  opacity:0.8;
+  transition:0.2s;
+}
+
+.footer-links a:hover{
+  color:#ff3c3c;
+  opacity:1;
+}
+
+.footer-copy{
+  font-size:13px;
+  opacity:0.6;
+}
+.footer-links{
+  display:flex;
+  justify-content:center;
+  gap:20px;
+  flex-wrap:wrap;   /* 🔥 VERY IMPORTANT */
+  max-width:100%;
+}
+/* MOBILE */
+* {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+@media (max-width:600px){
+
+.footer-links{
+  gap:8px;
+}
+
+.footer-logo{
+  font-size:20px;
+}
+
+}
 </style>
 </head>
 <body>
+
 <div class="bg-img">
 {% block body %}
 {% endblock %}
 
+
+<hr>
+<footer class="site-footer">
+  <div class="footer-container">
+
+    <h2 class="footer-logo">UzzuTV</h2>
+
+    <p class="footer-text">
+      UzzUTV does not store any files on our server, we only linked to the media which is hosted on 3rd party services.
+    </p>
+    <p class="footer-text">
+      Tip: Use Brave Browser or ad blocker
+    </p>
+
+    <div class="footer-links">
+      <a href="{% url 'home' %}">Home</a>
+      <a href="{% url 'movie' %}">Movies</a>
+      <a href="{% url 'tv' %}">Series</a>
+      <a href="{% url 'watchlist' %}">Watchlist</a>
+      <a href="{% url 'terms' %}">Terms</a>
+      <a href="{% url 'dmca' %}">DMCA</a>
+    </div>
+
+    <p class="footer-copy">
+      © 2026 UzzuTV. All rights reserved.
+    </p>
+
+  </div>
+</footer>
+
+
 </div>
 <nav class="navbar navbar-expand-lg  bg-transparent navbar-dark">
   <div class="container-fluid">
-    <a class="navbar-brand" href="{% url 'index'%}">UzzuTv</a>
+    <a class="navbar-brand" href="{% url 'index'%}">UzzUTV</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -74,6 +226,9 @@ z-index:-1;
         </li>
         <li class="nav-item">
           <a class="nav-link" href="{% url 'tv'%}">Series</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'watchlist'%}">Watchlist</a>
         </li>
 
       </ul>
@@ -91,11 +246,308 @@ z-index:-1;
 
 
 
+<script>
+
+
+
+
+function saveContinue(id, type, poster){
+
+let list = JSON.parse(localStorage.getItem("continueWatching")) || [];
+
+/* remove old */
+list = list.filter(item => !(item.id == id && item.type == type));
+
+/* add new */
+list.unshift({
+id,
+type,
+poster,
+time: Date.now()   // ⭐ IMPORTANT
+});
+
+/* limit */
+list = list.slice(0, 20);
+
+localStorage.setItem("continueWatching", JSON.stringify(list));
+}
+
+function getContinue(){
+return JSON.parse(localStorage.getItem("continueWatching")) || [];
+}
+
+
+
+
+
+function saveContinueTV(id, poster, season, episode){
+
+let list = JSON.parse(localStorage.getItem("continueWatchingTV")) || [];
+
+/* remove old entry */
+list = list.filter(item => item.id != id);
+
+/* add updated */
+list.unshift({
+id,
+poster,
+season,
+episode,
+type: "tv",        // ⭐ IMPORTANT
+time: Date.now()   // ⭐ IMPORTANT
+});
+
+/* limit */
+list = list.slice(0, 20);
+
+localStorage.setItem("continueWatchingTV", JSON.stringify(list));
+}
+
+function getContinueTV(){
+return JSON.parse(localStorage.getItem("continueWatchingTV")) || [];
+}
 
 
 
 
 
 
+
+function renderContinueTV(containerId){
+
+const container = document.getElementById(containerId);
+if(!container) return;
+
+let list = getContinueTV();
+
+if(list.length === 0){
+container.innerHTML = "";
+return;
+}
+
+container.innerHTML = `
+
+<div class="content-section">
+
+<div class="slider-header">
+
+<h2 class="section-title">Continue Watching</h2>
+
+<div class="slider-controls">
+<button onclick="slideLeft('${containerId}-slider')">❮</button>
+<button onclick="slideRight('${containerId}-slider')">❯</button>
+</div>
+
+</div>
+
+<div class="movie-row" id="${containerId}-slider">
+
+${list.map(item => `
+
+<div class="movie-card" style="position:relative;">
+
+<!-- ❌ DELETE BUTTON -->
+<button onclick="removeContinueTV('${item.id}')"
+style="
+position:absolute;
+top:8px;
+right:8px;
+background:rgba(0,0,0,0.7);
+border:none;
+color:white;
+width:28px;
+height:28px;
+border-radius:50%;
+cursor:pointer;
+z-index:10;
+font-size:14px;
+">
+✕
+</button>
+
+<!-- 🎯 EPISODE BADGE -->
+<div style="
+position:absolute;
+bottom:8px;
+left:8px;
+background:rgba(0,0,0,0.8);
+padding:4px 8px;
+border-radius:6px;
+font-size:12px;
+z-index:10;
+color:white;
+">
+S${item.season} E${item.episode}
+</div>
+
+<a href="/tv/${item.id}/watch?season=${item.season}&episode=${item.episode}">
+
+<img src="https://image.tmdb.org/t/p/w500${item.poster}">
+
+</a>
+
+</div>
+
+`).join("")}
+
+</div>
+
+</div>
+`;
+}
+
+
+function removeContinueTV(id){
+
+let list = getContinueTV();
+
+list = list.filter(item => item.id != id);
+
+localStorage.setItem("continueWatchingTV", JSON.stringify(list));
+
+renderContinueTV("continue-tv");
+}
+
+
+
+
+
+
+
+function getAllContinue(){
+
+let movies = JSON.parse(localStorage.getItem("continueWatching")) || [];
+let tv = JSON.parse(localStorage.getItem("continueWatchingTV")) || [];
+
+/* add type to movies */
+movies = movies.map(item => ({
+...item,
+type: "movie"
+}));
+
+/* merge */
+let combined = [...movies, ...tv];
+
+/* sort by latest */
+combined.sort((a, b) => b.time - a.time);
+
+return combined.slice(0, 20);
+}
+
+
+
+
+
+
+
+
+
+
+function renderContinueHome(containerId){
+
+const container = document.getElementById(containerId);
+if(!container) return;
+
+let list = getAllContinue();
+
+if(list.length === 0){
+container.innerHTML = "";
+return;
+}
+
+container.innerHTML = `
+
+<div class="content-section">
+
+<div class="slider-header">
+
+<h2 class="section-title">Continue Watching</h2>
+
+<div class="slider-controls">
+<button onclick="slideLeft('${containerId}-slider')">❮</button>
+<button onclick="slideRight('${containerId}-slider')">❯</button>
+</div>
+
+</div>
+
+<div class="movie-row" id="${containerId}-slider">
+
+${list.map(item => `
+
+<div class="movie-card" style="position:relative;">
+
+<!-- DELETE -->
+<button onclick="removeMixed('${item.id}', '${item.type}')"
+style="
+position:absolute;
+top:8px;
+right:8px;
+background:rgba(0,0,0,0.7);
+border:none;
+color:white;
+width:28px;
+height:28px;
+border-radius:50%;
+cursor:pointer;
+z-index:10;
+">
+✕
+</button>
+
+${item.type === "tv" ? `
+<div style="
+position:absolute;
+bottom:8px;
+left:8px;
+background:rgba(0,0,0,0.8);
+padding:4px 8px;
+border-radius:6px;
+font-size:12px;
+z-index:10;
+color:white;
+">
+S${item.season} E${item.episode}
+</div>
+` : ""}
+
+<a href="${
+item.type === "movie"
+? `/movie/${item.id}`
+: `/tv/${item.id}/watch?season=${item.season}&episode=${item.episode}`
+}">
+
+<img src="https://image.tmdb.org/t/p/w500${item.poster}">
+
+</a>
+
+</div>
+
+`).join("")}
+
+</div>
+
+</div>
+`;
+}
+
+function removeMixed(id, type){
+
+if(type === "movie"){
+
+let list = JSON.parse(localStorage.getItem("continueWatching")) || [];
+list = list.filter(item => item.id != id);
+localStorage.setItem("continueWatching", JSON.stringify(list));
+
+}else{
+
+let list = JSON.parse(localStorage.getItem("continueWatchingTV")) || [];
+list = list.filter(item => item.id != id);
+localStorage.setItem("continueWatchingTV", JSON.stringify(list));
+
+}
+
+renderContinueHome("continue-home");
+}
+</script>
 </body>
 </html>

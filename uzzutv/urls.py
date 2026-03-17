@@ -9,6 +9,9 @@ urlpatterns=[
     path("movie/<int:movie_id>/watch/", views.watchmov, name="watchmov"),
     path("search/", views.search, name="search"),
     path("home/", views.home, name="home"),
-    path("<str:type>/<int:id>/", views.detail, name="detail")
+    path("<str:type>/<int:id>/", views.detail, name="detail"),
+    path("watchlist/", views.watchlist, name="watchlist"),
+    path("terms/", views.terms, name="terms"),
+    path("dmca/", views.dmca, name="dmca"),
 
 ]
