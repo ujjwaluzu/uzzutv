@@ -14,4 +14,5 @@ urlpatterns=[
     path("terms/", views.terms, name="terms"),
     path("dmca/", views.dmca, name="dmca"),
 
+
 ]

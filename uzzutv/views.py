@@ -9,6 +9,9 @@ load_dotenv()
 API_KEY = os.getenv("TMDB_KEY")
 BASE_URL = "https://api.themoviedb.org/3"
 
+from django.shortcuts import render, redirect
+
+
 def load_homepage_data():
 
     cache_key = "homepage_data"
@@ -418,9 +421,11 @@ def watchtv(request, tv_id):
     # -----------------------------
     # PLAYER URL
     # -----------------------------
-    url = f"https://vidfast.pro/tv/{imdb}/{season}/{episode}?autoPlay=true&sub=en&mute=false"
+    url5 =f"https://player.videasy.net/tv/{tv_id}/{season}/{episode}?color=8B5CF6&autoPlay=true&nextEpisode=false&episodeSelector=fasle"
+    url4 = f"https://vidfast.pro/tv/{imdb}/{season}/{episode}?autoPlay=true&sub=en&mute=false"
     url2 = f"https://vidnest.fun/tv/{tv_id}/{season}/{episode}"
     url3 = f"https://vidsrcme.ru/embed/tv?imdb={imdb}&season={season}&episode={episode}&ds_lang=en&autoplay=1"
+    url = f"https://www.vidking.net/embed/tv/{tv_id}/{season}/{episode}?color=e50914&autoPlay=true&nextEpisode=false&episodeSelector=fasle"
 
     return render(request, "uzzutv/watchtv.html", {
         "id": tv_id,
@@ -428,6 +433,8 @@ def watchtv(request, tv_id):
         "url":url,
         "url2":url2,
         "url3": url3,
+        "url4":url4,
+        "url5":url5,
         "imdb": imdb,
         "seasons": seasons,
         "episodes": episodes,
@@ -469,13 +476,17 @@ def watchmov(request, movie_id):
     # -----------------------------
     # PLAYER URL
     # -----------------------------
+    url = f"https://www.vidking.net/embed/movie/{movie_id}?color=e50914&autoPlay=true"
     url2 = f"https://vidnest.fun/movie/{movie_id}?autoPlay=true&sub=en"
     url3 = f"https://vidsrcme.ru/embed/movie?imdb={imdb}&ds_lang=en&autoplay=1"
-    url = f"https://vidfast.pro/movie/{imdb}?autoPlay=true?sub=en"
+    url4 = f"https://vidfast.pro/movie/{imdb}?autoPlay=true?sub=en"
+    url5 = f"https://player.videasy.net/movie/{movie_id}?color=8B5CF6&autoPlay=true"
     return render(request, "uzzutv/watchmov.html", {
         "url": url,
         "url2": url2,
         "url3": url3,
+        "url4":url4,
+        "url5": url5,
         "id":imdb
     })
 

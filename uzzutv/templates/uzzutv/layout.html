@@ -183,7 +183,7 @@ z-index:-1;
 <footer class="site-footer">
   <div class="footer-container">
 
-    <h2 class="footer-logo">UzzuTV</h2>
+    <h2 class="footer-logo">UzzUTV</h2>
 
     <p class="footer-text">
       UzzUTV does not store any files on our server, we only linked to the media which is hosted on 3rd party services.
@@ -230,8 +230,8 @@ z-index:-1;
         <li class="nav-item">
           <a class="nav-link" href="{% url 'watchlist'%}">Watchlist</a>
         </li>
-
       </ul>
+
       <form method="get" action="/search" class="d-flex">
         <input style="color: white;" class="form-control me-2 bg-transparent" type="search" placeholder="Search" aria-label="Search" name="q">
         <button class="btn btn-outline-light" type="submit">Search</button>
@@ -512,7 +512,7 @@ S${item.season} E${item.episode}
 
 <a href="${
 item.type === "movie"
-? `/movie/${item.id}`
+? `/movie/${item.id}/watch`
 : `/tv/${item.id}/watch?season=${item.season}&episode=${item.episode}`
 }">
 
