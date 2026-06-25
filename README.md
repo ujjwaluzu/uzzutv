@@ -1,23 +1,23 @@
-# 🎬 UzzUTV
+# UzzUTV
 
 UzzUTV is a modern streaming platform built with Django that allows users to discover, watch, and manage movies and TV series in one place. The project focuses on providing a clean, responsive, and user-friendly viewing experience.
 
 ---
 
-## ✨ Features
+## Features
 
-### 🎥 Movies & TV Series
+### Movies & TV Series
 
 * Browse movies and TV shows
 * Dedicated pages for movies and series
 * Detailed content information
 
-### 🔍 Search
+### Search
 
 * Search movies and TV series instantly
 * Easy content discovery
 
-### ❤️ Watchlist
+### Watchlist
 
 * Save favorite movies and series
 * Access your watchlist anytime
@@ -33,14 +33,14 @@ UzzUTV is a modern streaming platform built with Django that allows users to dis
 * Resume content from where you left off
 * Track viewing progress
 
-### 📱 Responsive Design
+### Responsive Design
 
 * Mobile-friendly interface
 * Works on desktops, tablets, and smartphones
 
 ---
 
-## 🛠 Built With
+## Built With
 
 * Python
 * Django
@@ -56,7 +56,7 @@ UzzUTV is a modern streaming platform built with Django that allows users to dis
 
 ---
 
-## 📸 Screenshots
+## Screenshots
 
 
 
@@ -71,7 +71,7 @@ UzzUTV is a modern streaming platform built with Django that allows users to dis
 
 ---
 
-## 🔮 Future Improvements
+## Future Improvements
 
 * User profiles
 * Ratings and reviews
@@ -84,18 +84,18 @@ UzzUTV is a modern streaming platform built with Django that allows users to dis
 
 ---
 
-## ⚠ Disclaimer
+## Disclaimer
 
 This project was created for educational and learning purposes. Users are responsible for ensuring that any content streamed through the platform complies with applicable copyright laws and licensing requirements.
 
 ---
 
-## 👨‍💻 Author
+## Author
 
 **Ujjwal Baunthiyal**
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License.
