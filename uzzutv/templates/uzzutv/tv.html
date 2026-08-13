@@ -120,7 +120,7 @@ src="https://image.tmdb.org/t/p/original{{ tv.backdrop_path }}">
 <a href="{% url 'detail' 'tv' popular.id %}">
 
 
-<img src="https://image.tmdb.org/t/p/w500{{ popular.poster_path }}">
+<img loading="lazy" src="https://image.tmdb.org/t/p/w500{{ popular.poster_path }}">
 
 </a>
 
@@ -167,7 +167,7 @@ src="https://image.tmdb.org/t/p/original{{ tv.backdrop_path }}">
 <a href="{% url 'detail' 'tv' top.id %}">
 
 
-<img src="https://image.tmdb.org/t/p/w500{{ top.poster_path }}">
+<img loading="lazy" src="https://image.tmdb.org/t/p/w500{{ top.poster_path }}">
 
 </a>
 

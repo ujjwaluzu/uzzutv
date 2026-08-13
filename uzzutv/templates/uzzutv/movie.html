@@ -97,7 +97,7 @@ onclick="saveContinue('{{movie.id}}','movie','{{movie.poster_path}}')">
 <a href="{% url 'detail' 'movie' popular.id %}">
 
 
-<img src="https://image.tmdb.org/t/p/w500{{ popular.poster_path }}">
+<img loading="lazy" src="https://image.tmdb.org/t/p/w500{{ popular.poster_path }}">
 
 </a>
 
@@ -144,7 +144,7 @@ onclick="saveContinue('{{movie.id}}','movie','{{movie.poster_path}}')">
 <a href="{% url 'detail' 'movie' top.id %}">
 
 
-<img src="https://image.tmdb.org/t/p/w500{{ top.poster_path }}">
+<img loading="lazy" src="https://image.tmdb.org/t/p/w500{{ top.poster_path }}">
 
 </a>
 
@@ -272,7 +272,7 @@ z-index:10;
 </button>
 
 <a href="/movie/${item.id}/watch">
-<img src="https://image.tmdb.org/t/p/w500${item.poster}">
+<img loading="lazy" src="https://image.tmdb.org/t/p/w500${item.poster}">
 </a>
 
 </div>

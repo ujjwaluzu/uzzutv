@@ -522,11 +522,21 @@ def search(request):
     tv = []
 
     if query:
-        movie_url = f"https://api.themoviedb.org/3/search/movie?api_key={API_KEY}&query={query}"
-        tv_url = f"https://api.themoviedb.org/3/search/tv?api_key={API_KEY}&query={query}"
 
-        movies = requests.get(movie_url).json().get("results", [])
-        tv = requests.get(tv_url).json().get("results", [])
+        cache_key = f"search_{query.strip().lower()}"
+        cached = cache.get(cache_key)
+
+        if cached is not None:
+            movies, tv = cached
+
+        else:
+            movie_url = f"https://api.themoviedb.org/3/search/movie?api_key={API_KEY}&query={query}"
+            tv_url = f"https://api.themoviedb.org/3/search/tv?api_key={API_KEY}&query={query}"
+
+            movies = requests.get(movie_url, timeout=10).json().get("results", [])
+            tv = requests.get(tv_url, timeout=10).json().get("results", [])
+
+            cache.set(cache_key, (movies, tv), 3600)  # 1 hour
 
     return render(request,"uzzutv/search.html",{
         "query":query,
@@ -633,16 +643,23 @@ def home(request):
 
 def detail(request, type, id):
 
-    url = f"https://api.themoviedb.org/3/{type}/{id}?api_key={API_KEY}&append_to_response=credits,recommendations"
+    cache_key = f"detail_{type}_{id}"
+    context = cache.get(cache_key)
 
-    data = requests.get(url).json()
+    if not context:
 
-    context = {
-        "data": data,
-        "type": type,
-        "cast": data["credits"]["cast"][:12],
-        "recommendations": data["recommendations"]["results"][:14]
-    }
+        url = f"https://api.themoviedb.org/3/{type}/{id}?api_key={API_KEY}&append_to_response=credits,recommendations"
+
+        data = requests.get(url, timeout=10).json()
+
+        context = {
+            "data": data,
+            "type": type,
+            "cast": data["credits"]["cast"][:12],
+            "recommendations": data["recommendations"]["results"][:14]
+        }
+
+        cache.set(cache_key, context, 43200)  # 12 hours
 
     return render(request, "uzzutv/detail.html", context)
 
