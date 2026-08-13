@@ -26,6 +26,7 @@ body{
     font-size:24px;
     margin-bottom:15px;
     font-weight:600;
+    padding-top:30px;
 }
 
 /* Player wrapper */
@@ -94,62 +95,103 @@ margin-bottom:20px;
 /* Server Section */
 
 .server-section{
-margin-top:10px;
-margin-left: 200px;
+    max-width:960px;
+    margin:10px auto 0;
+    padding:14px;
+    background:linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.015));
+    border:1px solid rgba(255,255,255,0.06);
+    border-radius:16px;
+    backdrop-filter:blur(6px);
 }
 
 .server-title{
-font-size:18px;
-margin-bottom:10px;
+    font-size:16px;
+    font-weight:600;
+    color:#e5e7eb;
+    margin:0 0 14px;
+    letter-spacing:0.01em;
+}
+
+.server-title::after{
+    content:" \00B7 switch anytime";
+    color:#6b7280;
+    font-weight:400;
+    font-size:13px;
 }
 
 /* Buttons */
 
 .server-list{
-display:flex;
-gap:10px;
-flex-wrap:wrap;
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(140px, 1fr));
+    gap:10px;
 }
 
 .server-btn{
-padding:10px 18px;
-border-radius:8px;
-border:none;
-background:#1f2937;
-color:white;
-cursor:pointer;
-font-size:14px;
-transition:0.2s;
+    padding:12px 16px;
+    border-radius:10px;
+    border:1px solid rgba(255,255,255,0.08);
+    background:#1c222b;
+    color:#cbd5e1;
+    cursor:pointer;
+    font-size:14px;
+    font-weight:600;
+    font-family:inherit;
+    transition:all 0.2s ease;
 }
 
-/* Hover */
-
 .server-btn:hover{
-background:#374151;
+    background:#242c38;
+    border-color:rgba(255,255,255,0.16);
+    color:#ffffff;
+    transform:translateY(-1px);
+}
+
+.server-btn:active{
+    transform:translateY(0);
 }
 
 /* Active server */
 
 .server-btn.active{
-background:white;
-color:black;
-font-weight:600;
+    background:rgba(255,255,255,0.14);
+    border-color:rgba(255,255,255,0.22);
+    color:#ffffff;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,0.08), 0 6px 18px rgba(0,0,0,0.35);
+}
+
+.server-btn.active:hover{
+    background:rgba(255,255,255,0.17);
+}
+
+/* Tablet */
+
+@media (max-width:900px){
+
+.server-list{
+    grid-template-columns:repeat(auto-fill, minmax(130px, 1fr));
+}
+
 }
 
 /* Mobile */
 
 @media (max-width:600px){
 .server-section{
-margin-top:10px;
-margin-left: 30px;
+    margin-top:16px;
+    margin-left:14px;
+    margin-right:14px;
+    padding:12px;
 }
+
 .server-list{
-justify-content:center;
+    grid-template-columns:repeat(2, 1fr);
+    gap:8px;
 }
 
 .server-btn{
-padding:8px 14px;
-font-size:13px;
+    padding:11px 8px;
+    font-size:13px;
 }
 
 }
@@ -157,7 +199,7 @@ font-size:13px;
 
 <div class="container">
 
-<h1 class="video-title">{{id}}</h1>
+<h1 class="video-title">{{title}}</h1>
 
 <div class="player">
 

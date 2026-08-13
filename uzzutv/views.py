@@ -474,6 +474,26 @@ def watchmov(request, movie_id):
         cache.set(imdb_cache_key, imdb, 86400)  # cache 24 hours
 
     # -----------------------------
+    # MOVIE TITLE (CACHED)
+    # -----------------------------
+
+    title_cache_key = f"movie_title_{movie_id}"
+    title = cache.get(title_cache_key)
+
+    if not title:
+
+        movie_data = requests.get(
+            f"{BASE_URL}/movie/{movie_id}",
+            params=params,
+            timeout=10
+        ).json()
+
+        title = movie_data.get("title", "")
+
+        if title:
+            cache.set(title_cache_key, title, 86400)
+
+    # -----------------------------
     # PLAYER URL
     # -----------------------------
     url = f"https://www.vidking.net/embed/movie/{movie_id}?color=e50914&autoPlay=true"
@@ -487,7 +507,8 @@ def watchmov(request, movie_id):
         "url3": url3,
         "url4":url4,
         "url5": url5,
-        "id":imdb
+        "id":imdb,
+        "title":title
     })
 
 
