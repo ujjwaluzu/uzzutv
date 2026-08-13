@@ -436,6 +436,7 @@ def watchtv(request, tv_id):
         "url4":url4,
         "url5":url5,
         "imdb": imdb,
+        "title": tv.get("name", ""),
         "seasons": seasons,
         "episodes": episodes,
         "current_season": int(season),
