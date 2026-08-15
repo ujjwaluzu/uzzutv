@@ -11,6 +11,9 @@ BASE_URL = "https://api.themoviedb.org/3"
 
 from django.shortcuts import render, redirect
 
+def auth(request):
+    return render(request, "uzzutv/auth.html")
+
 
 def load_homepage_data():
 
@@ -481,6 +484,9 @@ def watchmov(request, movie_id):
     title_cache_key = f"movie_title_{movie_id}"
     title = cache.get(title_cache_key)
 
+    poster_cache_key = f"movie_poster_{movie_id}"
+    poster = cache.get(poster_cache_key)
+
     if not title:
 
         movie_data = requests.get(
@@ -491,8 +497,14 @@ def watchmov(request, movie_id):
 
         title = movie_data.get("title", "")
 
+        if not poster:
+            poster = movie_data.get("poster_path", "")
+
         if title:
             cache.set(title_cache_key, title, 86400)
+
+        if poster:
+            cache.set(poster_cache_key, poster, 86400)
 
     # -----------------------------
     # PLAYER URL
@@ -509,6 +521,8 @@ def watchmov(request, movie_id):
         "url4":url4,
         "url5": url5,
         "id":imdb,
+        "tmdb_id": movie_id,
+        "poster": poster,
         "title":title
     })
 

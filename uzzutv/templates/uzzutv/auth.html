@@ -1,0 +1,432 @@
+{% extends "uzzutv/layout.html" %}
+
+{% block css %}
+<style>
+.auth-page{
+    min-height: calc(100vh - 120px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:60px 16px;
+}
+
+.auth-card{
+    width:100%;
+    max-width:440px;
+    background:rgba(22,24,29,0.88);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:20px;
+    padding:40px 36px;
+    box-shadow:0 20px 60px rgba(0,0,0,0.6);
+    backdrop-filter:blur(12px);
+}
+
+.auth-brand{
+    font-family:"Passero One", sans-serif;
+    font-size:44px;
+    color:#ff3c3c;
+    text-align:center;
+    letter-spacing:2px;
+    margin-bottom:8px;
+    line-height:1;
+}
+
+.auth-title{
+    color:#ffffff;
+    font-weight:700;
+    font-size:24px;
+    margin-bottom:6px;
+}
+
+.auth-subtitle{
+    color:#9ca3af;
+    font-size:14px;
+}
+
+.auth-message{
+    border-radius:10px;
+}
+
+.auth-input-group{
+    position:relative;
+}
+
+.auth-input-group .material-icons{
+    position:absolute;
+    left:14px;
+    top:50%;
+    transform:translateY(-50%);
+    color:#6b7280;
+    font-size:20px;
+    pointer-events:none;
+}
+
+.auth-input{
+    background:#16181d !important;
+    border:1px solid rgba(255,255,255,0.1) !important;
+    color:#ffffff !important;
+    border-radius:10px !important;
+    padding:12px 14px 12px 46px !important;
+    transition:border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+.auth-input:focus{
+    border-color:#ff3c3c !important;
+    box-shadow:0 0 0 3px rgba(255,60,60,0.15) !important;
+    background:#1b1d23 !important;
+}
+
+.auth-input::placeholder{
+    color:#6b7280;
+}
+
+.auth-submit{
+    width:100%;
+    padding:13px;
+    border:none;
+    border-radius:10px;
+    background:linear-gradient(135deg,#ff3c3c,#c81e1e);
+    color:#ffffff;
+    font-weight:700;
+    font-size:16px;
+    font-family:inherit;
+    cursor:pointer;
+    transition:transform 0.15s, box-shadow 0.2s, opacity 0.2s;
+}
+
+.auth-submit:hover{
+    transform:translateY(-1px);
+    box-shadow:0 8px 24px rgba(255,60,60,0.35);
+}
+
+.auth-submit:disabled{
+    opacity:0.6;
+    transform:none;
+}
+
+.auth-toggle{
+    color:#ff3c3c;
+    font-weight:600;
+    text-decoration:none;
+    background:none;
+    border:none;
+    cursor:pointer;
+    padding:0;
+    font-size:14px;
+}
+
+.auth-toggle:hover{
+    text-decoration:underline;
+}
+</style>
+{% endblock %}
+
+{% block body %}
+
+<div class="auth-page">
+
+    <div class="auth-card">
+
+        <div class="auth-brand">UzzUTV</div>
+
+        <h2 class="auth-title text-center" id="auth-title">Welcome Back</h2>
+
+        <p class="auth-subtitle text-center" id="auth-subtitle">
+            Sign in to continue watching across your devices.
+        </p>
+
+        <div id="auth-message" class="alert d-none auth-message"></div>
+
+        <form id="auth-form" class="mt-4">
+
+            <div class="mb-3 d-none" id="username-field">
+
+                <label class="form-label text-secondary">
+                    Username
+                </label>
+
+                <div class="auth-input-group">
+
+                    <span class="material-icons">person</span>
+
+                    <input
+                        type="text"
+                        id="auth-username"
+                        class="form-control auth-input"
+                        placeholder="Choose a username"
+                        maxlength="30"
+                    >
+
+                </div>
+
+            </div>
+
+            <div class="mb-3">
+
+                <label class="form-label text-secondary">
+                    Email
+                </label>
+
+                <div class="auth-input-group">
+
+                    <span class="material-icons">mail</span>
+
+                    <input
+                        type="email"
+                        id="auth-email"
+                        class="form-control auth-input"
+                        placeholder="you@example.com"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+            <div class="mb-4">
+
+                <label class="form-label text-secondary">
+                    Password
+                </label>
+
+                <div class="auth-input-group">
+
+                    <span class="material-icons">lock</span>
+
+                    <input
+                        type="password"
+                        id="auth-password"
+                        class="form-control auth-input"
+                        placeholder="••••••••"
+                        minlength="6"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+            <button
+                type="submit"
+                id="auth-submit"
+                class="auth-submit"
+            >
+                Sign In
+            </button>
+
+        </form>
+
+        <div class="text-center mt-4">
+
+            <span
+                class="text-secondary"
+                id="auth-toggle-text"
+            >
+                Don't have an account?
+            </span>
+
+            <button
+                type="button"
+                id="auth-toggle"
+                class="auth-toggle"
+            >
+                Sign Up
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+let isSignup = false;
+
+const authForm = document.getElementById("auth-form");
+const emailInput = document.getElementById("auth-email");
+const passwordInput = document.getElementById("auth-password");
+const usernameInput = document.getElementById("auth-username");
+const usernameField = document.getElementById("username-field");
+
+const authTitle = document.getElementById("auth-title");
+const authSubtitle = document.getElementById("auth-subtitle");
+
+const authSubmit = document.getElementById("auth-submit");
+
+const authToggle = document.getElementById("auth-toggle");
+const authToggleText = document.getElementById("auth-toggle-text");
+
+const authMessage = document.getElementById("auth-message");
+
+
+function showAuthMessage(message, type = "danger") {
+
+    authMessage.textContent = message;
+    authMessage.className = `alert alert-${type}`;
+
+}
+
+
+authToggle.addEventListener("click", () => {
+
+    isSignup = !isSignup;
+
+    authMessage.className = "alert d-none";
+
+    if (isSignup) {
+
+        authTitle.textContent = "Create Account";
+
+        authSubtitle.textContent =
+            "Create an account to save your Continue Watching.";
+
+        authSubmit.textContent = "Sign Up";
+
+        authToggleText.textContent =
+            "Already have an account?";
+
+        authToggle.textContent = "Sign In";
+
+        usernameField.classList.remove("d-none");
+        usernameInput.required = true;
+
+    } else {
+
+        authTitle.textContent = "Welcome Back";
+
+        authSubtitle.textContent =
+            "Sign in to continue watching across your devices.";
+
+        authSubmit.textContent = "Sign In";
+
+        authToggleText.textContent =
+            "Don't have an account?";
+
+        authToggle.textContent = "Sign Up";
+
+        usernameField.classList.add("d-none");
+        usernameInput.required = false;
+
+    }
+
+});
+
+
+authForm.addEventListener("submit", async (event) => {
+
+    event.preventDefault();
+
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
+    const username = usernameInput.value.trim();
+
+    if (isSignup && !username) {
+
+        showAuthMessage("Username is required.");
+
+        return;
+    }
+
+    authSubmit.disabled = true;
+
+    authSubmit.textContent =
+        isSignup ? "Creating Account..." : "Signing In...";
+
+
+    try {
+
+        if (isSignup) {
+
+            const { data, error } =
+                await supabaseClient.auth.signUp({
+                    email,
+                    password,
+                    options: {
+                        data: {
+                            username: username
+                        }
+                    }
+                });
+
+            if (error) {
+                throw error;
+            }
+
+            if (data.session) {
+
+                showAuthMessage(
+                    "Account created successfully!",
+                    "success"
+                );
+
+                setTimeout(() => {
+                    window.location.href = "/home/";
+                }, 1000);
+
+            } else {
+
+                if (data.user &&
+                    data.user.identities &&
+                    data.user.identities.length === 0) {
+
+                    showAuthMessage(
+                        "An account with this email already exists. Please sign in."
+                    );
+
+                } else {
+
+                    showAuthMessage(
+                        "Account created. Please check your email to confirm your account.",
+                        "success"
+                    );
+
+                }
+
+                authSubmit.disabled = false;
+                authSubmit.textContent = "Sign Up";
+            }
+
+        } else {
+
+            const { data, error } =
+                await supabaseClient.auth.signInWithPassword({
+                    email,
+                    password
+                });
+
+            if (error) {
+                throw error;
+            }
+
+            showAuthMessage(
+                "Signed in successfully!",
+                "success"
+            );
+
+            setTimeout(() => {
+                window.location.href = "/home/";
+            }, 500);
+
+        }
+
+    } catch (error) {
+
+        console.error(error);
+
+        showAuthMessage(
+            error.message || "Something went wrong."
+        );
+
+        authSubmit.disabled = false;
+
+        authSubmit.textContent =
+            isSignup ? "Sign Up" : "Sign In";
+    }
+
+});
+
+</script>
+
+{% endblock %}
