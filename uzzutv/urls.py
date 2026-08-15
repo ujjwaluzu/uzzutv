@@ -13,6 +13,7 @@ urlpatterns=[
     path("watchlist/", views.watchlist, name="watchlist"),
     path("terms/", views.terms, name="terms"),
     path("dmca/", views.dmca, name="dmca"),
+    path("auth/", views.auth, name="auth"),
 
 
 ]
