@@ -1,5 +1,10 @@
 {% extends "uzzutv/layout.html" %}
 
+{% block title %}UzzUTV - Login / Sign Up{% endblock %}
+{% block meta_description %}Log in or create an account on UzzUTV to save your Continue Watching and watchlist across devices.{% endblock %}
+{% block robots %}noindex, nofollow{% endblock %}
+{% block canonical %}{% endblock %}
+
 {% block css %}
 <style>
 .auth-page{
@@ -339,16 +344,24 @@ authForm.addEventListener("submit", async (event) => {
 
         if (isSignup) {
 
-            const { data, error } =
-                await supabaseClient.auth.signUp({
-                    email,
-                    password,
-                    options: {
-                        data: {
-                            username: username
-                        }
-                    }
-                });
+        const redirectUrl =
+            window.location.hostname === "127.0.0.1" ||
+            window.location.hostname === "localhost"
+                ? `${window.location.origin}/auth/`
+                : "https://uzzutv.pythonanywhere.com/auth/";
+
+
+        const { data, error } =
+            await supabaseClient.auth.signUp({
+                email,
+                password,
+                options: {
+                    data: {
+                        username: username
+                    },
+                    emailRedirectTo: redirectUrl
+                }
+            });
 
             if (error) {
                 throw error;
