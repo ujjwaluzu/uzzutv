@@ -12,95 +12,284 @@
 
 {% block body %}
 
-<h2 style="margin-top:60px; margin-left: 5px; color:white;">My Watchlist</h2>
+<div class="content-section" style="margin-top:60px;">
 
-<div id="watchlist-container"></div>
+    <div class="slider-header">
+
+        <h2 class="section-title">
+            My Watchlist
+        </h2>
+
+        <div class="slider-controls">
+
+            <button onclick="slideLeft('watchlist-slider')">
+                <span class="material-icons">
+                    chevron_left
+                </span>
+            </button>
+
+            <button onclick="slideRight('watchlist-slider')">
+                <span class="material-icons">
+                    chevron_right
+                </span>
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <div id="watchlist-container">
+
+        <h3 style="text-align:center; margin-top:50px; color:white;">
+            Loading...
+        </h3>
+
+    </div>
+
+</div>
+
 
 <script>
 
-/* Get watchlist */
-function getWatchlist(){
-return JSON.parse(localStorage.getItem("watchlist")) || [];
+async function loadWatchlist() {
+
+    const container =
+        document.getElementById("watchlist-container");
+
+    const user = await getCurrentUser();
+
+
+    /* NOT LOGGED IN */
+
+    if (!user) {
+
+        container.innerHTML = `
+            <div style="
+                text-align:center;
+                margin-top:50px;
+                color:white;
+            ">
+
+                <h3>
+                    Please log in to view your watchlist.
+                </h3>
+
+                <a
+                    href="/auth/"
+                    class="btn btn-outline-light mt-3"
+                >
+                    Login
+                </a>
+
+            </div>
+        `;
+
+        return;
+    }
+
+
+    /* GET WATCHLIST */
+
+    const { data, error } = await supabaseClient
+        .from("watchlist")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", {
+            ascending: false
+        });
+
+
+    if (error) {
+
+        console.error(
+            "Error loading watchlist:",
+            error
+        );
+
+        container.innerHTML = `
+            <h3 style="
+                text-align:center;
+                margin-top:50px;
+                color:white;
+            ">
+                Unable to load your watchlist.
+            </h3>
+        `;
+
+        return;
+    }
+
+
+    /* EMPTY WATCHLIST */
+
+    if (!data || data.length === 0) {
+
+        container.innerHTML = `
+            <div style="
+                text-align:center;
+                margin-top:50px;
+                color:white;
+            ">
+
+                <h3>
+                    Your watchlist is empty
+                </h3>
+
+                <p style="opacity:0.7;">
+                    Add movies and TV shows to find them here.
+                </p>
+
+            </div>
+        `;
+
+        return;
+    }
+
+
+    /* RENDER */
+
+    container.innerHTML = `
+
+        <div
+            class="movie-row"
+            id="watchlist-slider"
+        >
+
+            ${data.map(item => `
+
+                <div
+                    class="movie-card"
+                    style="position:relative;"
+                >
+
+                    <!-- REMOVE BUTTON -->
+
+                    <button
+                        onclick="
+                            removeWatchlistItem(
+                                '${item.media_id}',
+                                '${item.media_type}'
+                            )
+                        "
+                        style="
+                            position:absolute;
+                            top:8px;
+                            right:8px;
+                            background:rgba(0,0,0,0.75);
+                            border:none;
+                            color:white;
+                            width:30px;
+                            height:30px;
+                            border-radius:50%;
+                            cursor:pointer;
+                            z-index:10;
+                        "
+                        title="Remove from watchlist"
+                    >
+                        ✕
+                    </button>
+
+
+                    <!-- POSTER -->
+
+                    <a
+                        href="/${item.media_type}/${item.media_id}/"
+                    >
+
+                        <img
+                            loading="lazy"
+                            alt="${item.title || 'Watchlist item'} poster"
+                            src="https://image.tmdb.org/t/p/w500${item.poster}"
+                        >
+
+                    </a>
+
+                </div>
+
+            `).join("")}
+
+        </div>
+    `;
 }
 
-/* Render UI */
-function renderWatchlist(){
 
-const container = document.getElementById("watchlist-container");
-const list = getWatchlist();
+/* REMOVE */
 
-if(list.length === 0){
-container.innerHTML = `
-<h3 style="text-align:center; margin-top:50px; color:white;">
-Your watchlist is empty 
-</h3>`;
-return;
+async function removeWatchlistItem(id, type) {
+
+    const user = await getCurrentUser();
+
+    if (!user) {
+        return;
+    }
+
+    const { error } = await supabaseClient
+        .from("watchlist")
+        .delete()
+        .eq("user_id", user.id)
+        .eq("media_id", Number(id))
+        .eq("media_type", type);
+
+
+    if (error) {
+
+        console.error(
+            "Error removing watchlist item:",
+            error
+        );
+
+        return;
+    }
+
+
+    loadWatchlist();
 }
 
-/* Separate movies & tv */
-const movies = list.filter(item => item.type === "movie");
-const tvshows = list.filter(item => item.type === "tv");
 
-/* Build section function */
-function createSection(title, items, sliderId){
+/* SLIDERS */
 
-if(items.length === 0) return "";
+function slideLeft(id) {
 
-return `
-<div class="content-section">
+    const slider =
+        document.getElementById(id);
 
-<div class="slider-header">
+    if (slider) {
 
-<h2 class="section-title">${title}</h2>
+        slider.scrollBy({
+            left: -600,
+            behavior: "smooth"
+        });
 
-<div class="slider-controls">
-<button onclick="slideLeft('${sliderId}')">
-<span class="material-icons">chevron_left</span>
-</button>
-
-<button onclick="slideRight('${sliderId}')">
-<span class="material-icons">chevron_right</span>
-</button>
-</div>
-
-</div>
-
-<div class="movie-row" id="${sliderId}">
-
-${items.map(item => `
-<div class="movie-card">
-
-<a href="/${item.type}/${item.id}">
-<img loading="lazy" src="https://image.tmdb.org/t/p/w500${item.poster}">
-</a>
-
-</div>
-`).join("")}
-
-</div>
-
-</div>
-`;
+    }
 }
 
-/* Render both sections */
-container.innerHTML =
-createSection("Movies", movies, "movie-watchlist") +
-createSection("TV Shows", tvshows, "tv-watchlist");
 
+function slideRight(id) {
+
+    const slider =
+        document.getElementById(id);
+
+    if (slider) {
+
+        slider.scrollBy({
+            left: 600,
+            behavior: "smooth"
+        });
+
+    }
 }
 
-/* Slider */
-function slideLeft(id){
-document.getElementById(id).scrollBy({left:-600, behavior:"smooth"});
-}
 
-function slideRight(id){
-document.getElementById(id).scrollBy({left:600, behavior:"smooth"});
-}
+/* LOAD */
 
-/* Init */
-renderWatchlist();
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+        loadWatchlist();
+    }
+);
+
 </script>
 
 {% endblock %}

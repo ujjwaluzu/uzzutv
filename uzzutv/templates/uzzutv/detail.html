@@ -647,49 +647,17 @@ const type = btn.dataset.type;
 const title = btn.dataset.title;
 const poster = btn.dataset.poster;
 
-/* Get watchlist */
-function getWatchlist(){
-return JSON.parse(localStorage.getItem("watchlist")) || [];
-}
-
-/* Save watchlist */
-function saveWatchlist(list){
-localStorage.setItem("watchlist", JSON.stringify(list));
-}
-
-/* Check if exists */
-function isInWatchlist(){
-return getWatchlist().some(item => item.id == id && item.type == type);
-}
-
-/* Update button text */
-function updateButton(){
-if(isInWatchlist()){
-btn.textContent = "✓ In Watchlist";
-} else {
-btn.textContent = "＋ Add Watchlist";
-}
-}
-
 /* Toggle */
 btn.addEventListener("click", () => {
-
-let list = getWatchlist();
-
-if(isInWatchlist()){
-// remove
-list = list.filter(item => !(item.id == id && item.type == type));
-} else {
-// add
-list.push({ id, type, title, poster });
-}
-
-saveWatchlist(list);
-updateButton();
-
+toggleWatchlist(id, type, title, poster, btn);
 });
 
 /* Initial check */
-updateButton();
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+        updateWatchlistButton(id, type, btn);
+    }
+);
 </script>
 {% endblock %}
