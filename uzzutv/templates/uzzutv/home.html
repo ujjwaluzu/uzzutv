@@ -5,6 +5,31 @@
 <link rel="stylesheet" href="{% static 'uzzutv/home.css' %}">
 
 {% endblock %}
+
+{% block title %}UzzUTV - Movies & TV Series{% endblock %}
+{% block meta_description %}Watch movies and TV series online on UzzUTV. Discover trending titles, explore genres like action, romance, comedy and animation, and start watching instantly.{% endblock %}
+{% block canonical %}<link rel="canonical" href="https://uzzutv.pythonanywhere.com/home/">{% endblock %}
+{% block og_url %}https://uzzutv.pythonanywhere.com/home/{% endblock %}
+{% block og_image %}{% if hero %}{% with hero|first as first_item %}{% if first_item.backdrop_path %}https://image.tmdb.org/t/p/original{{ first_item.backdrop_path }}{% else %}https://uzzutv.pythonanywhere.com/static/uzzutv/images/logo.png{% endif %}{% endwith %}{% else %}https://uzzutv.pythonanywhere.com/static/uzzutv/images/logo.png{% endif %}{% endblock %}
+{% block head %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "UzzUTV",
+  "alternateName": "UzzuTV",
+  "url": "https://uzzutv.pythonanywhere.com/home/",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": {
+      "@type": "EntryPoint",
+      "urlTemplate": "https://uzzutv.pythonanywhere.com/search/?q={search_term_string}"
+    },
+    "query-input": "required name=search_term_string"
+  }
+}
+</script>
+{% endblock %}
 <style>
 /* PRELOADER */
 
@@ -76,13 +101,13 @@ pointer-events:none;
 
 <div class="hero-slide">
 
-<img class="hero-bg"
+<img class="hero-bg" alt=""
 src="https://image.tmdb.org/t/p/original{{ item.backdrop_path }}">
 
 <div class="hero-content">
 
 {% if item.logo %}
-<img class="hero-logo" src="https://image.tmdb.org/t/p/w500{{ item.logo }}">
+<img class="hero-logo" alt="{% if item.title %}{{ item.title }}{% else %}{{ item.name }}{% endif %} logo" src="https://image.tmdb.org/t/p/w500{{ item.logo }}">
 {% else %}
 <h2 class="hero-title" style="font-family: 'Passero One', sans-serif;">
 {% if item.title %}{{ item.title|truncatewords:3 }}{% else %}{{ item.name|truncatewords:3 }}{% endif %}
@@ -155,7 +180,7 @@ onclick="saveContinue('{{item.id}}','movie','{{item.poster_path}}')">
 <a href="{% url 'detail' 'tv' item.id %}">
 {% endif %}
 
-<img loading="lazy" src="https://image.tmdb.org/t/p/w500{{ item.poster_path }}">
+<img loading="lazy" alt="{% if item.title %}{{ item.title }}{% else %}{{ item.name }}{% endif %} poster" src="https://image.tmdb.org/t/p/w500{{ item.poster_path }}">
 
 </a>
 
@@ -213,7 +238,7 @@ onclick="saveContinue('{{item.id}}','movie','{{item.poster_path}}')">
 <a href="{% url 'detail' 'tv' item.id %}">
 {% endif %}
 
-<img loading="lazy" src="https://image.tmdb.org/t/p/w500{{ item.poster_path }}">
+<img loading="lazy" alt="{% if item.title %}{{ item.title }}{% else %}{{ item.name }}{% endif %} poster" src="https://image.tmdb.org/t/p/w500{{ item.poster_path }}">
 
 </a>
 
@@ -259,7 +284,7 @@ onclick="saveContinue('{{item.id}}','movie','{{item.poster_path}}')">
 <a href="{% url 'detail' 'tv' item.id %}">
 {% endif %}
 
-<img loading="lazy" src="https://image.tmdb.org/t/p/w500{{ item.poster_path }}">
+<img loading="lazy" alt="{% if item.title %}{{ item.title }}{% else %}{{ item.name }}{% endif %} poster" src="https://image.tmdb.org/t/p/w500{{ item.poster_path }}">
 
 </a>
 
@@ -302,7 +327,7 @@ onclick="saveContinue('{{item.id}}','movie','{{item.poster_path}}')">
 <a href="{% url 'detail' 'tv' item.id %}">
 {% endif %}
 
-<img loading="lazy" src="https://image.tmdb.org/t/p/w500{{ item.poster_path }}">
+<img loading="lazy" alt="{% if item.title %}{{ item.title }}{% else %}{{ item.name }}{% endif %} poster" src="https://image.tmdb.org/t/p/w500{{ item.poster_path }}">
 
 </a>
 
@@ -352,7 +377,7 @@ onclick="saveContinue('{{item.id}}','movie','{{item.poster_path}}')">
 <a href="{% url 'detail' 'tv' item.id %}">
 {% endif %}
 
-<img loading="lazy" src="https://image.tmdb.org/t/p/w500{{ item.poster_path }}">
+<img loading="lazy" alt="{% if item.title %}{{ item.title }}{% else %}{{ item.name }}{% endif %} poster" src="https://image.tmdb.org/t/p/w500{{ item.poster_path }}">
 
 </a>
 

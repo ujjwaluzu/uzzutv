@@ -1,6 +1,51 @@
 {% extends "uzzutv/layout.html" %}
 {% load static %}
 
+{% block title %}UzzUTV - {% if type == "movie" %}{{ data.title }}{% else %}{{ data.name }}{% endif %}{% endblock %}
+{% block meta_description %}{% if type == "movie" %}Watch {{ data.title }} on UzzUTV. Explore movie details, poster, information and available streaming options.{% else %}Watch {{ data.name }} on UzzUTV. Explore episodes, seasons and series information.{% endif %}{% endblock %}
+{% block canonical %}<link rel="canonical" href="https://uzzutv.pythonanywhere.com/{{ type }}/{{ data.id }}/">{% endblock %}
+{% block og_type %}{% if type == "movie" %}video.movie{% else %}video.tv_show{% endif %}{% endblock %}
+{% block og_url %}https://uzzutv.pythonanywhere.com/{{ type }}/{{ data.id }}/{% endblock %}
+{% block og_image %}{% if data.poster_path %}https://image.tmdb.org/t/p/w500{{ data.poster_path }}{% else %}https://uzzutv.pythonanywhere.com/static/uzzutv/images/logo.png{% endif %}{% endblock %}
+{% block head %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "{% if type == 'movie' %}Movie{% else %}TVSeries{% endif %}",
+  "name": "{% if type == 'movie' %}{{ data.title|escapejs }}{% else %}{{ data.name|escapejs }}{% endif %}",
+  "url": "https://uzzutv.pythonanywhere.com/{{ type }}/{{ data.id }}/"
+  {% if data.poster_path %},"image": "https://image.tmdb.org/t/p/w500{{ data.poster_path }}"{% endif %}
+  {% if data.overview %},"description": "{{ data.overview|escapejs }}"{% endif %}
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://uzzutv.pythonanywhere.com/home/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "{% if type == 'movie' %}Movies{% else %}TV Series{% endif %}",
+      "item": "https://uzzutv.pythonanywhere.com/{% if type == 'movie' %}movie{% else %}tv{% endif %}/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "{% if type == 'movie' %}{{ data.title|escapejs }}{% else %}{{ data.name|escapejs }}{% endif %}",
+      "item": "https://uzzutv.pythonanywhere.com/{{ type }}/{{ data.id }}/"
+    }
+  ]
+}
+</script>
+{% endblock %}
+
 {% block body %}
 
 <style>
@@ -493,7 +538,7 @@ data-poster="{{data.poster_path}}">
 
 <div class="cast-card">
 
-<img loading="lazy" src="https://image.tmdb.org/t/p/w185{{actor.profile_path}}">
+<img loading="lazy" alt="{{ actor.name }}" src="https://image.tmdb.org/t/p/w185{{actor.profile_path}}">
 
 <p>{{actor.name}}</p>
 
@@ -548,7 +593,7 @@ data-poster="{{data.poster_path}}">
 
 <a href="/{{type}}/{{rec.id}}">
 <div class="movie-card">
-<img loading="lazy" src="https://image.tmdb.org/t/p/w500{{rec.poster_path}}">
+<img loading="lazy" alt="{% if type == 'movie' %}{{ rec.title }}{% else %}{{ rec.name }}{% endif %} poster" src="https://image.tmdb.org/t/p/w500{{rec.poster_path}}">
 </div>
 </a>
 

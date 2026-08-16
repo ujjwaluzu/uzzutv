@@ -5,6 +5,11 @@
 <link rel="stylesheet" href="{% static 'uzzutv/home.css' %}">
 
 {% endblock %}
+
+{% block title %}UzzUTV - Movies{% endblock %}
+{% block meta_description %}Explore trending, popular and top-rated movies on UzzUTV. Discover what to watch next and stream your favourite films instantly.{% endblock %}
+{% block canonical %}<link rel="canonical" href="https://uzzutv.pythonanywhere.com/movie/">{% endblock %}
+{% block og_url %}https://uzzutv.pythonanywhere.com/movie/{% endblock %}
 <style>
 
 
@@ -25,7 +30,7 @@
 
 <div class="hero-slide">
 
-<img class="hero-bg"
+<img class="hero-bg" alt=""
 src="https://image.tmdb.org/t/p/original{{ movie.backdrop_path }}">
 
 <div class="hero-content">
@@ -97,7 +102,7 @@ onclick="saveContinue('{{movie.id}}','movie','{{movie.poster_path}}')">
 <a href="{% url 'detail' 'movie' popular.id %}">
 
 
-<img loading="lazy" src="https://image.tmdb.org/t/p/w500{{ popular.poster_path }}">
+<img loading="lazy" alt="{{ popular.title }} poster" src="https://image.tmdb.org/t/p/w500{{ popular.poster_path }}">
 
 </a>
 
@@ -144,7 +149,7 @@ onclick="saveContinue('{{movie.id}}','movie','{{movie.poster_path}}')">
 <a href="{% url 'detail' 'movie' top.id %}">
 
 
-<img loading="lazy" src="https://image.tmdb.org/t/p/w500{{ top.poster_path }}">
+<img loading="lazy" alt="{{ top.title }} poster" src="https://image.tmdb.org/t/p/w500{{ top.poster_path }}">
 
 </a>
 

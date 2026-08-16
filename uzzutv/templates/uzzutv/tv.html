@@ -5,6 +5,11 @@
 <link rel="stylesheet" href="{% static 'uzzutv/home.css' %}">
 
 {% endblock %}
+
+{% block title %}UzzUTV - TV Series{% endblock %}
+{% block meta_description %}Explore trending, popular and top-rated TV series on UzzUTV. Browse seasons and episodes, and stream your favourite shows instantly.{% endblock %}
+{% block canonical %}<link rel="canonical" href="https://uzzutv.pythonanywhere.com/tv/">{% endblock %}
+{% block og_url %}https://uzzutv.pythonanywhere.com/tv/{% endblock %}
 <style>
 #loader{
 position:fixed;
@@ -53,7 +58,7 @@ to{ transform:rotate(360deg); }
 
 <div class="hero-slide">
 
-<img class="hero-bg"
+<img class="hero-bg" alt=""
 src="https://image.tmdb.org/t/p/original{{ tv.backdrop_path }}">
 
 <div class="hero-content">
@@ -120,7 +125,7 @@ src="https://image.tmdb.org/t/p/original{{ tv.backdrop_path }}">
 <a href="{% url 'detail' 'tv' popular.id %}">
 
 
-<img loading="lazy" src="https://image.tmdb.org/t/p/w500{{ popular.poster_path }}">
+<img loading="lazy" alt="{{ popular.name }} poster" src="https://image.tmdb.org/t/p/w500{{ popular.poster_path }}">
 
 </a>
 
@@ -167,7 +172,7 @@ src="https://image.tmdb.org/t/p/original{{ tv.backdrop_path }}">
 <a href="{% url 'detail' 'tv' top.id %}">
 
 
-<img loading="lazy" src="https://image.tmdb.org/t/p/w500{{ top.poster_path }}">
+<img loading="lazy" alt="{{ top.name }} poster" src="https://image.tmdb.org/t/p/w500{{ top.poster_path }}">
 
 </a>
 
