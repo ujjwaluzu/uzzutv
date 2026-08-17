@@ -1,8 +1,11 @@
 {% extends "uzzutv/layout.html" %}
 {% load static %}
 
-{% block title %}UzzUTV - Profile{% endblock %}
-{% block meta_description %}Public UzzUTV profile - ratings and comments.{% endblock %}
+{% block title %}UzzUTV - User Profile{% endblock %}
+{% block meta_description %}View a UzzUTV user's ratings and recent comments on movies and TV shows.{% endblock %}
+{% block robots %}index, follow{% endblock %}
+{% block canonical %}<link rel="canonical" href="https://uzzutv.pythonanywhere.com/profile/{{ user_id }}/">{% endblock %}
+{% block og_url %}https://uzzutv.pythonanywhere.com/profile/{{ user_id }}/{% endblock %}
 
 {% block css %}
 <style>
@@ -681,6 +684,49 @@ function renderProfile(profile, isOwner) {
 
     if (isOwner) {
         document.getElementById("profile-you-badge").style.display = "inline-block";
+    }
+
+    /* SEO enrichment once the profile is known */
+
+    document.title = `UzzUTV - @${username} - Ratings & Comments`;
+
+    const description = document.querySelector('meta[name="description"]');
+
+    if (description) {
+        description.setAttribute(
+            "content",
+            `View ${username}'s ratings and recent comments on movies and TV shows on UzzUTV.`
+        );
+    }
+
+    const pageTitle = `UzzUTV - @${username} - Ratings & Comments`;
+
+    const ogTitle = document.querySelector('meta[property="og:title"]');
+
+    if (ogTitle) {
+        ogTitle.setAttribute("content", pageTitle);
+    }
+
+    const twitterTitle = document.querySelector('meta[name="twitter:title"]');
+
+    if (twitterTitle) {
+        twitterTitle.setAttribute("content", pageTitle);
+    }
+
+    if (profile.avatar_url) {
+
+        const ogImage = document.querySelector('meta[property="og:image"]');
+
+        if (ogImage) {
+            ogImage.setAttribute("content", profile.avatar_url);
+        }
+
+        const twitterImage = document.querySelector('meta[name="twitter:image"]');
+
+        if (twitterImage) {
+            twitterImage.setAttribute("content", profile.avatar_url);
+        }
+
     }
 
     loadProfileContent(profile);

@@ -5,8 +5,8 @@
 <link rel="stylesheet" href="{% static 'uzzutv/home.css' %}">
 {% endblock %}
 
-{% block title %}UzzUTV - My Ratings{% endblock %}
-{% block meta_description %}All your ratings on UzzUTV.{% endblock %}
+{% block title %}UzzUTV - Ratings{% endblock %}
+{% block meta_description %}Browse movie and TV ratings on UzzUTV.{% endblock %}
 {% block robots %}noindex, nofollow{% endblock %}
 {% block canonical %}{% endblock %}
 
@@ -246,6 +246,9 @@ async function loadRatings() {
 
         document.getElementById("rated-title").textContent =
             `${displayName}'s Ratings`;
+
+        document.title =
+            `${displayName}'s Ratings - UzzUTV`;
 
     } else {
 
