@@ -10,9 +10,9 @@
 <style>
 .profile-page{
     min-height: calc(100vh - 160px);
-    max-width: 1100px;
+    max-width: 1280px;
     margin: 0 auto;
-    padding: 70px 20px 60px;
+    padding: 64px 24px 60px;
     color: white;
 }
 
@@ -156,32 +156,109 @@
 /* ---------- CONTENT SECTIONS ---------- */
 
 .profile-section{
-    margin-top: 36px;
+    margin-top: 32px;
+}
+
+.profile-section-header{
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
 }
 
 .profile-section-title{
+    display: flex;
+    align-items: center;
+    gap: 12px;
     font-size: 22px;
     font-weight: 700;
-    margin-bottom: 16px;
+    margin-bottom: 0;
 }
 
-.profile-grid{
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 14px;
+.profile-section-title::before{
+    content: "";
+    width: 4px;
+    height: 22px;
+    background: linear-gradient(180deg, #ff3c3c, #c81e1e);
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+
+.profile-slider{
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    padding-bottom: 10px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.15) transparent;
+}
+
+.profile-slider::-webkit-scrollbar{
+    height: 6px;
+}
+
+.profile-slider::-webkit-scrollbar-thumb{
+    background: rgba(255,255,255,0.15);
+    border-radius: 3px;
+}
+
+.profile-slider::-webkit-scrollbar-track{
+    background: transparent;
+}
+
+.profile-slider .profile-card{
+    flex: 0 0 170px;
+    width: 170px;
+}
+
+.profile-slider > .profile-empty{
+    width: 100%;
+}
+
+.profile-slider-controls{
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
+}
+
+.profile-slider-controls button{
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.12);
+    color: #d1d5db;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: inherit;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.profile-slider-controls button:hover{
+    background: rgba(255,60,60,0.12);
+    border-color: #ff3c3c;
+    color: #ff3c3c;
 }
 
 .profile-card{
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.07);
+    background: rgba(20,22,28,0.9);
+    border: 1px solid rgba(255,255,255,0.08);
     border-radius: 12px;
     overflow: hidden;
-    transition: transform 0.2s, border-color 0.2s;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
 }
 
 .profile-card:hover{
-    transform: translateY(-3px);
-    border-color: rgba(255,60,60,0.5);
+    transform: translateY(-4px);
+    border-color: rgba(255,60,60,0.55);
+    box-shadow: 0 10px 24px rgba(0,0,0,0.45);
 }
 
 .profile-card img{
@@ -189,10 +266,15 @@
     aspect-ratio: 2/3;
     object-fit: cover;
     display: block;
+    transition: transform 0.3s ease;
+}
+
+.profile-card:hover img{
+    transform: scale(1.05);
 }
 
 .profile-card-title{
-    padding: 10px 12px;
+    padding: 10px 12px 6px;
     font-size: 13.5px;
     font-weight: 600;
     color: #e5e7eb;
@@ -202,16 +284,10 @@
 }
 
 .profile-card-stars{
-    padding: 0 12px 10px;
+    padding: 0 12px 12px;
     color: #ff3c3c;
     font-size: 13px;
     letter-spacing: 1px;
-}
-
-.profile-view-all{
-    display: flex;
-    justify-content: center;
-    margin-top: 18px;
 }
 
 .profile-view-all-btn{
@@ -221,7 +297,7 @@
     color: #d1d5db;
     font-size: 13px;
     font-weight: 500;
-    padding: 8px 20px;
+    padding: 9px 22px;
     border-radius: 8px;
     text-decoration: none;
     transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
@@ -237,18 +313,25 @@
 /* ---------- COMMENTS ---------- */
 
 .profile-comment{
-    background: rgba(255,255,255,0.03);
+    background: rgba(20,22,28,0.9);
     border: 1px solid rgba(255,255,255,0.07);
-    border-radius: 12px;
-    padding: 14px 18px;
+    border-radius: 10px;
+    padding: 12px 16px;
     margin-bottom: 10px;
+    transition: border-color 0.15s ease;
+}
+
+.profile-comment:hover{
+    border-color: rgba(255,60,60,0.4);
 }
 
 .profile-comment-media{
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 10px;
     margin-bottom: 6px;
+    flex-wrap: wrap;
 }
 
 .profile-comment-media a{
@@ -262,9 +345,23 @@
     text-decoration: underline;
 }
 
+.profile-comment-meta{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
 .profile-comment-date{
-    color: #5f6670;
+    color: #6b7280;
     font-size: 12px;
+}
+
+.profile-comment-arrow{
+    color: #6b7280;
+    font-size: 14px;
+    line-height: 1;
 }
 
 .profile-comment-stars{
@@ -275,9 +372,9 @@
 }
 
 .profile-comment-content{
-    color: #d8dce2;
-    font-size: 14px;
-    line-height: 1.6;
+    color: #d1d5db;
+    font-size: 13.5px;
+    line-height: 1.55;
     white-space: pre-wrap;
     word-break: break-word;
 }
@@ -375,9 +472,9 @@
         padding: 24px 14px 40px;
     }
 
-    .profile-grid{
-        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-        gap: 10px;
+    .profile-slider .profile-card{
+        flex-basis: 135px;
+        width: 135px;
     }
 
 }
@@ -470,13 +567,39 @@
 
         <div class="profile-section">
 
-            <h2 class="profile-section-title">Rated Movies & TV</h2>
+            <div class="profile-section-header">
 
-            <div id="rated-grid" class="profile-grid"></div>
+                <h2 class="profile-section-title">Rated Movies & TV</h2>
 
-            <div class="profile-view-all" id="rated-view-all" style="display:none;">
-                <a href="/rated/" class="profile-view-all-btn">View All</a>
+                <a href="/rated/" class="profile-view-all-btn" id="rated-view-all" style="display:none;">View All →</a>
+
+                <div class="profile-slider-controls">
+                    <button type="button" onclick="profileSlideLeft('rated-slider')">❮</button>
+                    <button type="button" onclick="profileSlideRight('rated-slider')">❯</button>
+                </div>
+
             </div>
+
+            <div id="rated-slider" class="profile-slider"></div>
+
+        </div>
+
+        <div class="profile-section">
+
+            <div class="profile-section-header">
+
+                <h2 class="profile-section-title">Watchlist</h2>
+
+                <a href="/watchlist/" class="profile-view-all-btn" id="watchlist-view-all" style="display:none;">View All →</a>
+
+                <div class="profile-slider-controls">
+                    <button type="button" onclick="profileSlideLeft('watchlist-slider')">❮</button>
+                    <button type="button" onclick="profileSlideRight('watchlist-slider')">❯</button>
+                </div>
+
+            </div>
+
+            <div id="watchlist-slider" class="profile-slider"></div>
 
         </div>
 
@@ -494,18 +617,6 @@
                 <button type="button" id="profile-comment-prev">← Previous</button>
                 <span class="profile-comment-page-info" id="profile-comment-page-info">Page 1 of 1</span>
                 <button type="button" id="profile-comment-next">Next →</button>
-            </div>
-
-        </div>
-
-        <div class="profile-section">
-
-            <h2 class="profile-section-title">Watchlist</h2>
-
-            <div id="watchlist-grid" class="profile-grid"></div>
-
-            <div class="profile-view-all" id="watchlist-view-all" style="display:none;">
-                <a href="/watchlist/" class="profile-view-all-btn">View All</a>
             </div>
 
         </div>
@@ -870,10 +981,10 @@ async function loadProfileContent(user) {
         watchlistCount;
 
     document.getElementById("rated-view-all").style.display =
-        ratingsCount > 12 ? "flex" : "none";
+        ratingsCount > 12 ? "inline-block" : "none";
 
     document.getElementById("watchlist-view-all").style.display =
-        watchlistCount > 12 ? "flex" : "none";
+        watchlistCount > 12 ? "inline-block" : "none";
 
     profileCommentPage = 1;
 
@@ -1031,12 +1142,12 @@ document.getElementById("profile-comment-next").addEventListener(
 
 async function renderRatings(ratings) {
 
-    const container = document.getElementById("rated-grid");
+    const container = document.getElementById("rated-slider");
 
     if (!ratings || ratings.length === 0) {
 
         container.innerHTML = `
-            <div class="profile-empty" style="grid-column:1/-1;">
+            <div class="profile-empty">
                 No ratings yet. Rate movies and TV shows to see them here.
             </div>
         `;
@@ -1045,7 +1156,7 @@ async function renderRatings(ratings) {
     }
 
     container.innerHTML =
-        '<div class="profile-empty" style="grid-column:1/-1;">Loading...</div>';
+        '<div class="profile-empty">Loading...</div>';
 
     const mediaMap = await loadMediaInfos(ratings);
 
@@ -1166,6 +1277,10 @@ async function renderComments(comments) {
 
         mediaLine.appendChild(link);
 
+        const meta = document.createElement("div");
+
+        meta.className = "profile-comment-meta";
+
         const date = document.createElement("span");
 
         date.className = "profile-comment-date";
@@ -1173,7 +1288,17 @@ async function renderComments(comments) {
         date.textContent =
             formatProfileDate(comment.created_at);
 
-        mediaLine.appendChild(date);
+        meta.appendChild(date);
+
+        const arrow = document.createElement("span");
+
+        arrow.className = "profile-comment-arrow";
+
+        arrow.textContent = "›";
+
+        meta.appendChild(arrow);
+
+        mediaLine.appendChild(meta);
 
         row.appendChild(mediaLine);
 
@@ -1215,12 +1340,12 @@ async function renderComments(comments) {
 
 function renderWatchlist(watchlist) {
 
-    const container = document.getElementById("watchlist-grid");
+    const container = document.getElementById("watchlist-slider");
 
     if (!watchlist || watchlist.length === 0) {
 
         container.innerHTML = `
-            <div class="profile-empty" style="grid-column:1/-1;">
+            <div class="profile-empty">
                 Your watchlist is empty.
             </div>
         `;
@@ -1267,6 +1392,32 @@ function renderWatchlist(watchlist) {
         container.appendChild(card);
 
     });
+
+}
+
+
+/* =========================================================
+   PROFILE SLIDERS
+========================================================= */
+
+function profileSlideLeft(id) {
+
+    const slider = document.getElementById(id);
+
+    if (slider) {
+        slider.scrollBy({ left: -600, behavior: "smooth" });
+    }
+
+}
+
+
+function profileSlideRight(id) {
+
+    const slider = document.getElementById(id);
+
+    if (slider) {
+        slider.scrollBy({ left: 600, behavior: "smooth" });
+    }
 
 }
 
