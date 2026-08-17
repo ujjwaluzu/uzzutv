@@ -12,6 +12,7 @@ urlpatterns=[
     path("<str:type>/<int:id>/", views.detail, name="detail"),
     path("watchlist/", views.watchlist, name="watchlist"),
 path("rated/", views.rated, name="rated"),
+path("rated/<uuid:user_id>/", views.rated, name="rated_user"),
     path("terms/", views.terms, name="terms"),
     path("dmca/", views.dmca, name="dmca"),
     path("auth/", views.auth, name="auth"),

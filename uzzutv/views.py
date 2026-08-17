@@ -727,8 +727,8 @@ def detail(request, type, id):
 def watchlist(request):
     return render(request, "uzzutv/watchlist.html")
 
-def rated(request):
-    return render(request, "uzzutv/rated.html")
+def rated(request, user_id=None):
+    return render(request, "uzzutv/rated.html", {"user_id": user_id})
 
 def terms(request):
     return render(request, "uzzutv/terms.html")
