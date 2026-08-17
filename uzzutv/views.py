@@ -559,7 +559,7 @@ def watchmov(request, movie_id):
     url = f"https://www.vidking.net/embed/movie/{movie_id}?color=e50914&autoPlay=true"
     url2 = f"https://vidnest.fun/movie/{movie_id}?autoPlay=true&sub=en"
     url3 = f"https://vidsrcme.ru/embed/movie?imdb={imdb}&ds_lang=en&autoplay=1"
-    url4 = f"https://vidfast.pro/movie/{imdb}?autoPlay=true?sub=en"
+    url4 = f"https://vidfast.pro/movie/{imdb}?autoPlay=true&sub=en&mute=false"
     url5 = f"https://player.videasy.net/movie/{movie_id}?color=8B5CF6&autoPlay=true"
     return render(request, "uzzutv/watchmov.html", {
         "url": url,

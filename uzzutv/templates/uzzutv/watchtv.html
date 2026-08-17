@@ -23,28 +23,213 @@
 
 <style>
 body{
-    background:#242428;
-    color:white;
+    background:#0b0b0b !important;
+    color:#f5f5f5;
+    font-family:"Inter", sans-serif;
     overflow-x:hidden;
 }
 
-/* Player */
+/* =========================================================
+   CONTAINER
+========================================================= */
 
-.watch-info{
-    font-size:17px;
+.watch-container{
+    max-width:1280px;
+    margin:0 auto;
+    padding:88px 24px 70px;
+}
+
+/* =========================================================
+   EPISODE HEADER
+========================================================= */
+
+.watch-header{
+    margin-bottom:24px;
+}
+
+.watch-title{
+    font-size:clamp(26px, 3vw, 38px);
+    font-weight:800;
+    letter-spacing:-.5px;
+    line-height:1.15;
+    margin:0 0 8px;
+    color:#ffffff;
+    overflow-wrap:break-word;
+}
+
+.watch-meta{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex-wrap:wrap;
+    margin:0;
+    font-size:14px;
+    color:#9ca3af;
+}
+
+.watch-meta .meta-strong{
+    color:#d1d5db;
     font-weight:600;
-    margin:0 0 10px;
-    color:#e5e7eb;
+}
+
+.watch-meta .meta-dot{
+    color:#ff3c3c;
+    font-weight:700;
+}
+
+/* =========================================================
+   LAYOUT GRID
+========================================================= */
+
+.watch-grid{
+    display:grid;
+    grid-template-columns:320px minmax(0,1fr);
+    gap:24px;
+    align-items:start;
+}
+
+/* =========================================================
+   EPISODE SIDEBAR
+========================================================= */
+
+.watch-sidebar{
+    background:#151515;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:14px;
+    padding:18px;
+    position:sticky;
+    top:84px;
+    max-height:calc(100vh - 104px);
+    overflow-y:auto;
+    scrollbar-width:thin;
+    scrollbar-color:#333333 transparent;
+}
+
+.watch-sidebar::-webkit-scrollbar{
+    width:6px;
+}
+
+.watch-sidebar::-webkit-scrollbar-thumb{
+    background:#2e2e2e;
+    border-radius:3px;
+}
+
+/* Season selector */
+
+.season-form{
+    margin-bottom:14px;
+}
+
+.season-select{
+    width:100%;
+    appearance:none;
+    -webkit-appearance:none;
+    background:#0f0f0f url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 14px center;
+    color:#ffffff;
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:10px;
+    padding:11px 38px 11px 14px;
+    font-size:14px;
+    font-weight:600;
+    font-family:inherit;
+    cursor:pointer;
+    outline:none;
+    transition:border-color .2s ease, box-shadow .2s ease;
+}
+
+.season-select:focus{
+    border-color:#ff3c3c;
+    box-shadow:0 0 0 3px rgba(255,60,60,.15);
+}
+
+.season-select option{
+    background:#151515;
+    color:#ffffff;
+}
+
+/* Episode list */
+
+.episode-list{
+    border-top:1px solid rgba(255,255,255,.06);
+    padding-top:6px;
+}
+
+.episode{
+    border-bottom:1px solid rgba(255,255,255,.05);
+}
+
+.episode:last-child{
+    border-bottom:none;
+}
+
+.episode a{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:11px 12px;
+    border-radius:8px;
+    text-decoration:none;
+    color:#d1d5db;
+    font-size:14px;
+    transition:background-color .2s ease, color .2s ease;
+}
+
+.episode a:hover{
+    background:#1f1f1f;
+    color:#ffffff;
+}
+
+.ep-num{
+    min-width:26px;
+    text-align:right;
+    font-size:13px;
+    font-weight:700;
+    color:#6b7280;
+    flex-shrink:0;
+}
+
+.ep-name{
+    flex:1;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.episode.active a{
+    background:#ff3c3c;
+    color:#ffffff;
+    font-weight:600;
+    box-shadow:0 0 14px rgba(255,60,60,.35);
+}
+
+.episode.active a::before{
+    content:"\25B6";
+    font-size:9px;
+    color:#ffffff;
+    flex-shrink:0;
+}
+
+.episode.active .ep-num{
+    color:#ffffff;
+}
+
+/* =========================================================
+   MAIN / PLAYER
+========================================================= */
+
+.watch-main{
+    min-width:0;
 }
 
 .player{
     position:relative;
     width:100%;
     aspect-ratio:16/9;
-    background:#000;
-    border-radius:12px;
+    background:#000000;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:14px;
     overflow:hidden;
-    box-shadow:0 10px 40px rgba(0,0,0,0.6);
+    box-shadow:0 15px 40px rgba(0,0,0,.35);
 }
 
 .player iframe{
@@ -56,123 +241,188 @@ body{
     border:none;
 }
 
-/* Sidebar */
-
-.sidebar{
-    background:#111;
-    padding:15px;
-    border-radius:10px;
-    max-height:80vh;
-    overflow-y:auto;
-    margin-top:32px;
-}
-
-.episode{
-    padding:10px;
-    border-bottom:1px solid #333;
-}
-
-.episode a{
-    text-decoration:none;
-    color:white;
-    display:block;
-}
-
-.episode:hover{
-    background:#1f1f1f;
-}
-
-.active{
-    background:#2b2b2b;
-}
-
-/* Server */
+/* =========================================================
+   SERVERS
+========================================================= */
 
 .server-section{
-    margin-top:15px;
+    margin-top:24px;
+    padding:20px;
+    background:#151515;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:14px;
 }
 
 .server-title{
     font-size:16px;
-    margin-bottom:10px;
+    font-weight:700;
+    color:#ffffff;
+    margin:0 0 16px;
+}
+
+.server-title::after{
+    content:" \00B7 switch anytime";
+    color:#9ca3af;
+    font-weight:400;
+    font-size:13px;
 }
 
 .server-list{
     display:flex;
-    gap:10px;
     flex-wrap:wrap;
+    gap:10px;
 }
 
 .server-btn{
-    padding:8px 14px;
-    border-radius:8px;
-    border:none;
-    background:#1f2937;
-    color:white;
+    flex:1 1 150px;
+    padding:12px 16px;
+    border-radius:10px;
+    border:1px solid rgba(255,255,255,.08);
+    background:#181818;
+    color:#d1d5db;
     cursor:pointer;
     font-size:13px;
+    font-weight:600;
+    letter-spacing:.03em;
+    text-transform:uppercase;
+    font-family:inherit;
+    transition:background-color .2s ease, border-color .2s ease, color .2s ease, box-shadow .2s ease;
+}
+
+.server-btn:hover{
+    background:#242424;
+    border-color:rgba(255,255,255,.16);
+    color:#ffffff;
 }
 
 .server-btn.active{
-    background:white;
-    color:black;
-    font-weight:600;
+    background:#ff3c3c;
+    border-color:#ff3c3c;
+    color:#ffffff;
+    box-shadow:0 0 12px rgba(255,60,60,.25);
 }
 
-/* MOBILE ORDER */
+.server-btn.active:hover{
+    background:#ff2b2b;
+}
 
-@media (max-width:768px){
+/* =========================================================
+   TABLET (768px - 1023px)
+========================================================= */
 
-/* Order control */
-.server-col{ order:1; padding-top:15px; }
-.player-col{ order:2; }
-.sidebar-col{ order:3; }
+@media (min-width:768px) and (max-width:1023px){
 
-/* Sidebar smaller */
-.sidebar{
-    max-height:300px;
-    margin-top:0;
+.watch-container{
+    padding:84px 20px 60px;
+}
+
+.watch-grid{
+    grid-template-columns:280px minmax(0,1fr);
+}
+
+}
+
+/* =========================================================
+   MOBILE (< 768px)
+========================================================= */
+
+@media (max-width:767px){
+
+.watch-container{
+    padding:72px 14px 50px;
+}
+
+.watch-header{
+    text-align:center;
+    margin-bottom:18px;
+}
+
+.watch-title{
+    font-size:24px;
+}
+
+.watch-meta{
+    justify-content:center;
+}
+
+.watch-grid{
+    grid-template-columns:1fr;
+    gap:18px;
+}
+
+.watch-main{
+    order:-1;
+}
+
+.watch-sidebar{
+    position:static;
+    max-height:none;
+    padding:14px;
+}
+
+.episode-list{
+    max-height:400px;
+    overflow-y:auto;
+    scrollbar-width:thin;
+    scrollbar-color:#333333 transparent;
+}
+
+.episode-list::-webkit-scrollbar{
+    width:6px;
+}
+
+.episode-list::-webkit-scrollbar-thumb{
+    background:#2e2e2e;
+    border-radius:3px;
+}
+
+.server-section{
+    padding:14px;
 }
 
 .server-list{
-    justify-content:center;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
 }
-.mobile{
-    font-size: 1rem;
+
+.server-btn{
+    flex:none;
+    padding:13px 10px;
+    font-size:12.5px;
 }
+
+.server-btn:last-child:nth-child(odd){
+    grid-column:1 / -1;
+}
+
 }
 
 </style>
-<div class="container mt-5">
+<div class="watch-container">
 
-<div class="row g-3">
+    <header class="watch-header">
 
-    <!-- SERVER (TOP on mobile, below player on desktop) -->
-    <div class="col-12 d-md-none server-col">
+        <h1 class="watch-title">{{ title }}</h1>
 
-        <div class="server-section">
-            <h3 class="server-title">Servers</h3>
+        <p class="watch-meta">
+            <span class="meta-strong">S{{ current_season }}</span>
+            <span class="meta-dot">·</span>
+            <span class="meta-strong">E{{ current_episode }}</span>
+            <span class="meta-dot">·</span>
+            <span class="meta-name">{% for ep in episodes %}{% if ep.episode_number == current_episode %}{{ ep.name }}{% endif %}{% endfor %}</span>
+        </p>
 
-            <div class="server-list">
-                <button class="server-btn active" onclick="changeServer('{{url}}', this)">Vidking</button>
-                <button class="server-btn" onclick="changeServer('{{url2}}', this)">Vidnest</button>
-                <button class="server-btn" onclick="changeServer('{{url3}}', this)">Vidsrc</button>
-                <button class="server-btn" onclick="changeServer('{{url4}}', this)">Vidfast</button>
-                <button class="server-btn" onclick="changeServer('{{url5}}', this)">Videasy</button>
-            </div>
-        </div>
+    </header>
 
-    </div>
+    <div class="watch-grid">
 
+        <!-- EPISODE SIDEBAR -->
+        <aside class="watch-sidebar">
 
-    <!-- SIDEBAR (LEFT on desktop) -->
-    <div class="col-md-3 sidebar-col">
+            <form method="GET" class="season-form">
 
-        <div class="sidebar">
-
-            <form method="GET">
-
-                <select name="season" onchange="this.form.submit()" class="form-select mb-3">
+                <select name="season" onchange="this.form.submit()" class="season-select">
 
                     {% for season in seasons %}
                     {% if season.season_number != 0 %}
@@ -191,53 +441,98 @@ body{
 
             </form>
 
-            {% for ep in episodes %}
+            <div class="episode-list">
 
-            <div class="episode {% if ep.episode_number == current_episode %}active{% endif %}">
-                <a href="?season={{current_season}}&episode={{ep.episode_number}}">
-                    <b>{{ ep.episode_number }}.</b> {{ ep.name }}
-                </a>
+                {% for ep in episodes %}
+
+                <div class="episode {% if ep.episode_number == current_episode %}active{% endif %}">
+                    <a href="?season={{current_season}}&episode={{ep.episode_number}}">
+                        <span class="ep-num">{{ ep.episode_number }}</span>
+                        <span class="ep-name">{{ ep.name }}</span>
+                    </a>
+                </div>
+
+                {% endfor %}
+
             </div>
 
-            {% endfor %}
+        </aside>
 
-        </div>
+        <!-- PLAYER + SERVERS -->
+        <main class="watch-main">
+
+            <div class="player">
+                <iframe id="player" src="{{url4}}" allowfullscreen allow="autoplay; encrypted-media"></iframe>
+            </div>
+
+            <section class="server-section">
+
+                <h3 class="server-title">Servers</h3>
+
+                <div class="server-list">
+                    <button class="server-btn active" onclick="changeServer('{{url4}}', this)">Vidfast</button>
+                    <button class="server-btn" onclick="changeServer('{{url}}', this)">Vidking</button>
+                    <button class="server-btn" onclick="changeServer('{{url2}}', this)">Vidnest</button>
+                    <button class="server-btn" onclick="changeServer('{{url3}}', this)">Vidsrc</button>
+                    <button class="server-btn" onclick="changeServer('{{url5}}', this)">Videasy</button>
+                </div>
+
+            </section>
+
+        </main>
 
     </div>
 
-
-    <!-- PLAYER + SERVER -->
-    <div class="col-md-9 player-col">
-
-        <!-- PLAYER -->
-        <h1 class="watch-info">{{title}} &middot; Season {{current_season}} &middot; Episode {{current_episode}}</h1>
-
-        <div class="player mb-3">
-            <iframe id="player" src="{{url}}" allowfullscreen allow="encrypted-media"></iframe>
-        </div>
-
-        <!-- SERVER (DESKTOP BELOW PLAYER) -->
-        <div class="server-section d-none d-md-block">
-
-            <h3 class="server-title">Servers</h3>
-
-            <div class="server-list">
-                <button class="server-btn active" onclick="changeServer('{{url}}', this)">Vidking</button>
-                <button class="server-btn" onclick="changeServer('{{url2}}', this)">Vidnest</button>
-                <button class="server-btn" onclick="changeServer('{{url3}}', this)">Vidsrc</button>
-                <button class="server-btn" onclick="changeServer('{{url4}}', this)">Vidfast</button>
-                <button class="server-btn" onclick="changeServer('{{url5}}', this)">Videasy</button>
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
 </div>
 
 
 <script>
+const VIDFAST_ORIGINS = [
+    "https://vidfast.pro", "https://vidfast.in", "https://vidfast.io",
+    "https://vidfast.me", "https://vidfast.net", "https://vidfast.pm",
+    "https://vidfast.vc", "https://vidfast.bz"
+];
+
+let vidfastLastMuteCmd = 0;
+
+function isVidfast(url){
+    try{
+        return VIDFAST_ORIGINS.includes(new URL(url, window.location.href).origin);
+    }catch(e){
+        return false;
+    }
+}
+
+function vidfastUnmute(iframe){
+    if(!iframe || !isVidfast(iframe.src)) return;
+
+    const now = Date.now();
+    if(now - vidfastLastMuteCmd < 1200) return;
+    vidfastLastMuteCmd = now;
+
+    iframe.contentWindow.postMessage({ command: "mute", muted: false }, "*");
+    iframe.contentWindow.postMessage({ command: "volume", level: 1 }, "*");
+}
+
+function vidfastWatchdog(iframe){
+    if(!iframe || !isVidfast(iframe.src)) return;
+
+    let attempts = 0;
+    const timer = setInterval(() => {
+        iframe.contentWindow.postMessage({ command: "getStatus" }, "*");
+        attempts++;
+        if(attempts > 20) clearInterval(timer);
+    }, 1500);
+}
+
+window.addEventListener("message", ({ origin, data }) => {
+    if(!VIDFAST_ORIGINS.includes(origin) || !data) return;
+
+    if(data.type === "PLAYER_EVENT" && data.data && data.data.muted){
+        vidfastUnmute(document.getElementById("player"));
+    }
+});
+
 function changeServer(url, btn){
 
     document.getElementById("player").src = url;
@@ -249,10 +544,16 @@ function changeServer(url, btn){
     btn.classList.add("active");
 }
 
-
-
-
 window.addEventListener("DOMContentLoaded", () => {
+
+const player = document.getElementById("player");
+
+player.addEventListener("load", () => {
+    vidfastUnmute(player);
+    vidfastWatchdog(player);
+});
+
+vidfastWatchdog(player);
 
 console.log("ID:", "{{id}}");
 console.log("POSTER:", "{{poster}}");

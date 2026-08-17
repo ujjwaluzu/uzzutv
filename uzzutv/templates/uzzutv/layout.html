@@ -40,10 +40,24 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
 
 <style>
-body{
-  background: #111111 !important;
-  
+:root{
+  --uzz-bg:#0b0b0b;
+  --uzz-panel:#151515;
+  --uzz-red:#ff3c3c;
+  --uzz-muted:#9ca3af;
+  --uzz-border:rgba(255,255,255,.08);
 }
+
+body{
+  background:#111111 !important;
+  font-family:"Inter", sans-serif;
+}
+
+* {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
 .bg-img{
   height: 100vh;
   width: 100vw;
@@ -53,150 +67,336 @@ body{
   left: 0;
   z-index: -1;
 }
-.navbar-brand,
-.nav-link{
-font-family: "Inter", sans-serif;
-color:white !important;
+
+/* =========================================================
+   NAVBAR
+========================================================= */
+
+.navbar{
+  position: sticky;
+  top: 0;
+  z-index: 1050;
+  background: transparent;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  padding: .65rem 1.25rem;
 }
 
-.nav-link:hover{
-color:#ff3c3c !important;
-}
-
-.nav-link.active,
-.nav-link.active:hover{
-color:#ff3c3c !important;
-}
 nav::after{
-content:"";
-position:absolute;
-top:0;
-left:0;
-width:100%;
-height:120px;
-background:linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
-z-index:-1;
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 120px;
+  background: linear-gradient(to bottom, rgba(0,0,0,.72), transparent);
+  pointer-events: none;
+  z-index: -1;
 }
 
-
-
-/* MOBILE NAV FIX */
-
-@media (max-width:768px){
-
-/* Dropdown background */
-.navbar-collapse{
-    background: rgba(0,0,0,0.95);
-    padding: 15px;
-    margin-top:10px;
-    border-radius:10px;
+.navbar-brand{
+  font-family: "Inter", sans-serif;
+  color: #ffffff !important;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -.5px;
+  margin-right: 2rem;
 }
 
-/* Make links bigger */
+.navbar-brand .brand-red{
+  color: #ff3c3c;
+}
+
+.navbar-brand:hover{
+  color: #ffffff !important;
+}
+
+.navbar-nav{
+  gap: .25rem;
+}
+
 .navbar-nav .nav-link{
-    font-size:18px;
-    padding:10px 0;
+  font-family: "Inter", sans-serif;
+  color: #d1d5db !important;
+  font-size: 14.5px;
+  font-weight: 500;
+  padding: .55rem .95rem;
+  border-radius: 8px;
+  position: relative;
+  transition: color .2s ease, background-color .2s ease;
 }
 
-/* Search spacing */
-.navbar form{
-    margin-top:10px;
+.navbar-nav .nav-link:hover{
+  color: #ffffff !important;
+  background: rgba(255,255,255,.05);
 }
 
-/* Input styling */
-.navbar input{
-    border:1px solid rgba(255,255,255,0.3);
+.navbar-nav .nav-link.active,
+.navbar-nav .nav-link.active:hover{
+  color: #ff3c3c !important;
+  background: rgba(255,60,60,.10);
+  font-weight: 600;
 }
 
-/* Button full width */
-.navbar button{
+.navbar-nav .nav-link.active::after{
+  content: "";
+  position: absolute;
+  left: .95rem;
+  right: .95rem;
+  bottom: .4rem;
+  height: 2px;
+  border-radius: 2px;
+  background: #ff3c3c;
+}
 
-    margin-top:5px;
+/* AUTH AREA */
+
+.uzz-auth{
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  margin-left: 1rem;
+}
+
+.uzz-auth .btn{
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.14);
+  color: #ffffff;
+  border-radius: 8px;
+  padding: .45rem 1.1rem;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background-color .2s ease, border-color .2s ease;
+}
+
+.uzz-auth .btn:hover{
+  background: #ff3c3c;
+  border-color: #ff3c3c;
+  color: #ffffff;
+}
+
+#account-nav .navbar-text{
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+#account-nav .navbar-text:hover{
+  color: #ff3c3c;
+}
+
+/* SEARCH */
+
+.uzz-search{
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  margin-left: 1.25rem;
+}
+
+.uzz-search-input{
+  width: 250px;
+  background: #151515;
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 8px;
+  padding: .5rem .9rem;
+  color: #ffffff;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+.uzz-search-input::placeholder{
+  color: #6b7280;
+}
+
+.uzz-search-input:focus{
+  border-color: #ff3c3c;
+  box-shadow: 0 0 0 3px rgba(255,60,60,.15);
+}
+
+.uzz-search-btn{
+  background: #ff3c3c;
+  border: none;
+  color: #ffffff;
+  border-radius: 8px;
+  padding: .5rem 1.1rem;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background-color .2s ease;
+}
+
+.uzz-search-btn:hover{
+  background: #ff2b2b;
+}
+
+/* =========================================================
+   NAVBAR MOBILE (< 992px, bootstrap collapse breakpoint)
+========================================================= */
+
+@media (max-width: 991px){
+
+.navbar{
+  padding: .5rem 1rem;
+}
+
+.navbar-toggler{
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 8px;
+  padding: .35rem .6rem;
+}
+
+.navbar-toggler:focus{
+  box-shadow: 0 0 0 3px rgba(255,60,60,.25);
+}
+
+.navbar-collapse{
+  background: #151515;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 14px;
+  padding: 16px;
+  margin-top: 12px;
+  box-shadow: 0 20px 40px rgba(0,0,0,.45);
+}
+
+.navbar-nav .nav-link{
+  font-size: 15.5px;
+  padding: .7rem .9rem;
+}
+
+.navbar-nav .nav-link.active{
+  background: rgba(255,60,60,.12);
+}
+
+.uzz-auth{
+  flex-direction: column;
+  align-items: stretch;
+  gap: .5rem;
+  margin: 12px 0 0;
+}
+
+.uzz-auth .btn{
+  width: 100%;
+  padding: .7rem 1rem;
+  text-align: center;
+}
+
+#account-nav{
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.uzz-search{
+  flex-direction: column;
+  align-items: stretch;
+  gap: .5rem;
+  margin: 12px 0 0;
+}
+
+.uzz-search-input{
+  width: 100%;
+}
+
+.uzz-search-btn{
+  padding: .7rem 1rem;
 }
 
 }
 
-
-
-
-
-
-
-
-
-/* FOOTER STYLE */
+/* =========================================================
+   FOOTER
+========================================================= */
 
 .site-footer{
-  background:#0f172a;
-  color:white;
-  padding:40px 20px;
-  text-align:center;
-  width:100%;
-  max-width:100%;
-  overflow:hidden;
+  background: #0b0b0b;
+  border-top: 1px solid rgba(255,255,255,.08);
+  color: white;
+  padding: 56px 20px 40px;
+  text-align: center;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.footer-container{
+  max-width: 860px;
+  margin: 0 auto;
 }
 
 .footer-logo{
-  font-size:24px;
-  font-weight:700;
-  margin-bottom:10px;
+  font-family: "Inter", sans-serif;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -.5px;
+  margin-bottom: 14px;
+  color: #ffffff;
+}
+
+.footer-logo .logo-red{
+  color: #ff3c3c;
 }
 
 .footer-text{
-  opacity:0.7;
-  margin-bottom:20px;
+  color: #9ca3af;
+  font-size: 14px;
+  line-height: 1.65;
+  max-width: 620px;
+  margin: 0 auto 10px;
+  opacity: 1;
 }
 
-.site-footer{
-  background:#111111;
-  color:white;
-  padding:40px 20px;
-  text-align:center;
-  width:100%;
-  max-width:100%;
-  overflow:hidden;
+.footer-tip{
+  color: #d1d5db;
+  font-size: 14px;
+  margin: 0 auto;
+}
+
+.footer-links{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px 28px;
+  flex-wrap: wrap;
+  max-width: 100%;
+  margin: 26px 0 30px;
 }
 
 .footer-links a{
-  color:white;
-  text-decoration:none;
-  opacity:0.8;
-  transition:0.2s;
+  color: #cbd5e1;
+  text-decoration: none;
+  font-size: 14px;
+  transition: color .2s ease;
 }
 
 .footer-links a:hover{
-  color:#ff3c3c;
-  opacity:1;
+  color: #ff3c3c;
 }
 
 .footer-copy{
-  font-size:13px;
-  opacity:0.6;
+  font-size: 13px;
+  color: #6b7280;
+  margin: 0;
 }
-.footer-links{
-  display:flex;
-  justify-content:center;
-  gap:20px;
-  flex-wrap:wrap;   /* 🔥 VERY IMPORTANT */
-  max-width:100%;
-}
-/* MOBILE */
-* {
-  max-width: 100%;
-  box-sizing: border-box;
-}
-@media (max-width:600px){
 
-.footer-links{
-  gap:8px;
+@media (max-width: 600px){
+
+.site-footer{
+  padding: 44px 16px 32px;
 }
 
 .footer-logo{
-  font-size:20px;
+  font-size: 22px;
 }
 
+.footer-links{
+  gap: 10px 22px;
+  margin: 22px 0 26px;
 }
-</style>
+
+}</style>
 {% block head %}{% endblock %}
 </head>
 <body>
@@ -206,16 +406,15 @@ z-index:-1;
 {% endblock %}
 
 
-<hr>
 <footer class="site-footer">
   <div class="footer-container">
 
-    <h2 class="footer-logo">UzzUTV</h2>
+    <h2 class="footer-logo">Uzz<span class="logo-red">UTV</span></h2>
 
     <p class="footer-text">
       UzzUTV does not store any files on our server, we only linked to the media which is hosted on 3rd party services.
     </p>
-    <p class="footer-text">
+    <p class="footer-tip">
       Tip: Use Brave Browser or ad blocker
     </p>
 
@@ -229,7 +428,7 @@ z-index:-1;
     </div>
 
     <p class="footer-copy">
-      © 2026 UzzuTV. All rights reserved.
+      © 2026 UzzUTV. All rights reserved.
     </p>
 
   </div>
@@ -237,9 +436,9 @@ z-index:-1;
 
 
 </div>
-<nav class="navbar navbar-expand-lg  bg-transparent navbar-dark">
+<nav class="navbar navbar-expand-lg navbar-dark">
   <div class="container-fluid">
-    <a class="navbar-brand" href="{% url 'index'%}">UzzUTV</a>
+    <a class="navbar-brand" href="{% url 'index'%}">Uzz<span class="brand-red">UTV</span></a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -254,53 +453,47 @@ z-index:-1;
         <li class="nav-item">
           <a class="nav-link {% if request.resolver_match.url_name == 'tv' or request.resolver_match.url_name == 'watchtv' or request.resolver_match.url_name == 'detail' and request.resolver_match.kwargs.type == 'tv' %}active{% endif %}" href="{% url 'tv'%}">Series</a>
         </li>
-        <li>
-          <div class="ms-3" id="auth-nav">
-
-    <!-- Logged out -->
-    <a
-        href="/auth/"
-        id="login-nav"
-        class="btn btn-outline-light"
-    >
-        Login
-    </a>
-
-    <!-- Logged in -->
-    <div
-        id="account-nav"
-        class="d-none d-flex align-items-center gap-2"
-    >
-
-        <span
-            class="navbar-text text-white"
-            id="user-username"
-        >
-            Loading...
-        </span>
-
-        <button
-            type="button"
-            class="btn btn-outline-light"
-            id="logout-btn"
-        >
-            Logout
-        </button>
-
-    </div>
-
-</div>
-        </li>
       </ul>
 
+      <div class="uzz-auth" id="auth-nav">
 
+        <!-- Logged out -->
+        <a
+            href="/auth/"
+            id="login-nav"
+            class="btn"
+        >
+            Login
+        </a>
 
+        <!-- Logged in -->
+        <div
+            id="account-nav"
+            class="d-none d-flex align-items-center gap-2"
+        >
 
+            <span
+                class="navbar-text text-white"
+                id="user-username"
+            >
+                Loading...
+            </span>
 
+            <button
+                type="button"
+                class="btn"
+                id="logout-btn"
+            >
+                Logout
+            </button>
 
-      <form method="get" action="/search" class="d-flex">
-        <input style="color: white;" class="form-control me-2 bg-transparent" type="search" placeholder="Search" aria-label="Search" name="q">
-        <button class="btn btn-outline-light" type="submit">Search</button>
+        </div>
+
+      </div>
+
+      <form method="get" action="/search" class="uzz-search">
+        <input class="uzz-search-input" type="search" placeholder="Search series, movies..." aria-label="Search" name="q">
+        <button class="uzz-search-btn" type="submit">Search</button>
       </form>
     </div>
   </div>
