@@ -1,0 +1,344 @@
+{% extends "uzzutv/layout.html" %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'uzzutv/home.css' %}">
+{% endblock %}
+
+{% block title %}UzzUTV - My Ratings{% endblock %}
+{% block meta_description %}All your ratings on UzzUTV.{% endblock %}
+{% block robots %}noindex, nofollow{% endblock %}
+{% block canonical %}{% endblock %}
+
+{% block body %}
+
+<style>
+    .profile-grid{
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 14px;
+    }
+
+    .profile-card{
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.07);
+        border-radius: 12px;
+        overflow: hidden;
+        transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .profile-card:hover{
+        transform: translateY(-3px);
+        border-color: rgba(255,60,60,0.5);
+    }
+
+    .profile-card img{
+        width: 100%;
+        aspect-ratio: 2/3;
+        object-fit: cover;
+        display: block;
+    }
+
+    .profile-card-title{
+        padding: 10px 12px;
+        font-size: 13.5px;
+        font-weight: 600;
+        color: #e5e7eb;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .profile-card-stars{
+        padding: 0 12px 10px;
+        color: #ff3c3c;
+        font-size: 13px;
+        letter-spacing: 1px;
+    }
+
+    .profile-empty{
+        text-align: center;
+        color: #8b909a;
+        font-size: 14px;
+        padding: 28px 14px;
+        background: rgba(255,255,255,0.02);
+        border: 1px dashed rgba(255,255,255,0.12);
+        border-radius: 12px;
+    }
+</style>
+
+<div class="content-section" style="margin-top:60px;">
+
+    <div class="slider-header">
+
+        <h2 class="section-title">
+            My Ratings
+        </h2>
+
+    </div>
+
+
+    <div id="rated-container">
+
+        <h3 style="text-align:center; margin-top:50px; color:white;">
+            Loading...
+        </h3>
+
+    </div>
+
+</div>
+
+
+<script>
+
+async function fetchMediaInfo(type, id) {
+
+    try {
+
+        const response = await fetch(`/media-info/${type}/${id}/`);
+
+        if (!response.ok) {
+            return null;
+        }
+
+        return await response.json();
+
+    } catch (err) {
+
+        console.error("Error loading media info:", err);
+
+        return null;
+
+    }
+
+}
+
+
+async function loadMediaInfos(items) {
+
+    const pairs = {};
+
+    items.forEach((item) => {
+
+        const key = `${item.media_type}_${item.media_id}`;
+
+        if (!pairs[key]) {
+            pairs[key] = {
+                type: item.media_type,
+                id: item.media_id
+            };
+        }
+
+    });
+
+    const entries = Object.values(pairs);
+
+    const results = await Promise.all(
+        entries.map((entry) =>
+            fetchMediaInfo(entry.type, entry.id)
+        )
+    );
+
+    const map = {};
+
+    entries.forEach((entry, index) => {
+
+        map[`${entry.type}_${entry.id}`] = results[index];
+
+    });
+
+    return map;
+
+}
+
+
+function starRow(rating) {
+
+    let stars = "";
+
+    for (let i = 1; i <= 5; i++) {
+
+        stars +=
+            i <= rating
+                ? '<span style="color:#ff3c3c;">★</span>'
+                : '<span style="color:rgba(255,255,255,0.2);">☆</span>';
+
+    }
+
+    return stars;
+
+}
+
+
+async function loadRatings() {
+
+    const container =
+        document.getElementById("rated-container");
+
+    const user = await getCurrentUser();
+
+
+    /* NOT LOGGED IN */
+
+    if (!user) {
+
+        container.innerHTML = `
+            <div style="
+                text-align:center;
+                margin-top:50px;
+                color:white;
+            ">
+
+                <h3>
+                    Please log in to view your ratings.
+                </h3>
+
+                <a
+                    href="/auth/"
+                    class="btn btn-outline-light mt-3"
+                >
+                    Login
+                </a>
+
+            </div>
+        `;
+
+        return;
+    }
+
+
+    /* GET RATINGS */
+
+    const { data, error } = await supabaseClient
+        .from("ratings")
+        .select("id,media_id,media_type,rating,updated_at")
+        .eq("user_id", user.id)
+        .order("updated_at", {
+            ascending: false
+        });
+
+
+    if (error) {
+
+        console.error(
+            "Error loading ratings:",
+            error
+        );
+
+        container.innerHTML = `
+            <h3 style="
+                text-align:center;
+                margin-top:50px;
+                color:white;
+            ">
+                Unable to load your ratings.
+            </h3>
+        `;
+
+        return;
+    }
+
+
+    /* EMPTY RATINGS */
+
+    if (!data || data.length === 0) {
+
+        container.innerHTML = `
+            <div style="
+                text-align:center;
+                margin-top:50px;
+                color:white;
+            ">
+
+                <h3>
+                    You have not rated anything yet
+                </h3>
+
+                <p style="opacity:0.7;">
+                    Rate movies and TV shows to find them here.
+                </p>
+
+            </div>
+        `;
+
+        return;
+    }
+
+
+    /* RENDER */
+
+    container.innerHTML =
+        '<div class="profile-empty">Loading...</div>';
+
+    const mediaMap = await loadMediaInfos(data);
+
+    container.innerHTML =
+        '<div class="profile-grid" id="rated-grid"></div>';
+
+    const grid = document.getElementById("rated-grid");
+
+    data.forEach((rating) => {
+
+        const info =
+            mediaMap[`${rating.media_type}_${rating.media_id}`];
+
+        const title =
+            (info && info.title) || "Unknown title";
+
+        const poster =
+            info && info.poster_path
+                ? `https://image.tmdb.org/t/p/w500${info.poster_path}`
+                : "";
+
+        const card = document.createElement("a");
+
+        card.href = `/${rating.media_type}/${rating.media_id}/`;
+        card.className = "profile-card";
+        card.style.textDecoration = "none";
+
+        if (poster) {
+
+            const img = document.createElement("img");
+
+            img.loading = "lazy";
+            img.alt = `${title} poster`;
+            img.src = poster;
+
+            card.appendChild(img);
+
+        }
+
+        const titleEl = document.createElement("div");
+
+        titleEl.className = "profile-card-title";
+
+        titleEl.textContent = title;
+
+        card.appendChild(titleEl);
+
+        const stars = document.createElement("div");
+
+        stars.className = "profile-card-stars";
+
+        stars.innerHTML = starRow(rating.rating);
+
+        card.appendChild(stars);
+
+        grid.appendChild(card);
+
+    });
+}
+
+
+/* LOAD */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+        loadRatings();
+    }
+);
+
+</script>
+
+{% endblock %}

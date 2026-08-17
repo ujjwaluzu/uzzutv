@@ -159,10 +159,13 @@
                         id="auth-username"
                         class="form-control auth-input"
                         placeholder="Choose a username"
-                        maxlength="30"
+                        maxlength="20"
+                        autocomplete="off"
                     >
 
                 </div>
+
+                <div id="username-feedback" class="mt-2 d-none"></div>
 
             </div>
 
@@ -274,6 +277,96 @@ function showAuthMessage(message, type = "danger") {
 }
 
 
+/* ---------------------------------------------------------
+   USERNAME AVAILABILITY CHECK (DEBOUNCED)
+--------------------------------------------------------- */
+
+const usernameFeedback =
+    document.getElementById("username-feedback");
+
+let usernameCheckTimer = null;
+let usernameCheckInFlight = false;
+let usernameCheckResult = null;
+
+
+async function runUsernameCheck() {
+
+    const value = usernameInput.value.trim();
+
+    if (!value) {
+        usernameCheckResult = null;
+        usernameFeedback.className = "mt-2 d-none";
+        return;
+    }
+
+    const check = validateUsername(value);
+
+    if (!check.valid) {
+
+        usernameCheckResult = false;
+
+        usernameFeedback.className = "mt-2 text-warning";
+
+        usernameFeedback.innerHTML =
+            "Username can only contain letters, numbers and underscores (3-20 characters).";
+
+        return;
+    }
+
+    usernameFeedback.className = "mt-2 text-secondary";
+    usernameFeedback.innerHTML = "Checking...";
+
+    const available = await usernameAvailable(value);
+
+    usernameCheckInFlight = false;
+
+    if (value !== usernameInput.value.trim()) {
+        return;
+    }
+
+    if (available === null) {
+
+        usernameCheckResult = null;
+
+        usernameFeedback.className = "mt-2 d-none";
+
+        return;
+    }
+
+    usernameCheckResult = available;
+
+    if (available) {
+
+        usernameFeedback.className = "mt-2";
+
+        usernameFeedback.innerHTML =
+            '<span style="color:#22c55e;">✓ Username available</span>';
+
+    } else {
+
+        usernameFeedback.className = "mt-2";
+
+        usernameFeedback.innerHTML =
+            '<span style="color:#ff3c3c;">✕ Username already taken</span>';
+
+    }
+
+}
+
+
+usernameInput.addEventListener("input", () => {
+
+    clearTimeout(usernameCheckTimer);
+
+    usernameCheckTimer = setTimeout(() => {
+
+        runUsernameCheck();
+
+    }, 500);
+
+});
+
+
 authToggle.addEventListener("click", () => {
 
     isSignup = !isSignup;
@@ -344,6 +437,16 @@ authForm.addEventListener("submit", async (event) => {
 
         if (isSignup) {
 
+        const usernameCheck = validateUsername(username);
+
+        if (!usernameCheck.valid) {
+
+            showAuthMessage(usernameCheck.message);
+
+            return;
+
+        }
+
         const redirectUrl =
             window.location.hostname === "127.0.0.1" ||
             window.location.hostname === "localhost"
@@ -369,10 +472,29 @@ authForm.addEventListener("submit", async (event) => {
 
             if (data.session) {
 
-                showAuthMessage(
-                    "Account created successfully!",
-                    "success"
-                );
+                /* Create the profiles row (id = auth user id) */
+
+                const { profile, error: profileError } =
+                    await createUserProfile(
+                        data.session.user,
+                        username
+                    );
+
+                if (!profile) {
+
+                    showAuthMessage(
+                        profileError ||
+                        "Account created, but we could not save your username. You can set it up on your profile page."
+                    );
+
+                } else {
+
+                    showAuthMessage(
+                        "Account created successfully!",
+                        "success"
+                    );
+
+                }
 
                 setTimeout(() => {
                     window.location.href = "/home/";

@@ -1802,12 +1802,14 @@ async function setupCommentForm() {
         return;
     }
 
+    const profile = await ensureUserProfile(user);
+
     commentFormContainer.innerHTML = `
 
         <div class="comment-form">
 
             <div class="comment-form-avatar">
-                ${(user.email || "?").charAt(0).toUpperCase()}
+                ${(profile && profile.username || user.email || "?").charAt(0).toUpperCase()}
             </div>
 
             <div class="comment-form-main">
@@ -1989,6 +1991,69 @@ async function loadCommentAuthorRatings(comments) {
 
 
 /* ---------------------------------------------------------
+   COMMENT AUTHOR USERNAMES
+--------------------------------------------------------- */
+
+async function loadCommentUsernames(comments) {
+
+    const userIds = [
+        ...new Set(
+            comments
+                .map((comment) => comment.user_id)
+                .filter(Boolean)
+        )
+    ];
+
+    if (userIds.length === 0) {
+        return {};
+    }
+
+    const usernamesByUser = {};
+
+    try {
+
+        for (let i = 0; i < userIds.length; i += 100) {
+
+            const batch = userIds.slice(i, i + 100);
+
+            const { data, error } = await supabaseClient
+                .from("profiles")
+                .select("id,username")
+                .in("id", batch);
+
+            if (error) {
+
+                console.error(
+                    "Error loading comment usernames:",
+                    error
+                );
+
+                return {};
+
+            }
+
+            if (data) {
+                data.forEach((row) => {
+                    usernamesByUser[row.id] = row.username;
+                });
+            }
+
+        }
+
+    } catch (err) {
+
+        console.error("Error loading comment usernames:", err);
+
+        return {};
+
+    }
+
+    return usernamesByUser;
+
+}
+
+
+/* ---------------------------------------------------------
    LOAD COMMENTS (PAGINATED)
 --------------------------------------------------------- */
 
@@ -2077,6 +2142,9 @@ async function loadComments(page = currentCommentPage) {
     const ratingsByUser =
         await loadCommentAuthorRatings(data || []);
 
+    const usernamesByUser =
+        await loadCommentUsernames(data || []);
+
 
     commentsList.innerHTML = "";
 
@@ -2089,13 +2157,19 @@ async function loadComments(page = currentCommentPage) {
         commentCard.className = "comment-card";
 
 
+        const authorName =
+            usernamesByUser[comment.user_id] ||
+            comment.user_email;
+
+        const avatarName = authorName || "?";
+
         const avatar =
             document.createElement("div");
 
         avatar.className = "comment-avatar";
 
         avatar.textContent =
-            (comment.user_email || "?").charAt(0).toUpperCase();
+            avatarName.charAt(0).toUpperCase();
 
 
         const body =
@@ -2110,13 +2184,13 @@ async function loadComments(page = currentCommentPage) {
         header.className = "comment-header";
 
 
-        const email =
+        const author =
             document.createElement("span");
 
-        email.className = "comment-email";
+        author.className = "comment-email";
 
-        email.textContent =
-            comment.user_email;
+        author.textContent =
+            authorName || comment.user_email;
 
 
         const date =
@@ -2130,7 +2204,7 @@ async function loadComments(page = currentCommentPage) {
             );
 
 
-        header.appendChild(email);
+        header.appendChild(author);
         header.appendChild(date);
 
         body.appendChild(header);

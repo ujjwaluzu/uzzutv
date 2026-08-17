@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.core.cache import cache
 import requests
 import os
@@ -13,6 +13,47 @@ from django.shortcuts import render, redirect
 
 def auth(request):
     return render(request, "uzzutv/auth.html")
+
+
+def profile(request):
+    return render(request, "uzzutv/profile.html")
+
+
+def media_info(request, type, id):
+    """Cached TMDB title/poster lookup used by the profile page."""
+
+    if type not in ("movie", "tv"):
+        return HttpResponse("Invalid type", status=400)
+
+    cache_key = f"media_info_{type}_{id}"
+    info = cache.get(cache_key)
+
+    if info:
+        return JsonResponse(info)
+
+    params = {"api_key": API_KEY}
+
+    response = requests.get(
+        f"{BASE_URL}/{type}/{id}",
+        params=params,
+        timeout=10
+    )
+
+    if response.status_code != 200:
+        return HttpResponse("Not found", status=404)
+
+    data = response.json()
+
+    info = {
+        "id": data.get("id"),
+        "type": type,
+        "title": data.get("title") or data.get("name", ""),
+        "poster_path": data.get("poster_path", "")
+    }
+
+    cache.set(cache_key, info, 43200)  # 12 hours
+
+    return JsonResponse(info)
 
 
 def load_homepage_data():
@@ -679,6 +720,9 @@ def detail(request, type, id):
 
 def watchlist(request):
     return render(request, "uzzutv/watchlist.html")
+
+def rated(request):
+    return render(request, "uzzutv/rated.html")
 
 def terms(request):
     return render(request, "uzzutv/terms.html")

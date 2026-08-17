@@ -11,9 +11,12 @@ urlpatterns=[
     path("home/", views.home, name="home"),
     path("<str:type>/<int:id>/", views.detail, name="detail"),
     path("watchlist/", views.watchlist, name="watchlist"),
+path("rated/", views.rated, name="rated"),
     path("terms/", views.terms, name="terms"),
     path("dmca/", views.dmca, name="dmca"),
     path("auth/", views.auth, name="auth"),
+    path("profile/", views.profile, name="profile"),
+    path("media-info/<str:type>/<int:id>/", views.media_info, name="media_info"),
 
 
 ]

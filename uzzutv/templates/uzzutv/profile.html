@@ -1,0 +1,1318 @@
+{% extends "uzzutv/layout.html" %}
+{% load static %}
+
+{% block title %}UzzUTV - My Profile{% endblock %}
+{% block meta_description %}Your UzzUTV profile - ratings, comments and watchlist.{% endblock %}
+{% block robots %}noindex, nofollow{% endblock %}
+{% block canonical %}{% endblock %}
+
+{% block css %}
+<style>
+.profile-page{
+    min-height: calc(100vh - 160px);
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 70px 20px 60px;
+    color: white;
+}
+
+/* ---------- SETUP CARD ---------- */
+
+.profile-setup-card{
+    max-width: 460px;
+    margin: 40px auto 0;
+    background: rgba(22,24,29,0.88);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    padding: 40px 32px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+}
+
+.profile-setup-title{
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.profile-setup-sub{
+    color: #9ca3af;
+    font-size: 14px;
+    margin-bottom: 24px;
+}
+
+.profile-setup-input{
+    background: #16181d !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    color: #ffffff !important;
+    border-radius: 10px !important;
+    padding: 12px 14px !important;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.profile-setup-input:focus{
+    border-color: #ff3c3c !important;
+    box-shadow: 0 0 0 3px rgba(255,60,60,0.15) !important;
+}
+
+.profile-setup-input::placeholder{
+    color: #6b7280;
+}
+
+.profile-setup-btn{
+    width: 100%;
+    padding: 13px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg,#ff3c3c,#c81e1e);
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.2s, opacity 0.2s;
+}
+
+.profile-setup-btn:hover{
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(255,60,60,0.35);
+}
+
+.profile-setup-btn:disabled{
+    opacity: 0.6;
+    transform: none;
+    cursor: not-allowed;
+}
+
+/* ---------- PROFILE HEADER ---------- */
+
+.profile-header{
+    display: flex;
+    align-items: center;
+    gap: 26px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    padding: 30px 32px;
+    flex-wrap: wrap;
+}
+
+.profile-avatar{
+    width: 92px;
+    height: 92px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff3c3c, #c81e1e);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.profile-identity{
+    flex: 1;
+    min-width: 200px;
+}
+
+.profile-username{
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.profile-handle{
+    color: #9ca3af;
+    font-size: 15px;
+    margin-top: 4px;
+}
+
+.profile-stats{
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.profile-stat{
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 12px 20px;
+    text-align: center;
+    min-width: 110px;
+}
+
+.profile-stat-value{
+    font-size: 24px;
+    font-weight: 700;
+    color: #ff3c3c;
+}
+
+.profile-stat-label{
+    font-size: 12px;
+    color: #9ca3af;
+    margin-top: 2px;
+}
+
+/* ---------- CONTENT SECTIONS ---------- */
+
+.profile-section{
+    margin-top: 36px;
+}
+
+.profile-section-title{
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+.profile-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 14px;
+}
+
+.profile-card{
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s;
+}
+
+.profile-card:hover{
+    transform: translateY(-3px);
+    border-color: rgba(255,60,60,0.5);
+}
+
+.profile-card img{
+    width: 100%;
+    aspect-ratio: 2/3;
+    object-fit: cover;
+    display: block;
+}
+
+.profile-card-title{
+    padding: 10px 12px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #e5e7eb;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.profile-card-stars{
+    padding: 0 12px 10px;
+    color: #ff3c3c;
+    font-size: 13px;
+    letter-spacing: 1px;
+}
+
+.profile-view-all{
+    display: flex;
+    justify-content: center;
+    margin-top: 18px;
+}
+
+.profile-view-all-btn{
+    display: inline-block;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.12);
+    color: #d1d5db;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.profile-view-all-btn:hover{
+    background: rgba(255,60,60,0.12);
+    border-color: #ff3c3c;
+    color: #ff3c3c;
+    text-decoration: none;
+}
+
+/* ---------- COMMENTS ---------- */
+
+.profile-comment{
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 10px;
+}
+
+.profile-comment-media{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+}
+
+.profile-comment-media a{
+    color: #ff3c3c;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.profile-comment-media a:hover{
+    text-decoration: underline;
+}
+
+.profile-comment-date{
+    color: #5f6670;
+    font-size: 12px;
+}
+
+.profile-comment-stars{
+    color: #ff3c3c;
+    font-size: 12px;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+}
+
+.profile-comment-content{
+    color: #d8dce2;
+    font-size: 14px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.profile-comment-pagination{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 14px 0 4px;
+}
+
+.profile-comment-pagination button{
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.12);
+    color: #d1d5db;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: inherit;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.profile-comment-pagination button:hover:not(:disabled){
+    background: rgba(255,60,60,0.12);
+    border-color: #ff3c3c;
+    color: #ff3c3c;
+}
+
+.profile-comment-pagination button:disabled{
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.profile-comment-page-info{
+    color: #9ca3af;
+    font-size: 13px;
+}
+
+.profile-empty{
+    text-align: center;
+    color: #8b909a;
+    font-size: 14px;
+    padding: 28px 14px;
+    background: rgba(255,255,255,0.02);
+    border: 1px dashed rgba(255,255,255,0.12);
+    border-radius: 12px;
+}
+
+.profile-login-prompt{
+    text-align: center;
+    padding: 80px 20px;
+}
+
+.profile-login-prompt h2{
+    margin-bottom: 12px;
+}
+
+.profile-loading{
+    text-align: center;
+    padding: 80px 20px;
+    color: #9ca3af;
+}
+
+/* ---------- RESPONSIVE ---------- */
+
+@media (max-width: 768px){
+
+    .profile-header{
+        flex-direction: column;
+        text-align: center;
+        padding: 24px 18px;
+    }
+
+    .profile-stats{
+        justify-content: center;
+    }
+
+    .profile-stat{
+        min-width: 96px;
+        padding: 10px 14px;
+    }
+
+    .profile-username{
+        font-size: 26px;
+    }
+
+}
+
+@media (max-width: 480px){
+
+    .profile-page{
+        padding: 24px 14px 40px;
+    }
+
+    .profile-grid{
+        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+        gap: 10px;
+    }
+
+}
+</style>
+{% endblock %}
+
+{% block body %}
+
+<div class="profile-page">
+
+    <div id="profile-loading" class="profile-loading">
+        Loading your profile...
+    </div>
+
+    <div id="profile-setup" class="d-none">
+
+        <div class="profile-setup-card">
+
+            <div class="profile-setup-title">
+                Complete Your Profile
+            </div>
+
+            <div class="profile-setup-sub">
+                Choose a unique username to continue.
+            </div>
+
+            <div id="setup-message" class="alert d-none"></div>
+
+            <label class="form-label text-secondary">
+                Username
+            </label>
+
+            <input
+                type="text"
+                id="setup-username"
+                class="form-control profile-setup-input"
+                placeholder="Choose a username"
+                maxlength="20"
+                autocomplete="off"
+            >
+
+            <div id="setup-feedback" class="mt-2 d-none"></div>
+
+            <button
+                type="button"
+                id="setup-save"
+                class="profile-setup-btn mt-4"
+            >
+                Save Username
+            </button>
+
+        </div>
+
+    </div>
+
+    <div id="profile-main" class="d-none">
+
+        <div class="profile-header">
+
+            <div class="profile-avatar" id="profile-avatar"></div>
+
+            <div class="profile-identity">
+
+                <div class="profile-username" id="profile-username"></div>
+
+                <div class="profile-handle" id="profile-handle"></div>
+
+            </div>
+
+            <div class="profile-stats">
+
+                <div class="profile-stat">
+                    <div class="profile-stat-value" id="stat-ratings">0</div>
+                    <div class="profile-stat-label">⭐ Ratings</div>
+                </div>
+
+                <div class="profile-stat">
+                    <div class="profile-stat-value" id="stat-comments">0</div>
+                    <div class="profile-stat-label">💬 Comments</div>
+                </div>
+
+                <div class="profile-stat">
+                    <div class="profile-stat-value" id="stat-watchlist">0</div>
+                    <div class="profile-stat-label">📺 Watchlist</div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="profile-section">
+
+            <h2 class="profile-section-title">Rated Movies & TV</h2>
+
+            <div id="rated-grid" class="profile-grid"></div>
+
+            <div class="profile-view-all" id="rated-view-all" style="display:none;">
+                <a href="/rated/" class="profile-view-all-btn">View All</a>
+            </div>
+
+        </div>
+
+        <div class="profile-section">
+
+            <h2 class="profile-section-title">Recent Comments</h2>
+
+            <div id="recent-comments"></div>
+
+            <div
+                class="profile-comment-pagination"
+                id="profile-comment-pagination"
+                style="display:none;"
+            >
+                <button type="button" id="profile-comment-prev">← Previous</button>
+                <span class="profile-comment-page-info" id="profile-comment-page-info">Page 1 of 1</span>
+                <button type="button" id="profile-comment-next">Next →</button>
+            </div>
+
+        </div>
+
+        <div class="profile-section">
+
+            <h2 class="profile-section-title">Watchlist</h2>
+
+            <div id="watchlist-grid" class="profile-grid"></div>
+
+            <div class="profile-view-all" id="watchlist-view-all" style="display:none;">
+                <a href="/watchlist/" class="profile-view-all-btn">View All</a>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function showSetupMessage(message, type = "danger") {
+
+    const box = document.getElementById("setup-message");
+
+    box.textContent = message;
+    box.className = `alert alert-${type}`;
+
+}
+
+
+function starRow(rating) {
+
+    let stars = "";
+
+    for (let i = 1; i <= 5; i++) {
+
+        stars +=
+            i <= rating
+                ? '<span style="color:#ff3c3c;">★</span>'
+                : '<span style="color:rgba(255,255,255,0.2);">☆</span>';
+
+    }
+
+    return stars;
+
+}
+
+
+async function fetchMediaInfo(type, id) {
+
+    try {
+
+        const response = await fetch(`/media-info/${type}/${id}/`);
+
+        if (!response.ok) {
+            return null;
+        }
+
+        return await response.json();
+
+    } catch (err) {
+
+        console.error("Error loading media info:", err);
+
+        return null;
+
+    }
+
+}
+
+
+async function loadMediaInfos(items, existingMap) {
+
+    const pairs = {};
+
+    items.forEach((item) => {
+
+        const key = `${item.media_type}_${item.media_id}`;
+
+        if (!pairs[key]) {
+            pairs[key] = {
+                type: item.media_type,
+                id: item.media_id
+            };
+        }
+
+    });
+
+    const map = existingMap || {};
+
+    const entries = Object.values(pairs).filter((entry) =>
+        !map[`${entry.type}_${entry.id}`]
+    );
+
+    const results = await Promise.all(
+        entries.map((entry) =>
+            fetchMediaInfo(entry.type, entry.id)
+        )
+    );
+
+    entries.forEach((entry, index) => {
+
+        map[`${entry.type}_${entry.id}`] = results[index];
+
+    });
+
+    return map;
+
+}
+
+
+function formatProfileDate(dateString) {
+
+    const date = new Date(dateString);
+
+    const now = new Date();
+
+    const seconds = Math.floor((now - date) / 1000);
+
+    if (seconds < 60) return "Just now";
+
+    if (seconds < 3600)
+        return `${Math.floor(seconds / 60)} min ago`;
+
+    if (seconds < 86400)
+        return `${Math.floor(seconds / 3600)} hr ago`;
+
+    if (seconds < 604800)
+        return `${Math.floor(seconds / 86400)} days ago`;
+
+    return date.toLocaleDateString();
+
+}
+
+
+/* =========================================================
+   USERNAME SETUP FLOW
+========================================================= */
+
+const setupUsername = document.getElementById("setup-username");
+const setupFeedback = document.getElementById("setup-feedback");
+const setupSave = document.getElementById("setup-save");
+
+let setupCheckTimer = null;
+
+
+async function runSetupUsernameCheck() {
+
+    const value = setupUsername.value.trim();
+
+    if (!value) {
+
+        setupFeedback.className = "mt-2 d-none";
+
+        return;
+    }
+
+    const check = validateUsername(value);
+
+    if (!check.valid) {
+
+        setupFeedback.className = "mt-2 text-warning";
+        setupFeedback.innerHTML =
+            "Username can only contain letters, numbers and underscores (3-20 characters).";
+
+        return;
+    }
+
+    setupFeedback.className = "mt-2 text-secondary";
+    setupFeedback.innerHTML = "Checking...";
+
+    const available = await usernameAvailable(value);
+
+    if (value !== setupUsername.value.trim()) {
+        return;
+    }
+
+    if (available === null) {
+
+        setupFeedback.className = "mt-2 d-none";
+
+        return;
+    }
+
+    if (available) {
+
+        setupFeedback.className = "mt-2";
+        setupFeedback.innerHTML =
+            '<span style="color:#22c55e;">✓ Username available</span>';
+
+    } else {
+
+        setupFeedback.className = "mt-2";
+        setupFeedback.innerHTML =
+            '<span style="color:#ff3c3c;">✕ Username already taken</span>';
+
+    }
+
+}
+
+
+setupUsername.addEventListener("input", () => {
+
+    clearTimeout(setupCheckTimer);
+
+    setupCheckTimer = setTimeout(runSetupUsernameCheck, 500);
+
+});
+
+
+setupSave.addEventListener("click", async () => {
+
+    const user = await getCurrentUser();
+
+    if (!user) {
+
+        window.location.href = "/auth/";
+        return;
+
+    }
+
+    const check = validateUsername(setupUsername.value);
+
+    if (!check.valid) {
+
+        showSetupMessage(check.message);
+        return;
+
+    }
+
+    setupSave.disabled = true;
+    setupSave.textContent = "Saving...";
+
+    showSetupMessage("", "info");
+
+    const { profile, error } =
+        await createUserProfile(user, check.value);
+
+    if (!profile) {
+
+        showSetupMessage(error || "Unable to save your username. Please try again.");
+
+        setupSave.disabled = false;
+        setupSave.textContent = "Save Username";
+
+        return;
+    }
+
+    showSetupMessage("Username saved!", "success");
+
+    setupSave.disabled = false;
+    setupSave.textContent = "Save Username";
+
+    setTimeout(() => {
+        window.location.reload();
+    }, 600);
+
+});
+
+
+/* =========================================================
+   RENDER PROFILE
+========================================================= */
+
+function renderProfile(profile, user) {
+
+    document.getElementById("profile-loading").classList.add("d-none");
+
+    document.getElementById("profile-setup").classList.add("d-none");
+
+    const main = document.getElementById("profile-main");
+
+    main.classList.remove("d-none");
+
+    const avatar = document.getElementById("profile-avatar");
+
+    avatar.textContent = (profile.username || "?").charAt(0).toUpperCase();
+
+    document.getElementById("profile-username").textContent =
+        profile.username;
+
+    document.getElementById("profile-handle").textContent =
+        `@${profile.username}`;
+
+    loadProfileContent(user);
+
+}
+
+
+const PROFILE_COMMENTS_PER_PAGE = 4;
+
+let profileCommentPage = 1;
+
+let profileTotalComments = 0;
+
+let profileCommentRatings = [];
+
+const profileMediaMap = {};
+
+
+/* =========================================================
+   LOAD PROFILE CONTENT
+========================================================= */
+
+async function loadProfileContent(user) {
+
+    const [ratingsResult, commentsResult, watchlistResult] =
+        await Promise.all([
+            supabaseClient
+                .from("ratings")
+                .select("id,media_id,media_type,rating,updated_at", {
+                    count: "exact"
+                })
+                .eq("user_id", user.id)
+                .order("updated_at", {
+                    ascending: false
+                })
+                .limit(12),
+            supabaseClient
+                .from("comments")
+                .select("id,media_id,media_type,content,created_at", {
+                    count: "exact"
+                })
+                .eq("user_id", user.id)
+                .order("created_at", {
+                    ascending: false
+                })
+                .range(0, PROFILE_COMMENTS_PER_PAGE - 1),
+            supabaseClient
+                .from("watchlist")
+                .select("media_id,media_type,title,poster,created_at", {
+                    count: "exact"
+                })
+                .eq("user_id", user.id)
+                .order("created_at", {
+                    ascending: false
+                })
+                .limit(12)
+        ]);
+
+    const ratings = ratingsResult.data || [];
+    const comments = commentsResult.data || [];
+    const watchlist = watchlistResult.data || [];
+
+    const ratingsCount =
+        ratingsResult.count != null
+            ? ratingsResult.count
+            : ratings.length;
+
+    const commentsCount =
+        commentsResult.count != null
+            ? commentsResult.count
+            : comments.length;
+
+    const watchlistCount =
+        watchlistResult.count != null
+            ? watchlistResult.count
+            : watchlist.length;
+
+    document.getElementById("stat-ratings").textContent =
+        ratingsCount;
+
+    document.getElementById("stat-comments").textContent =
+        commentsCount;
+
+    document.getElementById("stat-watchlist").textContent =
+        watchlistCount;
+
+    document.getElementById("rated-view-all").style.display =
+        ratingsCount > 12 ? "flex" : "none";
+
+    document.getElementById("watchlist-view-all").style.display =
+        watchlistCount > 12 ? "flex" : "none";
+
+    profileCommentPage = 1;
+
+    profileTotalComments = commentsCount;
+
+    profileCommentRatings = ratings;
+
+    renderRatings(ratings);
+
+    renderComments(comments);
+
+    renderWatchlist(watchlist);
+
+}
+
+
+/* =========================================================
+   LOAD PROFILE COMMENT PAGE
+========================================================= */
+
+async function loadProfileCommentsPage(page) {
+
+    const user = await getCurrentUser();
+
+    if (!user) return;
+
+    const from = (page - 1) * PROFILE_COMMENTS_PER_PAGE;
+    const to = from + PROFILE_COMMENTS_PER_PAGE - 1;
+
+    const container = document.getElementById("recent-comments");
+
+    container.innerHTML =
+        '<div class="profile-empty">Loading...</div>';
+
+    const { data, error, count } = await supabaseClient
+        .from("comments")
+        .select("id,media_id,media_type,content,created_at", {
+            count: "exact"
+        })
+        .eq("user_id", user.id)
+        .order("created_at", {
+            ascending: false
+        })
+        .range(from, to);
+
+    if (error) {
+
+        console.error("Error loading comments:", error);
+
+        container.innerHTML =
+            '<div class="profile-empty">Unable to load comments.</div>';
+
+        return;
+
+    }
+
+    profileTotalComments =
+        count != null ? count : (data || []).length;
+
+    renderComments(data || []);
+
+}
+
+
+/* =========================================================
+   PROFILE COMMENT PAGINATION
+========================================================= */
+
+function updateCommentPagination() {
+
+    const controls =
+        document.getElementById("profile-comment-pagination");
+
+    if (!controls) return;
+
+    const totalPages = Math.max(
+        1,
+        Math.ceil(profileTotalComments / PROFILE_COMMENTS_PER_PAGE)
+    );
+
+    if (totalPages <= 1) {
+
+        hideCommentPagination();
+
+        return;
+
+    }
+
+    controls.style.display = "flex";
+
+    document.getElementById("profile-comment-page-info").textContent =
+        `Page ${profileCommentPage} of ${totalPages}`;
+
+    document.getElementById("profile-comment-prev").disabled =
+        profileCommentPage <= 1;
+
+    document.getElementById("profile-comment-next").disabled =
+        profileCommentPage >= totalPages;
+
+}
+
+
+function hideCommentPagination() {
+
+    const controls =
+        document.getElementById("profile-comment-pagination");
+
+    if (controls) {
+        controls.style.display = "none";
+    }
+
+}
+
+
+document.getElementById("profile-comment-prev").addEventListener(
+    "click",
+    () => {
+
+        if (profileCommentPage > 1) {
+
+            profileCommentPage--;
+
+            loadProfileCommentsPage(profileCommentPage);
+
+        }
+
+    }
+);
+
+
+document.getElementById("profile-comment-next").addEventListener(
+    "click",
+    () => {
+
+        const totalPages = Math.max(
+            1,
+            Math.ceil(profileTotalComments / PROFILE_COMMENTS_PER_PAGE)
+        );
+
+        if (profileCommentPage < totalPages) {
+
+            profileCommentPage++;
+
+            loadProfileCommentsPage(profileCommentPage);
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   RATINGS
+========================================================= */
+
+async function renderRatings(ratings) {
+
+    const container = document.getElementById("rated-grid");
+
+    if (!ratings || ratings.length === 0) {
+
+        container.innerHTML = `
+            <div class="profile-empty" style="grid-column:1/-1;">
+                No ratings yet. Rate movies and TV shows to see them here.
+            </div>
+        `;
+
+        return;
+    }
+
+    container.innerHTML =
+        '<div class="profile-empty" style="grid-column:1/-1;">Loading...</div>';
+
+    const mediaMap = await loadMediaInfos(ratings);
+
+    container.innerHTML = "";
+
+    ratings.forEach((rating) => {
+
+        const info =
+            mediaMap[`${rating.media_type}_${rating.media_id}`];
+
+        const title =
+            (info && info.title) || "Unknown title";
+
+        const poster =
+            info && info.poster_path
+                ? `https://image.tmdb.org/t/p/w500${info.poster_path}`
+                : "";
+
+        const card = document.createElement("a");
+
+        card.href = `/${rating.media_type}/${rating.media_id}/`;
+        card.className = "profile-card";
+        card.style.textDecoration = "none";
+
+        if (poster) {
+
+            const img = document.createElement("img");
+
+            img.loading = "lazy";
+            img.alt = `${title} poster`;
+
+            img.src = poster;
+
+            card.appendChild(img);
+
+        }
+
+        const titleEl = document.createElement("div");
+
+        titleEl.className = "profile-card-title";
+
+        titleEl.textContent = title;
+
+        card.appendChild(titleEl);
+
+        const stars = document.createElement("div");
+
+        stars.className = "profile-card-stars";
+
+        stars.innerHTML = starRow(rating.rating);
+
+        card.appendChild(stars);
+
+        container.appendChild(card);
+
+    });
+
+}
+
+
+/* =========================================================
+   COMMENTS
+========================================================= */
+
+async function renderComments(comments) {
+
+    const container = document.getElementById("recent-comments");
+
+    if (!comments || comments.length === 0) {
+
+        container.innerHTML = `
+            <div class="profile-empty">
+                No comments yet.
+            </div>
+        `;
+
+        hideCommentPagination();
+
+        return;
+    }
+
+    container.innerHTML =
+        '<div class="profile-empty">Loading...</div>';
+
+    const mediaMap = await loadMediaInfos(comments, profileMediaMap);
+
+    const ratingByMedia = {};
+
+    (profileCommentRatings || []).forEach((rating) => {
+
+        ratingByMedia[`${rating.media_type}_${rating.media_id}`] =
+            rating.rating;
+
+    });
+
+    container.innerHTML = "";
+
+    comments.forEach((comment) => {
+
+        const info =
+            mediaMap[`${comment.media_type}_${comment.media_id}`];
+
+        const title =
+            (info && info.title) || "Unknown title";
+
+        const row = document.createElement("div");
+
+        row.className = "profile-comment";
+
+        const mediaLine = document.createElement("div");
+
+        mediaLine.className = "profile-comment-media";
+
+        const link = document.createElement("a");
+
+        link.href = `/${comment.media_type}/${comment.media_id}/`;
+        link.textContent = title;
+
+        mediaLine.appendChild(link);
+
+        const date = document.createElement("span");
+
+        date.className = "profile-comment-date";
+
+        date.textContent =
+            formatProfileDate(comment.created_at);
+
+        mediaLine.appendChild(date);
+
+        row.appendChild(mediaLine);
+
+        const userRating =
+            ratingByMedia[`${comment.media_type}_${comment.media_id}`];
+
+        if (userRating) {
+
+            const stars = document.createElement("div");
+
+            stars.className = "profile-comment-stars";
+
+            stars.innerHTML = starRow(userRating);
+
+            row.appendChild(stars);
+
+        }
+
+        const content = document.createElement("div");
+
+        content.className = "profile-comment-content";
+
+        content.textContent = comment.content;
+
+        row.appendChild(content);
+
+        container.appendChild(row);
+
+    });
+
+    updateCommentPagination();
+
+}
+
+
+/* =========================================================
+   WATCHLIST (uses existing watchlist data, no changes)
+========================================================= */
+
+function renderWatchlist(watchlist) {
+
+    const container = document.getElementById("watchlist-grid");
+
+    if (!watchlist || watchlist.length === 0) {
+
+        container.innerHTML = `
+            <div class="profile-empty" style="grid-column:1/-1;">
+                Your watchlist is empty.
+            </div>
+        `;
+
+        return;
+    }
+
+    container.innerHTML = "";
+
+    watchlist.forEach((item) => {
+
+        const title = item.title || "Watchlist item";
+
+        const poster = item.poster
+            ? `https://image.tmdb.org/t/p/w500${item.poster}`
+            : "";
+
+        const card = document.createElement("a");
+
+        card.href = `/${item.media_type}/${item.media_id}/`;
+        card.className = "profile-card";
+        card.style.textDecoration = "none";
+
+        if (poster) {
+
+            const img = document.createElement("img");
+
+            img.loading = "lazy";
+            img.alt = `${title} poster`;
+            img.src = poster;
+
+            card.appendChild(img);
+
+        }
+
+        const titleEl = document.createElement("div");
+
+        titleEl.className = "profile-card-title";
+
+        titleEl.textContent = title;
+
+        card.appendChild(titleEl);
+
+        container.appendChild(card);
+
+    });
+
+}
+
+
+/* =========================================================
+   INITIALIZE
+========================================================= */
+
+document.addEventListener("DOMContentLoaded", async () => {
+
+    const user = await getCurrentUser();
+
+    const loading = document.getElementById("profile-loading");
+    const setup = document.getElementById("profile-setup");
+    const main = document.getElementById("profile-main");
+
+    if (!user) {
+
+        loading.innerHTML = `
+            <div class="profile-login-prompt">
+                <h2>Please log in to view your profile</h2>
+                <a href="/auth/" class="btn btn-outline-light">
+                    Login
+                </a>
+            </div>
+        `;
+
+        return;
+    }
+
+    const profile = await ensureUserProfile(user);
+
+    if (profile) {
+
+        renderProfile(profile, user);
+
+    } else {
+
+        loading.classList.add("d-none");
+
+        setup.classList.remove("d-none");
+
+    }
+
+});
+
+</script>
+
+{% endblock %}
