@@ -844,6 +844,17 @@ border-right:1px solid #333;
     white-space:nowrap;
 }
 
+.comment-author-link{
+    color:rgba(255,255,255,.9);
+    text-decoration:none;
+    transition:color .15s ease;
+}
+
+.comment-author-link:hover{
+    color:#ff3c3c;
+    text-decoration:underline;
+}
+
 .comment-date{
     color:#5f6670;
     font-size:12px;
@@ -2157,9 +2168,11 @@ async function loadComments(page = currentCommentPage) {
         commentCard.className = "comment-card";
 
 
+        const profileName =
+            usernamesByUser[comment.user_id];
+
         const authorName =
-            usernamesByUser[comment.user_id] ||
-            comment.user_email;
+            profileName || comment.user_email;
 
         const avatarName = authorName || "?";
 
@@ -2185,9 +2198,22 @@ async function loadComments(page = currentCommentPage) {
 
 
         const author =
-            document.createElement("span");
+            document.createElement(
+                profileName ? "a" : "span"
+            );
 
         author.className = "comment-email";
+
+        if (profileName) {
+
+            author.href =
+                `/profile/${comment.user_id}/`;
+
+            author.classList.add(
+                "comment-author-link"
+            );
+
+        }
 
         author.textContent =
             authorName || comment.user_email;

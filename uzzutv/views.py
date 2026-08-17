@@ -19,6 +19,12 @@ def profile(request):
     return render(request, "uzzutv/profile.html")
 
 
+def public_profile(request, user_id):
+    """Public profile page for any user, identified by their auth UUID."""
+
+    return render(request, "uzzutv/public_profile.html", {"user_id": user_id})
+
+
 def media_info(request, type, id):
     """Cached TMDB title/poster lookup used by the profile page."""
 

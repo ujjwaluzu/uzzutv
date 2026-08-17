@@ -16,6 +16,7 @@ path("rated/", views.rated, name="rated"),
     path("dmca/", views.dmca, name="dmca"),
     path("auth/", views.auth, name="auth"),
     path("profile/", views.profile, name="profile"),
+    path("profile/<uuid:user_id>/", views.public_profile, name="public_profile"),
     path("media-info/<str:type>/<int:id>/", views.media_info, name="media_info"),
 
 

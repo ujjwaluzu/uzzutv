@@ -1,0 +1,852 @@
+{% extends "uzzutv/layout.html" %}
+{% load static %}
+
+{% block title %}UzzUTV - Profile{% endblock %}
+{% block meta_description %}Public UzzUTV profile - ratings and comments.{% endblock %}
+
+{% block css %}
+<style>
+.profile-page{
+    min-height: calc(100vh - 160px);
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 70px 20px 60px;
+    color: white;
+}
+
+/* ---------- LOADING / NOT FOUND ---------- */
+
+.profile-status{
+    text-align: center;
+    padding: 80px 20px;
+    color: #9ca3af;
+}
+
+.profile-status h2{
+    color: white;
+    margin-bottom: 12px;
+}
+
+/* ---------- PROFILE HEADER ---------- */
+
+.profile-header{
+    display: flex;
+    align-items: center;
+    gap: 26px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    padding: 30px 32px;
+    flex-wrap: wrap;
+}
+
+.profile-avatar{
+    width: 92px;
+    height: 92px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff3c3c, #c81e1e);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    font-weight: 700;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.profile-avatar img{
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+}
+
+.profile-identity{
+    flex: 1;
+    min-width: 200px;
+}
+
+.profile-username-row{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.profile-username{
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.profile-you-badge{
+    background: rgba(255,60,60,0.15);
+    border: 1px solid rgba(255,60,60,0.5);
+    color: #ff3c3c;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 99px;
+    letter-spacing: .5px;
+}
+
+.profile-handle{
+    color: #9ca3af;
+    font-size: 15px;
+    margin-top: 4px;
+}
+
+.profile-stats{
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.profile-stat{
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 12px 20px;
+    text-align: center;
+    min-width: 110px;
+}
+
+.profile-stat-value{
+    font-size: 24px;
+    font-weight: 700;
+    color: #ff3c3c;
+}
+
+.profile-stat-label{
+    font-size: 12px;
+    color: #9ca3af;
+    margin-top: 2px;
+}
+
+/* ---------- CONTENT SECTIONS ---------- */
+
+.profile-section{
+    margin-top: 36px;
+}
+
+.profile-section-title{
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+.profile-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 14px;
+}
+
+.profile-card{
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s;
+    display: block;
+}
+
+.profile-card:hover{
+    transform: translateY(-3px);
+    border-color: rgba(255,60,60,0.5);
+}
+
+.profile-card img{
+    width: 100%;
+    aspect-ratio: 2/3;
+    object-fit: cover;
+    display: block;
+}
+
+.profile-card-poster-missing{
+    width: 100%;
+    aspect-ratio: 2/3;
+    background: rgba(255,255,255,0.04);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6b7280;
+    font-size: 30px;
+    font-weight: 700;
+}
+
+.profile-card-title{
+    padding: 10px 12px 0;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #e5e7eb;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.profile-card-stars{
+    padding: 0 12px 10px;
+    color: #ff3c3c;
+    font-size: 13px;
+    letter-spacing: 1px;
+}
+
+.profile-card-type{
+    display: inline-block;
+    margin: 0 12px 10px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #9ca3af;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 6px;
+    padding: 2px 8px;
+}
+
+/* ---------- COMMENTS ---------- */
+
+.profile-comment{
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 10px;
+}
+
+.profile-comment-media{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 6px;
+    flex-wrap: wrap;
+}
+
+.profile-comment-media a{
+    color: #ff3c3c;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.profile-comment-media a:hover{
+    text-decoration: underline;
+}
+
+.profile-comment-date{
+    color: #5f6670;
+    font-size: 12px;
+}
+
+.profile-comment-stars{
+    color: #ff3c3c;
+    font-size: 12px;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+}
+
+.profile-comment-content{
+    color: #d8dce2;
+    font-size: 14px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.profile-empty{
+    text-align: center;
+    color: #8b909a;
+    font-size: 14px;
+    padding: 28px 14px;
+    background: rgba(255,255,255,0.02);
+    border: 1px dashed rgba(255,255,255,0.12);
+    border-radius: 12px;
+}
+
+.profile-empty.grid-fill{
+    grid-column: 1/-1;
+}
+
+/* ---------- RESPONSIVE ---------- */
+
+@media (max-width: 768px){
+
+    .profile-header{
+        flex-direction: column;
+        text-align: center;
+        padding: 24px 18px;
+    }
+
+    .profile-stats{
+        justify-content: center;
+    }
+
+    .profile-stat{
+        min-width: 96px;
+        padding: 10px 14px;
+    }
+
+    .profile-username{
+        font-size: 26px;
+    }
+
+    .profile-username-row{
+        justify-content: center;
+    }
+
+}
+
+@media (max-width: 480px){
+
+    .profile-page{
+        padding: 24px 14px 40px;
+    }
+
+    .profile-grid{
+        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+        gap: 10px;
+    }
+
+    .profile-comment{
+        padding: 12px 14px;
+    }
+
+}
+</style>
+{% endblock %}
+
+{% block body %}
+
+<div class="profile-page">
+
+    <div id="profile-status" class="profile-status">
+        Loading profile...
+    </div>
+
+    <div id="profile-main" class="d-none">
+
+        <div class="profile-header">
+
+            <div class="profile-avatar" id="profile-avatar"></div>
+
+            <div class="profile-identity">
+
+                <div class="profile-username-row">
+
+                    <div class="profile-username" id="profile-username"></div>
+
+                    <span class="profile-you-badge" id="profile-you-badge" style="display:none;">
+                        You
+                    </span>
+
+                </div>
+
+                <div class="profile-handle" id="profile-handle"></div>
+
+            </div>
+
+            <div class="profile-stats">
+
+                <div class="profile-stat">
+                    <div class="profile-stat-value" id="stat-ratings">0</div>
+                    <div class="profile-stat-label">⭐ Ratings</div>
+                </div>
+
+                <div class="profile-stat">
+                    <div class="profile-stat-value" id="stat-comments">0</div>
+                    <div class="profile-stat-label">💬 Comments</div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="profile-section">
+
+            <h2 class="profile-section-title">Rated Movies & TV</h2>
+
+            <div id="rated-grid" class="profile-grid"></div>
+
+        </div>
+
+        <div class="profile-section">
+
+            <h2 class="profile-section-title">Recent Comments</h2>
+
+            <div id="recent-comments"></div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   PROFILE ID FROM URL
+========================================================= */
+
+const PROFILE_USER_ID = "{{ user_id }}";
+
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function starRow(rating) {
+
+    let stars = "";
+
+    for (let i = 1; i <= 5; i++) {
+
+        stars +=
+            i <= rating
+                ? '<span style="color:#ff3c3c;">★</span>'
+                : '<span style="color:rgba(255,255,255,0.2);">☆</span>';
+
+    }
+
+    return stars;
+
+}
+
+
+async function fetchMediaInfo(type, id) {
+
+    try {
+
+        const response = await fetch(`/media-info/${type}/${id}/`);
+
+        if (!response.ok) {
+            return null;
+        }
+
+        return await response.json();
+
+    } catch (err) {
+
+        console.error("Error loading media info:", err);
+
+        return null;
+
+    }
+
+}
+
+
+async function loadMediaInfos(items) {
+
+    const pairs = {};
+
+    items.forEach((item) => {
+
+        const key = `${item.media_type}_${item.media_id}`;
+
+        if (!pairs[key]) {
+            pairs[key] = {
+                type: item.media_type,
+                id: item.media_id
+            };
+        }
+
+    });
+
+    const entries = Object.values(pairs);
+
+    const results = await Promise.all(
+        entries.map((entry) =>
+            fetchMediaInfo(entry.type, entry.id)
+        )
+    );
+
+    const map = {};
+
+    entries.forEach((entry, index) => {
+
+        map[`${entry.type}_${entry.id}`] = results[index];
+
+    });
+
+    return map;
+
+}
+
+
+function formatProfileDate(dateString) {
+
+    const date = new Date(dateString);
+
+    const now = new Date();
+
+    const seconds = Math.floor((now - date) / 1000);
+
+    if (isNaN(date.getTime())) return "";
+
+    if (seconds < 60) return "Just now";
+
+    if (seconds < 3600)
+        return `${Math.floor(seconds / 60)} min ago`;
+
+    if (seconds < 86400)
+        return `${Math.floor(seconds / 3600)} hr ago`;
+
+    if (seconds < 604800)
+        return `${Math.floor(seconds / 86400)} days ago`;
+
+    return date.toLocaleDateString();
+
+}
+
+
+/* =========================================================
+   SHOW STATUS
+========================================================= */
+
+function showStatus(html) {
+
+    const status = document.getElementById("profile-status");
+
+    status.innerHTML = html;
+
+}
+
+
+/* =========================================================
+   RENDER PROFILE
+========================================================= */
+
+function renderProfile(profile, isOwner) {
+
+    document.getElementById("profile-status").classList.add("d-none");
+
+    document.getElementById("profile-main").classList.remove("d-none");
+
+    const username = profile.username || "User";
+
+    const avatar = document.getElementById("profile-avatar");
+
+    if (profile.avatar_url) {
+
+        const img = document.createElement("img");
+
+        img.loading = "lazy";
+        img.alt = `${username} avatar`;
+        img.src = profile.avatar_url;
+
+        avatar.innerHTML = "";
+
+        avatar.appendChild(img);
+
+    } else {
+
+        avatar.textContent = username.charAt(0).toUpperCase();
+
+    }
+
+    document.getElementById("profile-username").textContent = username;
+
+    document.getElementById("profile-handle").textContent = `@${username}`;
+
+    if (isOwner) {
+        document.getElementById("profile-you-badge").style.display = "inline-block";
+    }
+
+    loadProfileContent(profile);
+
+}
+
+
+/* =========================================================
+   LOAD PROFILE CONTENT
+========================================================= */
+
+async function loadProfileContent(profile) {
+
+    const [ratingsResult, commentsResult] = await Promise.all([
+        supabaseClient
+            .from("ratings")
+            .select("id,media_id,media_type,rating,updated_at", {
+                count: "exact"
+            })
+            .eq("user_id", profile.id)
+            .order("updated_at", {
+                ascending: false
+            })
+            .limit(12),
+        supabaseClient
+            .from("comments")
+            .select("id,media_id,media_type,content,created_at", {
+                count: "exact"
+            })
+            .eq("user_id", profile.id)
+            .order("created_at", {
+                ascending: false
+            })
+            .limit(4)
+    ]);
+
+    const ratings = ratingsResult.data || [];
+    const comments = commentsResult.data || [];
+
+    const ratingsCount =
+        ratingsResult.count != null
+            ? ratingsResult.count
+            : ratings.length;
+
+    const commentsCount =
+        commentsResult.count != null
+            ? commentsResult.count
+            : comments.length;
+
+    document.getElementById("stat-ratings").textContent = ratingsCount;
+
+    document.getElementById("stat-comments").textContent = commentsCount;
+
+    renderRatings(ratings);
+
+    renderComments(comments, ratings);
+
+}
+
+
+/* =========================================================
+   RATINGS
+========================================================= */
+
+async function renderRatings(ratings) {
+
+    const container = document.getElementById("rated-grid");
+
+    if (!ratings || ratings.length === 0) {
+
+        container.innerHTML = `
+            <div class="profile-empty grid-fill">
+                No ratings yet.
+            </div>
+        `;
+
+        return;
+    }
+
+    container.innerHTML =
+        '<div class="profile-empty grid-fill">Loading...</div>';
+
+    const mediaMap = await loadMediaInfos(ratings);
+
+    container.innerHTML = "";
+
+    ratings.forEach((rating) => {
+
+        const info =
+            mediaMap[`${rating.media_type}_${rating.media_id}`];
+
+        const title =
+            (info && info.title) || "Unknown title";
+
+        const poster =
+            info && info.poster_path
+                ? `https://image.tmdb.org/t/p/w500${info.poster_path}`
+                : "";
+
+        const card = document.createElement("a");
+
+        card.href = `/${rating.media_type}/${rating.media_id}/`;
+        card.className = "profile-card";
+        card.style.textDecoration = "none";
+
+        if (poster) {
+
+            const img = document.createElement("img");
+
+            img.loading = "lazy";
+            img.alt = `${title} poster`;
+            img.src = poster;
+
+            card.appendChild(img);
+
+        } else {
+
+            const missing = document.createElement("div");
+
+            missing.className = "profile-card-poster-missing";
+
+            missing.textContent = title.charAt(0).toUpperCase();
+
+            card.appendChild(missing);
+
+        }
+
+        const titleEl = document.createElement("div");
+
+        titleEl.className = "profile-card-title";
+
+        titleEl.textContent = title;
+
+        card.appendChild(titleEl);
+
+        const stars = document.createElement("div");
+
+        stars.className = "profile-card-stars";
+
+        stars.innerHTML = starRow(rating.rating);
+
+        card.appendChild(stars);
+
+        const type = document.createElement("div");
+
+        type.className = "profile-card-type";
+
+        type.textContent =
+            rating.media_type === "movie" ? "Movie" : "Series";
+
+        card.appendChild(type);
+
+        container.appendChild(card);
+
+    });
+
+}
+
+
+/* =========================================================
+   COMMENTS
+========================================================= */
+
+async function renderComments(comments, ratings) {
+
+    const container = document.getElementById("recent-comments");
+
+    if (!comments || comments.length === 0) {
+
+        container.innerHTML = `
+            <div class="profile-empty">
+                No comments yet.
+            </div>
+        `;
+
+        return;
+    }
+
+    container.innerHTML =
+        '<div class="profile-empty">Loading...</div>';
+
+    const mediaMap = await loadMediaInfos(comments);
+
+    const ratingByMedia = {};
+
+    (ratings || []).forEach((rating) => {
+
+        ratingByMedia[`${rating.media_type}_${rating.media_id}`] =
+            rating.rating;
+
+    });
+
+    container.innerHTML = "";
+
+    comments.forEach((comment) => {
+
+        const info =
+            mediaMap[`${comment.media_type}_${comment.media_id}`];
+
+        const title =
+            (info && info.title) || "Unknown title";
+
+        const row = document.createElement("div");
+
+        row.className = "profile-comment";
+
+        const mediaLine = document.createElement("div");
+
+        mediaLine.className = "profile-comment-media";
+
+        const link = document.createElement("a");
+
+        link.href = `/${comment.media_type}/${comment.media_id}/`;
+        link.textContent = title;
+
+        mediaLine.appendChild(link);
+
+        const date = document.createElement("span");
+
+        date.className = "profile-comment-date";
+
+        date.textContent =
+            formatProfileDate(comment.created_at);
+
+        mediaLine.appendChild(date);
+
+        row.appendChild(mediaLine);
+
+        const userRating =
+            ratingByMedia[`${comment.media_type}_${comment.media_id}`];
+
+        if (userRating) {
+
+            const stars = document.createElement("div");
+
+            stars.className = "profile-comment-stars";
+
+            stars.innerHTML = starRow(userRating);
+
+            row.appendChild(stars);
+
+        }
+
+        const content = document.createElement("div");
+
+        content.className = "profile-comment-content";
+
+        content.textContent = comment.content;
+
+        row.appendChild(content);
+
+        container.appendChild(row);
+
+    });
+
+}
+
+
+/* =========================================================
+   INITIALIZE
+========================================================= */
+
+document.addEventListener("DOMContentLoaded", async () => {
+
+    const { data: profile, error } = await supabaseClient
+        .from("profiles")
+        .select("id,username,avatar_url")
+        .eq("id", PROFILE_USER_ID)
+        .maybeSingle();
+
+    if (error || !profile) {
+
+        showStatus(`
+            <h2>Profile not found</h2>
+            <p>This profile does not exist or is no longer available.</p>
+            <a href="/home/" class="btn btn-outline-light mt-3">
+                Back to Home
+            </a>
+        `);
+
+        return;
+    }
+
+    const currentUser = await getCurrentUser();
+
+    const isOwner =
+        !!(currentUser && currentUser.id === profile.id);
+
+    renderProfile(profile, isOwner);
+
+});
+
+</script>
+
+{% endblock %}
