@@ -453,6 +453,9 @@ nav::after{
         <li class="nav-item">
           <a class="nav-link {% if request.resolver_match.url_name == 'tv' or request.resolver_match.url_name == 'watchtv' or request.resolver_match.url_name == 'detail' and request.resolver_match.kwargs.type == 'tv' %}active{% endif %}" href="{% url 'tv'%}">Series</a>
         </li>
+        <li class="nav-item d-none" id="party-nav-item">
+          <a class="nav-link {% if request.resolver_match.url_name == 'party' or request.resolver_match.url_name == 'party_room' %}active{% endif %}" href="{% url 'party'%}">Party</a>
+        </li>
       </ul>
 
       <div class="uzz-auth" id="auth-nav">
@@ -521,6 +524,7 @@ async function updateAuthNavbar() {
     const loginNav = document.getElementById("login-nav");
     const accountNav = document.getElementById("account-nav");
     const userUsername = document.getElementById("user-username");
+    const partyNav = document.getElementById("party-nav-item");
 
     if (!loginNav || !accountNav) {
         return;
@@ -537,6 +541,10 @@ async function updateAuthNavbar() {
 
         loginNav.classList.add("d-none");
         accountNav.classList.remove("d-none");
+
+        if (partyNav) {
+            partyNav.classList.remove("d-none");
+        }
 
         if (userUsername) {
 
@@ -592,6 +600,10 @@ async function updateAuthNavbar() {
 
         loginNav.classList.remove("d-none");
         accountNav.classList.add("d-none");
+
+        if (partyNav) {
+            partyNav.classList.add("d-none");
+        }
 
     }
 

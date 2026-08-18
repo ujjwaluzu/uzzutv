@@ -752,6 +752,24 @@ def detail(request, type, id):
 def watchlist(request):
     return render(request, "uzzutv/watchlist.html")
 
+
+# ----------------------------
+# WATCH PARTY
+# ----------------------------
+
+def party(request):
+    """Watch Party dashboard (create / join / manage own parties)."""
+
+    return render(request, "uzzutv/party.html")
+
+
+def party_room(request, room_code):
+    """Watch Party room page. Supabase auth + data are handled client-side."""
+
+    return render(request, "uzzutv/party_room.html", {
+        "room_code": room_code
+    })
+
 def rated(request, user_id=None):
     return render(request, "uzzutv/rated.html", {"user_id": user_id})
 

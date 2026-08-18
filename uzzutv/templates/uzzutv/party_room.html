@@ -1,0 +1,481 @@
+{% extends "uzzutv/layout.html" %}
+{% load static %}
+
+{% block title %}UzzUTV - Watch Party {{ room_code|upper }}{% endblock %}
+{% block meta_description %}Join a UzzUTV watch party and watch together with friends.{% endblock %}
+{% block robots %}noindex, nofollow{% endblock %}
+{% block canonical %}{% endblock %}
+
+{% block css %}
+<style>
+
+/* =========================================================
+   WATCH PARTY ROOM
+========================================================= */
+
+.party-room-page{
+    min-height: calc(100vh - 160px);
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 72px 24px 60px;
+    color: white;
+}
+
+.party-room-heading{
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -.5px;
+    margin-bottom: 6px;
+}
+
+.party-room-code-line{
+    color: #9ca3af;
+    font-size: 15px;
+    margin-bottom: 30px;
+}
+
+.party-room-code-line strong{
+    color: #ff3c3c;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+/* ---------- ROOM CARD ---------- */
+
+.party-room-card{
+    background: #151515;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 18px;
+    padding: 30px 30px 34px;
+    box-shadow: 0 2px 10px rgba(0,0,0,.35);
+}
+
+.party-room-media-type{
+    display: inline-block;
+    background: rgba(255,60,60,.12);
+    border: 1px solid rgba(255,60,60,.35);
+    color: #ff3c3c;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    border-radius: 20px;
+    padding: 6px 14px;
+    margin-bottom: 16px;
+}
+
+.party-room-media-row{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 13px 0;
+    border-bottom: 1px solid rgba(255,255,255,.06);
+    flex-wrap: wrap;
+}
+
+.party-room-media-row:last-of-type{
+    border-bottom: none;
+}
+
+.party-room-media-label{
+    color: #9ca3af;
+    font-size: 14px;
+}
+
+.party-room-media-value{
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.party-room-host{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 22px;
+    background: rgba(255,255,255,.03);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 12px;
+    padding: 14px 18px;
+}
+
+.party-room-host-icon{
+    font-size: 22px;
+}
+
+.party-room-host-label{
+    color: #9ca3af;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.party-room-host-name{
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 600;
+    margin-top: 2px;
+}
+
+/* ---------- PLAYER STAGE (next stage: VidFast + Realtime) ---------- */
+
+.party-room-stage{
+    margin-top: 20px;
+    background: #101010;
+    border: 1px dashed rgba(255,255,255,.12);
+    border-radius: 14px;
+    padding: 26px 20px;
+    text-align: center;
+    color: #6b7280;
+    font-size: 13px;
+}
+
+/* ---------- ROOM ACTIONS ---------- */
+
+.party-room-actions{
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+    flex-wrap: wrap;
+}
+
+.party-room-btn{
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg,#ff3c3c,#c81e1e);
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 12px 22px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: transform .15s, box-shadow .2s, opacity .2s;
+}
+
+.party-room-btn:hover{
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(255,60,60,.35);
+    color: #ffffff;
+}
+
+.party-room-btn-outline{
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.14);
+    color: #ffffff;
+}
+
+.party-room-btn-outline:hover{
+    background: rgba(255,60,60,.12);
+    border-color: #ff3c3c;
+    color: #ffffff;
+    box-shadow: none;
+}
+
+/* ---------- STATES ---------- */
+
+.party-room-state{
+    background: #151515;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 18px;
+    padding: 48px 30px;
+    text-align: center;
+}
+
+.party-room-state-icon{
+    font-size: 44px;
+    margin-bottom: 12px;
+}
+
+.party-room-state-title{
+    font-size: 24px;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.party-room-state-text{
+    color: #9ca3af;
+    font-size: 14px;
+    margin-bottom: 26px;
+}
+
+.party-room-loading{
+    text-align: center;
+    color: #9ca3af;
+    padding: 60px 20px;
+}
+
+/* ---------- RESPONSIVE ---------- */
+
+@media (max-width: 560px){
+
+    .party-room-page{
+        padding: 60px 16px 50px;
+    }
+
+    .party-room-card{
+        padding: 24px 20px 26px;
+    }
+
+    .party-room-actions .party-room-btn{
+        flex: 1;
+        text-align: center;
+    }
+
+}
+
+</style>
+{% endblock %}
+
+{% block body %}
+
+<div class="party-room-page">
+
+    <h1 class="party-room-heading">Watch Party</h1>
+
+    <p class="party-room-code-line">
+        Room: <strong>{{ room_code|upper }}</strong>
+    </p>
+
+    <div id="party-room-loading" class="party-room-loading">
+        Loading party...
+    </div>
+
+    <!-- PARTY NOT FOUND -->
+
+    <div id="party-room-notfound" class="party-room-state d-none">
+
+        <div class="party-room-state-icon">🔍</div>
+
+        <div class="party-room-state-title">Party Not Found</div>
+
+        <div class="party-room-state-text">
+            This party may have expired or the code may be incorrect.
+        </div>
+
+        <a href="{% url 'party' %}" class="party-room-btn">
+            Back to Party
+        </a>
+
+    </div>
+
+    <!-- PARTY EXPIRED -->
+
+    <div id="party-room-expired" class="party-room-state d-none">
+
+        <div class="party-room-state-icon">⏰</div>
+
+        <div class="party-room-state-title">This Party Has Expired</div>
+
+        <div class="party-room-state-text">
+            Parties are available for 24 hours after they are created.
+        </div>
+
+        <a href="{% url 'party' %}" class="party-room-btn">
+            Back to Party
+        </a>
+
+    </div>
+
+    <!-- PARTY INFO -->
+
+    <div id="party-room-info" class="d-none">
+
+        <div class="party-room-card">
+
+            <div class="party-room-media-type" id="room-media-type"></div>
+
+            <div class="party-room-media-row">
+
+                <span class="party-room-media-label">TMDB ID</span>
+
+                <span class="party-room-media-value" id="room-media-id"></span>
+
+            </div>
+
+            <div id="room-season-row" class="party-room-media-row">
+
+                <span class="party-room-media-label">Season</span>
+
+                <span class="party-room-media-value" id="room-season"></span>
+
+            </div>
+
+            <div id="room-episode-row" class="party-room-media-row">
+
+                <span class="party-room-media-label">Episode</span>
+
+                <span class="party-room-media-value" id="room-episode"></span>
+
+            </div>
+
+            <div class="party-room-host">
+
+                <div class="party-room-host-icon">👑</div>
+
+                <div>
+
+                    <div class="party-room-host-label">Host</div>
+
+                    <div class="party-room-host-name" id="room-host-name">
+                        Loading...
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!--
+             Stage 2 will place the synchronized VidFast iframe,
+             party members and host controls in this container.
+        -->
+
+        <div class="party-room-stage" id="party-room-stage">
+            The synchronized player will appear here.
+        </div>
+
+        <div class="party-room-actions">
+
+            <a
+                href="{% url 'party' %}"
+                class="party-room-btn party-room-btn-outline"
+            >
+                Back to Party
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+const PARTY_ROOM_CODE = "{{ room_code|upper }}";
+
+
+/* =========================================================
+   LOAD PARTY
+========================================================= */
+
+async function loadPartyRoom() {
+
+    const loading = document.getElementById("party-room-loading");
+    const notFound = document.getElementById("party-room-notfound");
+    const expired = document.getElementById("party-room-expired");
+    const info = document.getElementById("party-room-info");
+
+    const { data, error } = await supabaseClient
+        .from("watch_parties")
+        .select("*")
+        .eq("room_code", PARTY_ROOM_CODE)
+        .maybeSingle();
+
+    if (error || !data) {
+
+        loading.classList.add("d-none");
+
+        notFound.classList.remove("d-none");
+
+        return;
+    }
+
+    const expiresAt = new Date(data.expires_at);
+
+    const isExpired =
+        !isNaN(expiresAt.getTime()) && expiresAt < new Date();
+
+    if (isExpired) {
+
+        loading.classList.add("d-none");
+
+        expired.classList.remove("d-none");
+
+        return;
+    }
+
+    loading.classList.add("d-none");
+
+    info.classList.remove("d-none");
+
+    const isMovie = data.media_type === "movie";
+
+    document.getElementById("room-media-type").textContent =
+        isMovie ? "Movie" : "Series";
+
+    document.getElementById("room-media-id").textContent =
+        data.media_id;
+
+    const seasonRow = document.getElementById("room-season-row");
+    const episodeRow = document.getElementById("room-episode-row");
+
+    if (isMovie) {
+
+        seasonRow.style.display = "none";
+        episodeRow.style.display = "none";
+
+    } else {
+
+        document.getElementById("room-season").textContent =
+            data.season;
+
+        document.getElementById("room-episode").textContent =
+            data.episode;
+
+    }
+
+    loadHostName(data.host_user_id);
+
+}
+
+
+/* =========================================================
+   HOST USERNAME (from existing profiles table)
+========================================================= */
+
+async function loadHostName(hostUserId) {
+
+    const hostName = document.getElementById("room-host-name");
+
+    const profile = await getProfileByUserId(hostUserId);
+
+    if (profile && profile.username) {
+
+        hostName.textContent = profile.username;
+
+    } else {
+
+        hostName.textContent = "Party Host";
+
+    }
+
+}
+
+
+/* =========================================================
+   INITIALIZE
+========================================================= */
+
+document.addEventListener("DOMContentLoaded", async () => {
+
+    const user = await getCurrentUser();
+
+    if (!user) {
+
+        window.location.href = "/auth/";
+
+        return;
+    }
+
+    loadPartyRoom();
+
+});
+
+</script>
+
+{% endblock %}
