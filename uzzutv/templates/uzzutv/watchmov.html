@@ -3,9 +3,10 @@
 
 {% block title %}UzzUTV - Watch {{ title }}{% endblock %}
 {% block meta_description %}Watch {{ title }} online on UzzUTV. Stream this movie now with multiple server options.{% endblock %}
-{% block canonical %}<link rel="canonical" href="https://uzzutv.pythonanywhere.com/movie/{{ tmdb_id }}/watch/">{% endblock %}
+{% block robots %}noindex, follow{% endblock %}
+{% block canonical %}<link rel="canonical" href="https://uzzutv.pythonanywhere.com/movie/{{ tmdb_id }}/">{% endblock %}
 {% block og_type %}video.movie{% endblock %}
-{% block og_url %}https://uzzutv.pythonanywhere.com/movie/{{ tmdb_id }}/watch/{% endblock %}
+{% block og_url %}https://uzzutv.pythonanywhere.com/movie/{{ tmdb_id }}/{% endblock %}
 {% block og_image %}{% if poster %}https://image.tmdb.org/t/p/w500{{ poster }}{% else %}https://uzzutv.pythonanywhere.com/static/uzzutv/images/logo.png{% endif %}{% endblock %}
 {% block head %}
 <script type="application/ld+json">
@@ -13,7 +14,7 @@
   "@context": "https://schema.org",
   "@type": "Movie",
   "name": "{{ title|escapejs }}",
-  "url": "https://uzzutv.pythonanywhere.com/movie/{{ tmdb_id }}/watch/"
+  "url": "https://uzzutv.pythonanywhere.com/movie/{{ tmdb_id }}/"
   {% if poster %},"image": "https://image.tmdb.org/t/p/w500{{ poster }}"{% endif %}
 }
 </script>

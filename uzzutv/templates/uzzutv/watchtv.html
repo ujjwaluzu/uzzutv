@@ -3,9 +3,10 @@
 
 {% block title %}UzzUTV - Watch {{ title }}{% endblock %}
 {% block meta_description %}Watch {{ title }} online on UzzUTV. Explore episodes, seasons and series information.{% endblock %}
-{% block canonical %}<link rel="canonical" href="https://uzzutv.pythonanywhere.com/tv/{{ id }}/watch/?season={{ current_season }}&episode={{ current_episode }}">{% endblock %}
+{% block robots %}noindex, follow{% endblock %}
+{% block canonical %}<link rel="canonical" href="https://uzzutv.pythonanywhere.com/tv/{{ id }}/">{% endblock %}
 {% block og_type %}video.tv_show{% endblock %}
-{% block og_url %}https://uzzutv.pythonanywhere.com/tv/{{ id }}/watch/?season={{ current_season }}&episode={{ current_episode }}{% endblock %}
+{% block og_url %}https://uzzutv.pythonanywhere.com/tv/{{ id }}/{% endblock %}
 {% block og_image %}{% if poster %}https://image.tmdb.org/t/p/w500{{ poster }}{% else %}https://uzzutv.pythonanywhere.com/static/uzzutv/images/logo.png{% endif %}{% endblock %}
 {% block head %}
 <script type="application/ld+json">
@@ -13,7 +14,7 @@
   "@context": "https://schema.org",
   "@type": "TVSeries",
   "name": "{{ title|escapejs }}",
-  "url": "https://uzzutv.pythonanywhere.com/tv/{{ id }}/watch/?season={{ current_season }}&episode={{ current_episode }}"
+  "url": "https://uzzutv.pythonanywhere.com/tv/{{ id }}/"
   {% if poster %},"image": "https://image.tmdb.org/t/p/w500{{ poster }}"{% endif %}
 }
 </script>

@@ -1,10 +1,12 @@
 {% extends "uzzutv/layout.html" %}
 {% load static %}
 
-{% block title %}UzzUTV - {% if type == "movie" %}{{ data.title }}{% else %}{{ data.name }}{% endif %}{% endblock %}
-{% block meta_description %}{% if type == "movie" %}Watch {{ data.title }} on UzzUTV. Explore movie details, poster, information and available streaming options.{% else %}Watch {{ data.name }} on UzzUTV. Explore episodes, seasons and series information.{% endif %}{% endblock %}
+{% block title %}UzzUTV - {{ title_full }}{% endblock %}
+{% block meta_description %}{{ meta_desc|truncatewords:40 }}{% endblock %}
 {% block canonical %}<link rel="canonical" href="https://uzzutv.pythonanywhere.com/{{ type }}/{{ data.id }}/">{% endblock %}
 {% block og_type %}{% if type == "movie" %}video.movie{% else %}video.tv_show{% endif %}{% endblock %}
+{% block og_title %}UzzUTV - {{ title_full }}{% endblock %}
+{% block og_description %}{{ meta_desc|truncatewords:40 }}{% endblock %}
 {% block og_url %}https://uzzutv.pythonanywhere.com/{{ type }}/{{ data.id }}/{% endblock %}
 {% block og_image %}{% if data.poster_path %}https://image.tmdb.org/t/p/w500{{ data.poster_path }}{% else %}https://uzzutv.pythonanywhere.com/static/uzzutv/images/logo.png{% endif %}{% endblock %}
 {% block head %}
@@ -16,6 +18,15 @@
   "url": "https://uzzutv.pythonanywhere.com/{{ type }}/{{ data.id }}/"
   {% if data.poster_path %},"image": "https://image.tmdb.org/t/p/w500{{ data.poster_path }}"{% endif %}
   {% if data.overview %},"description": "{{ data.overview|escapejs }}"{% endif %}
+  {% if data.release_date %},"datePublished": "{{ data.release_date }}"{% elif data.first_air_date %},"datePublished": "{{ data.first_air_date }}"{% endif %}
+  {% if genres %},"genre": [{% for g in genres %}"{{ g|escapejs }}"{% if not forloop.last %},{% endif %}{% endfor %}]{% endif %}
+  {% if data.vote_count %},"aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "{{ data.vote_average|floatformat:1 }}",
+    "ratingCount": "{{ data.vote_count }}",
+    "bestRating": "10",
+    "worstRating": "1"
+  }{% endif %}
 }
 </script>
 <script type="application/ld+json">

@@ -19,6 +19,8 @@ path("rated/<uuid:user_id>/", views.rated, name="rated_user"),
     path("profile/", views.profile, name="profile"),
     path("profile/<uuid:user_id>/", views.public_profile, name="public_profile"),
     path("media-info/<str:type>/<int:id>/", views.media_info, name="media_info"),
+    path("robots.txt", views.robots_txt, name="robots_txt"),
+    path("sitemap.xml", views.sitemap_xml, name="sitemap_xml"),
 
 
 ]

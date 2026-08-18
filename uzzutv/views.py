@@ -713,9 +713,28 @@ def detail(request, type, id):
 
         data = requests.get(url, timeout=10).json()
 
+        title = data.get("title") or data.get("name", "")
+        year = None
+        raw_date = data.get("release_date") or data.get("first_air_date")
+        if raw_date:
+            year = raw_date[:4]
+
+        title_full = f"{title} ({year})" if year else title
+
+        overview = (data.get("overview") or "").strip()
+        if overview:
+            meta_desc = f"Watch {title} on UzzUTV. {overview}"
+        else:
+            meta_desc = f"Watch {title} on UzzUTV. Explore details, cast and streaming options."
+
+        genres = data.get("genres") or []
+
         context = {
             "data": data,
             "type": type,
+            "title_full": title_full,
+            "meta_desc": meta_desc,
+            "genres": [g.get("name", "") for g in genres],
             "cast": data["credits"]["cast"][:12],
             "recommendations": data["recommendations"]["results"][:14]
         }
@@ -735,3 +754,84 @@ def terms(request):
 
 def dmca(request):
     return render(request, "uzzutv/dmca.html")
+
+
+SITE_URL = "https://uzzutv.pythonanywhere.com"
+
+
+def robots_txt(request):
+    lines = [
+        "User-agent: *",
+        "Allow: /",
+        "Disallow: /auth/",
+        "Disallow: /profile/",
+        "Disallow: /watchlist/",
+        "Disallow: /rated/",
+        "Disallow: /admin/",
+        "Disallow: /media-info/",
+        "",
+        f"Sitemap: {SITE_URL}/sitemap.xml",
+    ]
+    return HttpResponse("\n".join(lines), content_type="text/plain")
+
+
+def sitemap_xml(request):
+
+    cache_key = "sitemap_urls"
+    urls = cache.get(cache_key)
+
+    if urls is None:
+
+        urls = [
+            {"loc": f"{SITE_URL}/", "priority": "1.0"},
+            {"loc": f"{SITE_URL}/home/", "priority": "1.0"},
+            {"loc": f"{SITE_URL}/movie/", "priority": "0.9"},
+            {"loc": f"{SITE_URL}/tv/", "priority": "0.9"},
+            {"loc": f"{SITE_URL}/search/", "priority": "0.5"},
+            {"loc": f"{SITE_URL}/terms/", "priority": "0.3"},
+            {"loc": f"{SITE_URL}/dmca/", "priority": "0.3"},
+        ]
+
+        seen = set()
+
+        try:
+            data = load_homepage_data()
+            groups = [
+                ("movie", data["trending_movies"]),
+                ("movie", data["popular_movies"]),
+                ("movie", data["top_movies"]),
+                ("tv", data["trending_tv"]),
+                ("tv", data["popular_tv"]),
+                ("tv", data["toprated_tv"]),
+            ]
+            for media_type, items in groups:
+                for item in items:
+                    item_id = item.get("id")
+                    if item_id is None:
+                        continue
+                    key = (media_type, item_id)
+                    if key in seen:
+                        continue
+                    seen.add(key)
+                    urls.append({
+                        "loc": f"{SITE_URL}/{media_type}/{item_id}/",
+                        "priority": "0.8",
+                    })
+        except Exception:
+            pass
+
+        cache.set(cache_key, urls, 21600)
+
+    items = "".join(
+        f"<url><loc>{u['loc']}</loc><changefreq>daily</changefreq><priority>{u['priority']}</priority></url>"
+        for u in urls
+    )
+
+    xml = (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        f"{items}\n"
+        "</urlset>"
+    )
+
+    return HttpResponse(xml, content_type="application/xml")
