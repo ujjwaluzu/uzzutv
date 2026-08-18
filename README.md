@@ -1,6 +1,6 @@
 # UzzUTV
 
-UzzUTV is a Netflix-style streaming platform built with Django that lets you discover, search, and watch movies and TV series. All content data is pulled live from **The Movie Database (TMDB) API**, with a responsive, mobile-friendly UI inspired by modern streaming apps.
+UzzUTV is a Netflix-style streaming platform built with Django that lets you discover, search, and watch movies and TV series. All content data is pulled live from **The Movie Database (TMDB) API**, with a responsive, mobile-friendly UI inspired by modern streaming apps. Accounts are powered by **Supabase**, giving you watchlist, Continue Watching, ratings, reviews, and public profiles.
 
 ---
 
@@ -22,8 +22,24 @@ UzzUTV is a Netflix-style streaming platform built with Django that lets you dis
 ### Search
 - Instant search across movies and TV shows
 
+### Accounts (Supabase)
+- Sign up / sign in with client-side field validation, live username availability checks, and friendly API error messages
+- Watchlist, Continue Watching, ratings, and comments synced across devices
+
+### Ratings & Reviews
+- Star-rating any movie or TV show on its detail page
+- Comment/review on detail pages, with paginated comment feeds
+
 ### Watchlist
-- Save favorites (powered by Supabase auth)
+- Save favorites to watch later
+
+### Profiles
+- Personal profile page with your rated titles, watchlist, and recent comments
+- Public, shareable profile pages at `/profile/<user_id>/`
+- Dedicated `/rated/` page listing all your ratings
+
+### Continue Watching
+- Picks up where you left off in movies and TV episodes, across devices
 
 ### Performance
 - Database-backed response caching (TMDB calls cached for hours)
@@ -39,7 +55,7 @@ UzzUTV is a Netflix-style streaming platform built with Django that lets you dis
 | Backend    | Python, Django 4.2                  |
 | Frontend   | HTML5, CSS3, Bootstrap 5, JavaScript |
 | Data       | TMDB API (movies/TV metadata)       |
-| Auth/Data  | Supabase (watchlist + auth)         |
+| Auth/Data  | Supabase (auth, watchlist, ratings, comments, profiles) |
 | Database   | SQLite (Django)                     |
 | Caching    | Django DatabaseCache                |
 | Deploy     | PythonAnywhere (see `settings.py`)  |
@@ -123,12 +139,16 @@ uzzutv/
 | `/`                       | Landing page                         |
 | `/home/`                  | Main browse page (hero + genre rows) |
 | `/movie/` `/tv/`          | Movies / TV shows                    |
-| `/<type>/<id>/`           | Detail page (cast, recommendations)  |
+| `/<type>/<id>/`           | Detail page (cast, recommendations, rate & comment) |
 | `/movie/<id>/watch/`      | Movie player                         |
 | `/tv/<id>/watch/`         | TV player (season/episode select)    |
 | `/search/`                | Search                               |
 | `/watchlist/`             | Your saved titles                    |
+| `/rated/`                 | Your ratings (with `/rated/<user_id>/` public view) |
 | `/auth/`                  | Sign in / sign up                    |
+| `/profile/`               | Your profile (ratings, watchlist, comments) |
+| `/profile/<user_id>/`     | Public profile                       |
+| `/media-info/<type>/<id>/`| Media metadata JSON (used by profile pages) |
 | `/terms/` `/dmca/`        | Legal pages                          |
 
 ---
@@ -148,12 +168,10 @@ The project is configured for PythonAnywhere:
 
 ## Future Improvements
 
-- User profiles
-- Ratings and reviews
 - Watch Together functionality
 - Personalized recommendations
 - Better streaming player
-- Episode progress syncing
+- Enhanced episode progress syncing
 - Notifications for new episodes
 - Progressive Web App (PWA)
 
