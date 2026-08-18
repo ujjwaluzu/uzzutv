@@ -1041,7 +1041,7 @@ border-right:1px solid #333;
 <!-- HERO SECTION -->
 
 <div class="hero"
-style="background-image:url('https://image.tmdb.org/t/p/original{{data.backdrop_path}}')">
+style="background-image:url('https://image.tmdb.org/t/p/w1280{{data.backdrop_path}}')">
 
 <div class="hero-overlay">
 
@@ -1341,7 +1341,7 @@ data-poster="{{data.poster_path}}">
 
 <a href="/{{type}}/{{rec.id}}">
 <div class="movie-card">
-<img loading="lazy" alt="{% if type == 'movie' %}{{ rec.title }}{% else %}{{ rec.name }}{% endif %} poster" src="https://image.tmdb.org/t/p/w500{{rec.poster_path}}">
+<img loading="lazy" decoding="async" alt="{% if type == 'movie' %}{{ rec.title }}{% else %}{{ rec.name }}{% endif %} poster" src="https://image.tmdb.org/t/p/w342{{rec.poster_path}}">
 </div>
 </a>
 

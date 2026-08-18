@@ -101,13 +101,13 @@ pointer-events:none;
 
 <div class="hero-slide">
 
-<img class="hero-bg" alt=""
-src="https://image.tmdb.org/t/p/original{{ item.backdrop_path }}">
+<img class="hero-bg" alt="" fetchpriority="high"
+src="https://image.tmdb.org/t/p/w1280{{ item.backdrop_path }}">
 
 <div class="hero-content">
 
 {% if item.logo %}
-<img class="hero-logo" alt="{% if item.title %}{{ item.title }}{% else %}{{ item.name }}{% endif %} logo" src="https://image.tmdb.org/t/p/w500{{ item.logo }}">
+<img class="hero-logo" alt="{% if item.title %}{{ item.title }}{% else %}{{ item.name }}{% endif %} logo" src="https://image.tmdb.org/t/p/w185{{ item.logo }}">
 {% else %}
 <h2 class="hero-title" style="font-family: 'Passero One', sans-serif;">
 {% if item.title %}{{ item.title|truncatewords:3 }}{% else %}{{ item.name|truncatewords:3 }}{% endif %}
@@ -180,7 +180,7 @@ onclick="saveContinue('{{item.id}}','movie','{{item.poster_path}}')">
 <a href="{% url 'detail' 'tv' item.id %}">
 {% endif %}
 
-<img loading="lazy" alt="{% if item.title %}{{ item.title }}{% else %}{{ item.name }}{% endif %} poster" src="https://image.tmdb.org/t/p/w500{{ item.poster_path }}">
+<img loading="lazy" decoding="async" alt="{% if item.title %}{{ item.title }}{% else %}{{ item.name }}{% endif %} poster" src="https://image.tmdb.org/t/p/w342{{ item.poster_path }}">
 
 </a>
 
@@ -238,7 +238,7 @@ onclick="saveContinue('{{item.id}}','movie','{{item.poster_path}}')">
 <a href="{% url 'detail' 'tv' item.id %}">
 {% endif %}
 
-<img loading="lazy" alt="{% if item.title %}{{ item.title }}{% else %}{{ item.name }}{% endif %} poster" src="https://image.tmdb.org/t/p/w500{{ item.poster_path }}">
+<img loading="lazy" decoding="async" alt="{% if item.title %}{{ item.title }}{% else %}{{ item.name }}{% endif %} poster" src="https://image.tmdb.org/t/p/w342{{ item.poster_path }}">
 
 </a>
 
@@ -284,7 +284,7 @@ onclick="saveContinue('{{item.id}}','movie','{{item.poster_path}}')">
 <a href="{% url 'detail' 'tv' item.id %}">
 {% endif %}
 
-<img loading="lazy" alt="{% if item.title %}{{ item.title }}{% else %}{{ item.name }}{% endif %} poster" src="https://image.tmdb.org/t/p/w500{{ item.poster_path }}">
+<img loading="lazy" decoding="async" alt="{% if item.title %}{{ item.title }}{% else %}{{ item.name }}{% endif %} poster" src="https://image.tmdb.org/t/p/w342{{ item.poster_path }}">
 
 </a>
 
@@ -327,7 +327,7 @@ onclick="saveContinue('{{item.id}}','movie','{{item.poster_path}}')">
 <a href="{% url 'detail' 'tv' item.id %}">
 {% endif %}
 
-<img loading="lazy" alt="{% if item.title %}{{ item.title }}{% else %}{{ item.name }}{% endif %} poster" src="https://image.tmdb.org/t/p/w500{{ item.poster_path }}">
+<img loading="lazy" decoding="async" alt="{% if item.title %}{{ item.title }}{% else %}{{ item.name }}{% endif %} poster" src="https://image.tmdb.org/t/p/w342{{ item.poster_path }}">
 
 </a>
 
@@ -377,7 +377,7 @@ onclick="saveContinue('{{item.id}}','movie','{{item.poster_path}}')">
 <a href="{% url 'detail' 'tv' item.id %}">
 {% endif %}
 
-<img loading="lazy" alt="{% if item.title %}{{ item.title }}{% else %}{{ item.name }}{% endif %} poster" src="https://image.tmdb.org/t/p/w500{{ item.poster_path }}">
+<img loading="lazy" decoding="async" alt="{% if item.title %}{{ item.title }}{% else %}{{ item.name }}{% endif %} poster" src="https://image.tmdb.org/t/p/w342{{ item.poster_path }}">
 
 </a>
 

@@ -58,8 +58,8 @@ to{ transform:rotate(360deg); }
 
 <div class="hero-slide">
 
-<img class="hero-bg" alt=""
-src="https://image.tmdb.org/t/p/original{{ tv.backdrop_path }}">
+<img class="hero-bg" alt="" fetchpriority="high"
+src="https://image.tmdb.org/t/p/w1280{{ tv.backdrop_path }}">
 
 <div class="hero-content">
 
@@ -125,7 +125,7 @@ src="https://image.tmdb.org/t/p/original{{ tv.backdrop_path }}">
 <a href="{% url 'detail' 'tv' popular.id %}">
 
 
-<img loading="lazy" alt="{{ popular.name }} poster" src="https://image.tmdb.org/t/p/w500{{ popular.poster_path }}">
+<img loading="lazy" decoding="async" alt="{{ popular.name }} poster" src="https://image.tmdb.org/t/p/w342{{ popular.poster_path }}">
 
 </a>
 
@@ -172,7 +172,7 @@ src="https://image.tmdb.org/t/p/original{{ tv.backdrop_path }}">
 <a href="{% url 'detail' 'tv' top.id %}">
 
 
-<img loading="lazy" alt="{{ top.name }} poster" src="https://image.tmdb.org/t/p/w500{{ top.poster_path }}">
+<img loading="lazy" decoding="async" alt="{{ top.name }} poster" src="https://image.tmdb.org/t/p/w342{{ top.poster_path }}">
 
 </a>
 
