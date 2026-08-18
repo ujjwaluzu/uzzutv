@@ -1,0 +1,87 @@
+{% extends 'uzzutv/layout.html' %}
+{% load static %}
+
+{% block title %}UzzUTV - Page Not Found{% endblock %}
+{% block meta_description %}The page you are looking for does not exist on UzzUTV. Return home to explore movies and TV series.{% endblock %}
+{% block robots %}noindex, follow{% endblock %}
+
+{% block body %}
+
+<style>
+.error-page{
+    min-height: calc(100vh - 220px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #ffffff;
+    padding: 80px 20px 60px;
+    position: relative;
+}
+
+.error-code{
+    font-family: "Passero One", cursive;
+    font-size: 130px;
+    line-height: 1;
+    letter-spacing: 4px;
+    background: linear-gradient(180deg, #ff3c3c 0%, #7f1010 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin-bottom: 6px;
+}
+
+.error-title{
+    font-family: "Inter", sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #ffffff;
+}
+
+.error-text{
+    font-size: 15px;
+    line-height: 1.6;
+    color: #9ca3af;
+    max-width: 420px;
+    margin: 0 auto 28px;
+}
+
+.error-btn{
+    display: inline-block;
+    background: #ff3c3c;
+    color: #ffffff;
+    font-family: "Inter", sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 12px 28px;
+    border-radius: 25px;
+    text-decoration: none;
+    transition: background-color .2s ease, transform .2s ease;
+}
+
+.error-btn:hover{
+    background: #ff2b2b;
+    transform: scale(1.03);
+    color: #ffffff;
+}
+
+@media (max-width: 600px){
+    .error-code{
+        font-size: 90px;
+    }
+    .error-title{
+        font-size: 22px;
+    }
+}
+</style>
+
+<div class="error-page">
+    <div class="error-code">404</div>
+    <h1 class="error-title">Page Not Found</h1>
+    <p class="error-text">The page you're looking for doesn't exist or has been moved. Let's get you back to watching.</p>
+    <a class="error-btn" href="{% url 'home' %}">Back to Home</a>
+</div>
+
+{% endblock %}

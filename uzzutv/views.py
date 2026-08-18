@@ -10,6 +10,7 @@ API_KEY = os.getenv("TMDB_KEY")
 BASE_URL = "https://api.themoviedb.org/3"
 
 from django.shortcuts import render, redirect
+from django.http import Http404
 
 def auth(request):
     return render(request, "uzzutv/auth.html")
@@ -711,7 +712,12 @@ def detail(request, type, id):
 
         url = f"https://api.themoviedb.org/3/{type}/{id}?api_key={API_KEY}&append_to_response=credits,recommendations"
 
-        data = requests.get(url, timeout=10).json()
+        response = requests.get(url, timeout=10)
+
+        if response.status_code != 200:
+            raise Http404(f"{type} {id} not found")
+
+        data = response.json()
 
         title = data.get("title") or data.get("name", "")
         year = None
