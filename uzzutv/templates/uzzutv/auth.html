@@ -123,6 +123,52 @@
 .auth-toggle:hover{
     text-decoration:underline;
 }
+
+.auth-input.is-invalid{
+    border-color:#ff3c3c !important;
+    box-shadow:0 0 0 3px rgba(255,60,60,0.12) !important;
+}
+
+.auth-input.is-valid{
+    border-color:#22c55e !important;
+    box-shadow:0 0 0 3px rgba(34,197,94,0.12) !important;
+}
+
+.auth-feedback{
+    font-size:13px;
+    line-height:1.4;
+    margin-top:6px;
+    display:none;
+    color:#ff6b6b;
+}
+
+.auth-feedback.show{
+    display:block;
+}
+
+.auth-feedback.is-ok{
+    color:#22c55e;
+}
+
+.auth-feedback.is-warn{
+    color:#fbbf24;
+}
+
+.auth-feedback.pw-checklist{
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:8px;
+    padding:10px 12px;
+    color:#9ca3af;
+}
+
+.auth-feedback .pw-check{
+    color:#6b7280;
+}
+
+.auth-feedback .pw-check.ok{
+    color:#22c55e;
+}
 </style>
 {% endblock %}
 
@@ -142,7 +188,7 @@
 
         <div id="auth-message" class="alert d-none auth-message"></div>
 
-        <form id="auth-form" class="mt-4">
+        <form id="auth-form" class="mt-4" novalidate>
 
             <div class="mb-3 d-none" id="username-field">
 
@@ -165,7 +211,7 @@
 
                 </div>
 
-                <div id="username-feedback" class="mt-2 d-none"></div>
+                <div id="username-feedback" class="auth-feedback" aria-live="polite"></div>
 
             </div>
 
@@ -188,6 +234,8 @@
                     >
 
                 </div>
+
+                <div id="email-feedback" class="auth-feedback" aria-live="polite"></div>
 
             </div>
 
@@ -212,12 +260,15 @@
 
                 </div>
 
+                <div id="password-feedback" class="auth-feedback" aria-live="polite"></div>
+
             </div>
 
             <button
                 type="submit"
                 id="auth-submit"
                 class="auth-submit"
+                disabled
             >
                 Sign In
             </button>
@@ -268,6 +319,9 @@ const authToggleText = document.getElementById("auth-toggle-text");
 
 const authMessage = document.getElementById("auth-message");
 
+const emailFeedback = document.getElementById("email-feedback");
+const passwordFeedback = document.getElementById("password-feedback");
+
 
 function showAuthMessage(message, type = "danger") {
 
@@ -275,6 +329,255 @@ function showAuthMessage(message, type = "danger") {
     authMessage.className = `alert alert-${type}`;
 
 }
+
+
+/* ---------------------------------------------------------
+   FIELD VALIDATION HELPERS
+--------------------------------------------------------- */
+
+function setFieldFeedback(input, feedback, message, state) {
+
+    input.classList.toggle("is-invalid", state === "error");
+    input.classList.toggle("is-valid", state === "ok");
+
+    if (message) {
+
+        feedback.textContent = message;
+        feedback.className = "auth-feedback show" +
+            (state === "ok" ? " is-ok" :
+             state === "warn" ? " is-warn" : "");
+
+    } else {
+
+        feedback.textContent = "";
+        feedback.className = "auth-feedback";
+
+    }
+
+}
+
+
+function validateEmail(email) {
+
+    const value = (email || "").trim();
+
+    if (!value) {
+        return { valid: false, message: "Email is required." };
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+        return {
+            valid: false,
+            message: "Please enter a valid email address."
+        };
+    }
+
+    return { valid: true, value };
+}
+
+
+function validatePassword(password) {
+
+    if (!password) {
+        return { valid: false, message: "Password is required." };
+    }
+
+    if (isSignup) {
+
+        if (password.length < 6) {
+            return {
+                valid: false,
+                message: "Password must be at least 6 characters."
+            };
+        }
+
+        if (!/[A-Za-z]/.test(password)) {
+            return {
+                valid: false,
+                message: "Password must contain at least one letter."
+            };
+        }
+
+        if (!/[0-9]/.test(password)) {
+            return {
+                valid: false,
+                message: "Password must contain at least one number."
+            };
+        }
+
+    }
+
+    return { valid: true };
+}
+
+
+function renderPasswordChecklist(password) {
+
+    if (!isSignup || !password) {
+        return false;
+    }
+
+    const checks = [
+        { label: "At least 6 characters", ok: password.length >= 6 },
+        { label: "Contains a letter", ok: /[A-Za-z]/.test(password) },
+        { label: "Contains a number", ok: /[0-9]/.test(password) }
+    ];
+
+    passwordFeedback.innerHTML = checks.map((check) =>
+        `<div class="pw-check${check.ok ? " ok" : ""}">` +
+        `${check.ok ? "✓" : "✕"} ${check.label}</div>`
+    ).join("");
+
+    passwordFeedback.className = "auth-feedback show pw-checklist";
+
+    return checks.every((check) => check.ok);
+
+}
+
+
+function friendlyAuthError(error) {
+
+    const code = String(error.code || "").toLowerCase();
+    const msg = String(error.message || "").toLowerCase();
+
+    if (code === "invalid_credentials" ||
+        msg.includes("invalid login credentials")) {
+        return "Incorrect email or password. Please try again.";
+    }
+
+    if (msg.includes("email not confirmed")) {
+        return "Please confirm your email before signing in. Check your inbox for the confirmation link.";
+    }
+
+    if (code === "user_already_exists" ||
+        msg.includes("already registered") ||
+        msg.includes("already been registered")) {
+        return "An account with this email already exists. Please sign in instead.";
+    }
+
+    if (msg.includes("password should be at least") ||
+        msg.includes("at least 6 characters")) {
+        return "Password must be at least 6 characters.";
+    }
+
+    if (code === "validation_failed" ||
+        msg.includes("invalid email") ||
+        msg.includes("is invalid")) {
+        return "Please enter a valid email address.";
+    }
+
+    if (msg.includes("rate limit") ||
+        msg.includes("too many requests") ||
+        msg.includes("slow down")) {
+        return "Too many attempts. Please wait a moment and try again.";
+    }
+
+    if (msg.includes("network") ||
+        msg.includes("failed to fetch")) {
+        return "Network error. Please check your connection and try again.";
+    }
+
+    return error.message || "Something went wrong. Please try again.";
+
+}
+
+
+/* ---------------------------------------------------------
+   SUBMIT BUTTON STATE (disabled until all fields valid)
+--------------------------------------------------------- */
+
+function updateSubmitState() {
+
+    const emailValid = validateEmail(emailInput.value.trim()).valid;
+    const passwordValid = validatePassword(passwordInput.value).valid;
+
+    let usernameValid = true;
+
+    if (isSignup) {
+
+        usernameValid =
+            validateUsername(usernameInput.value.trim()).valid &&
+            usernameCheckResult === true;
+
+    }
+
+    authSubmit.disabled = !(emailValid && passwordValid && usernameValid);
+
+}
+
+
+/* ---------------------------------------------------------
+   EMAIL / PASSWORD LIVE VALIDATION
+--------------------------------------------------------- */
+
+emailInput.addEventListener("blur", () => {
+
+    const check = validateEmail(emailInput.value.trim());
+
+    if (!check.valid) {
+        setFieldFeedback(emailInput, emailFeedback, check.message, "error");
+    }
+
+});
+
+
+emailInput.addEventListener("input", () => {
+
+    if (!emailInput.classList.contains("is-invalid")) {
+        return;
+    }
+
+    const check = validateEmail(emailInput.value.trim());
+
+    if (check.valid) {
+        setFieldFeedback(emailInput, emailFeedback, "", "ok");
+    }
+
+    updateSubmitState();
+
+});
+
+
+passwordInput.addEventListener("input", () => {
+
+    if (isSignup) {
+
+        const allOk = renderPasswordChecklist(passwordInput.value);
+
+        passwordInput.classList.toggle("is-invalid",
+            !allOk && passwordInput.value.length > 0);
+        passwordInput.classList.toggle("is-valid",
+            allOk && passwordInput.value.length > 0);
+
+        if (allOk) {
+
+            passwordFeedback.className = "auth-feedback show is-ok";
+            passwordFeedback.textContent = "Password looks good";
+
+        }
+
+    } else if (passwordInput.classList.contains("is-invalid")) {
+
+        if (validatePassword(passwordInput.value).valid) {
+            setFieldFeedback(passwordInput, passwordFeedback, "", "ok");
+        }
+
+    }
+
+    updateSubmitState();
+
+});
+
+
+passwordInput.addEventListener("blur", () => {
+
+    const check = validatePassword(passwordInput.value);
+
+    if (!check.valid) {
+        setFieldFeedback(passwordInput, passwordFeedback, check.message, "error");
+    }
+
+});
 
 
 /* ---------------------------------------------------------
@@ -295,7 +598,8 @@ async function runUsernameCheck() {
 
     if (!value) {
         usernameCheckResult = null;
-        usernameFeedback.className = "mt-2 d-none";
+        setFieldFeedback(usernameInput, usernameFeedback, "", "");
+        updateSubmitState();
         return;
     }
 
@@ -305,16 +609,26 @@ async function runUsernameCheck() {
 
         usernameCheckResult = false;
 
-        usernameFeedback.className = "mt-2 text-warning";
+        setFieldFeedback(
+            usernameInput,
+            usernameFeedback,
+            check.message,
+            "error"
+        );
 
-        usernameFeedback.innerHTML =
-            "Username can only contain letters, numbers and underscores (3-20 characters).";
+        updateSubmitState();
 
         return;
     }
 
-    usernameFeedback.className = "mt-2 text-secondary";
-    usernameFeedback.innerHTML = "Checking...";
+    usernameCheckResult = null;
+
+    setFieldFeedback(
+        usernameInput,
+        usernameFeedback,
+        "Checking...",
+        "warn"
+    );
 
     const available = await usernameAvailable(value);
 
@@ -328,7 +642,9 @@ async function runUsernameCheck() {
 
         usernameCheckResult = null;
 
-        usernameFeedback.className = "mt-2 d-none";
+        setFieldFeedback(usernameInput, usernameFeedback, "", "");
+
+        updateSubmitState();
 
         return;
     }
@@ -337,19 +653,25 @@ async function runUsernameCheck() {
 
     if (available) {
 
-        usernameFeedback.className = "mt-2";
-
-        usernameFeedback.innerHTML =
-            '<span style="color:#22c55e;">✓ Username available</span>';
+        setFieldFeedback(
+            usernameInput,
+            usernameFeedback,
+            "✓ Username available",
+            "ok"
+        );
 
     } else {
 
-        usernameFeedback.className = "mt-2";
-
-        usernameFeedback.innerHTML =
-            '<span style="color:#ff3c3c;">✕ Username already taken</span>';
+        setFieldFeedback(
+            usernameInput,
+            usernameFeedback,
+            "✕ Username already taken",
+            "error"
+        );
 
     }
+
+    updateSubmitState();
 
 }
 
@@ -372,6 +694,11 @@ authToggle.addEventListener("click", () => {
     isSignup = !isSignup;
 
     authMessage.className = "alert d-none";
+
+    setFieldFeedback(emailInput, emailFeedback, "", "");
+    setFieldFeedback(passwordInput, passwordFeedback, "", "");
+    setFieldFeedback(usernameInput, usernameFeedback, "", "");
+    usernameCheckResult = null;
 
     if (isSignup) {
 
@@ -409,6 +736,8 @@ authToggle.addEventListener("click", () => {
 
     }
 
+    updateSubmitState();
+
 });
 
 
@@ -420,9 +749,76 @@ authForm.addEventListener("submit", async (event) => {
     const password = passwordInput.value;
     const username = usernameInput.value.trim();
 
-    if (isSignup && !username) {
+    const emailCheck = validateEmail(email);
 
-        showAuthMessage("Username is required.");
+    setFieldFeedback(
+        emailInput,
+        emailFeedback,
+        emailCheck.valid ? "" : emailCheck.message,
+        emailCheck.valid ? "ok" : "error"
+    );
+
+    const passwordCheck = validatePassword(password);
+
+    if (!passwordCheck.valid) {
+        setFieldFeedback(
+            passwordInput,
+            passwordFeedback,
+            passwordCheck.message,
+            "error"
+        );
+    }
+
+    let usernameCheck = { valid: true };
+
+    if (isSignup) {
+
+        usernameCheck = validateUsername(username);
+
+        if (!usernameCheck.valid) {
+
+            setFieldFeedback(
+                usernameInput,
+                usernameFeedback,
+                usernameCheck.message,
+                "error"
+            );
+
+        } else if (usernameCheckResult === false) {
+
+            setFieldFeedback(
+                usernameInput,
+                usernameFeedback,
+                "✕ Username already taken",
+                "error"
+            );
+
+        }
+
+    }
+
+    if (!emailCheck.valid ||
+        !passwordCheck.valid ||
+        (isSignup && !usernameCheck.valid)) {
+
+        showAuthMessage("Please fix the highlighted fields.");
+
+        if (isSignup && !usernameCheck.valid) {
+            usernameInput.focus();
+        } else if (!emailCheck.valid) {
+            emailInput.focus();
+        } else {
+            passwordInput.focus();
+        }
+
+        return;
+    }
+
+    if (isSignup && usernameCheckResult === false) {
+
+        showAuthMessage("Username already taken. Please choose another.");
+
+        usernameInput.focus();
 
         return;
     }
@@ -437,34 +833,24 @@ authForm.addEventListener("submit", async (event) => {
 
         if (isSignup) {
 
-        const usernameCheck = validateUsername(username);
-
-        if (!usernameCheck.valid) {
-
-            showAuthMessage(usernameCheck.message);
-
-            return;
-
-        }
-
-        const redirectUrl =
-            window.location.hostname === "127.0.0.1" ||
-            window.location.hostname === "localhost"
-                ? `${window.location.origin}/home/`
-                : "https://uzzutv.pythonanywhere.com/home/";
+            const redirectUrl =
+                window.location.hostname === "127.0.0.1" ||
+                window.location.hostname === "localhost"
+                    ? `${window.location.origin}/home/`
+                    : "https://uzzutv.pythonanywhere.com/home/";
 
 
-        const { data, error } =
-            await supabaseClient.auth.signUp({
-                email,
-                password,
-                options: {
-                    data: {
-                        username: username
-                    },
-                    emailRedirectTo: redirectUrl
-                }
-            });
+            const { data, error } =
+                await supabaseClient.auth.signUp({
+                    email,
+                    password,
+                    options: {
+                        data: {
+                            username: username
+                        },
+                        emailRedirectTo: redirectUrl
+                    }
+                });
 
             if (error) {
                 throw error;
@@ -550,9 +936,7 @@ authForm.addEventListener("submit", async (event) => {
 
         console.error(error);
 
-        showAuthMessage(
-            error.message || "Something went wrong."
-        );
+        showAuthMessage(friendlyAuthError(error));
 
         authSubmit.disabled = false;
 
@@ -561,6 +945,9 @@ authForm.addEventListener("submit", async (event) => {
     }
 
 });
+
+
+updateSubmitState();
 
 </script>
 
