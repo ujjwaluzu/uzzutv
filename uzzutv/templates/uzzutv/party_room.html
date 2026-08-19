@@ -426,6 +426,66 @@
     flex-shrink: 0;
 }
 
+/* ---------- CAPACITY INDICATOR ---------- */
+
+.party-room-capacity-chip{
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #101010;
+    border: 1px solid rgba(255,255,255,.07);
+    border-radius: 999px;
+    padding: 6px 13px;
+    color: #d1d5db;
+    font-size: 12.5px;
+    font-weight: 600;
+}
+
+.party-room-capacity-chip.full{
+    border-color: rgba(255,60,60,.35);
+    color: #ff6b6b;
+}
+
+/* ---------- MEMBER ROW ---------- */
+
+.party-member-row{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+}
+
+.party-member-row + .party-member-row{
+    border-top: 1px solid rgba(255,255,255,.06);
+}
+
+.party-member-role{
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+    color: #c084fc;
+    background: rgba(168,85,247,.12);
+    border: 1px solid rgba(168,85,247,.35);
+    border-radius: 6px;
+    padding: 2px 8px;
+    flex-shrink: 0;
+}
+
+.party-member-name{
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.party-member-row.waiting .party-member-name{
+    color: #6b7280;
+    font-style: italic;
+}
+
 /* ---------- STATES ---------- */
 
 .party-room-state{
@@ -544,6 +604,8 @@
             Room: <strong>{{ room_code|upper }}</strong>
             <span class="party-room-code-sep">•</span>
             <span id="party-room-media-name">Loading...</span>
+            <span class="party-room-code-sep">•</span>
+            <span class="party-room-capacity-chip" id="party-capacity-chip">👥 -- / 2</span>
         </p>
 
     </header>
@@ -588,6 +650,25 @@
 
     </div>
 
+    <!-- ROOM FULL -->
+
+    <div id="party-room-full" class="party-room-state d-none">
+
+        <div class="party-room-state-icon">🚫</div>
+
+        <div class="party-room-state-title">Watch Party Full</div>
+
+        <div class="party-room-state-text">
+            This Watch Party already has 2 people.<br>
+            Only the host and one guest can watch together.
+        </div>
+
+        <a href="{% url 'party' %}" class="party-room-btn">
+            Back to Party
+        </a>
+
+    </div>
+
     <!-- PARTY INFO -->
 
     <div id="party-room-info" class="d-none">
@@ -607,6 +688,28 @@
             </div>
 
             <aside class="party-room-side">
+
+                <!-- MEMBERS -->
+
+                <div class="party-ha">
+
+                    <div class="party-ha-head">
+
+                        <div class="party-ha-title">Members</div>
+
+                    </div>
+
+                    <div class="party-member-row" id="member-host-row">
+                        <span class="party-member-role">HOST</span>
+                        <span class="party-member-name">👤 <span id="member-host-name">Loading...</span></span>
+                    </div>
+
+                    <div class="party-member-row waiting" id="member-guest-row">
+                        <span class="party-member-role" style="color:#60a5fa;background:rgba(59,130,246,.12);border-color:rgba(59,130,246,.35)">GUEST</span>
+                        <span class="party-member-name">👤 <span id="member-guest-name">Waiting...</span></span>
+                    </div>
+
+                </div>
 
                 <!-- HOST ACTIVITY -->
 
@@ -771,6 +874,17 @@ let hostTime = 0;          // last authoritative host currentTime
 let hostPlaying = false;   // last authoritative host playing state
 let hostAt = 0;            // Date.now() when hostTime was received
 
+let guestReady = false;    // guest activity has valid data (realtime for host)
+let guestTime = 0;         // last authoritative guest currentTime
+let guestPlaying = false;  // last authoritative guest playing state
+let guestAt = 0;           // Date.now() when guestTime was received
+let guestUsername = "";     // guest's display name
+
+let myRole = null;         // "host" or "guest"
+let myUsername = "";
+let guestReleaseTimer = null;
+let leaving = false;
+
 
 /* =========================================================
    TIME HELPERS
@@ -824,6 +938,19 @@ function hostDisplayTime() {
 }
 
 
+function guestDisplayTime() {
+
+    if (!isHost) return myDisplayTime();
+
+    if (!guestReady) return null;
+
+    if (!guestPlaying) return guestTime;
+
+    return guestTime + (Date.now() - guestAt) / 1000;
+
+}
+
+
 /* =========================================================
    RENDER
 ========================================================= */
@@ -856,15 +983,16 @@ function renderAll() {
 
     const diffSection = document.getElementById("party-diff-section");
 
-    if (!isHost && diffSection) {
+    if (diffSection) {
 
         const yourStatus = document.getElementById("your-status");
         const yourTime = document.getElementById("your-time");
         const diffLine = document.getElementById("party-diff-line");
 
-        const mTime = myDisplayTime();
+        const remoteTime = isHost ? guestDisplayTime() : myDisplayTime();
+        const remotePlaying = isHost ? guestPlaying : myPlaying;
 
-        if (mTime === null) {
+        if (remoteTime === null) {
 
             setStatus(yourStatus, "loading");
             yourStatus.textContent = "⏳ Loading...";
@@ -872,15 +1000,15 @@ function renderAll() {
 
         } else {
 
-            setStatus(yourStatus, myPlaying ? "playing" : "paused");
-            yourStatus.textContent = myPlaying ? "▶ Playing" : "⏸ Paused";
-            yourTime.textContent = formatTime(mTime);
+            setStatus(yourStatus, remotePlaying ? "playing" : "paused");
+            yourStatus.textContent = remotePlaying ? "▶ Playing" : "⏸ Paused";
+            yourTime.textContent = formatTime(remoteTime);
 
         }
 
-        if (hTime !== null && mTime !== null) {
+        if (hTime !== null && remoteTime !== null) {
 
-            const diff = hTime - mTime;
+            const diff = hTime - remoteTime;
 
             if (Math.abs(diff) < 3) {
 
@@ -888,11 +1016,15 @@ function renderAll() {
 
             } else if (diff > 0) {
 
-                diffLine.textContent = `Host is ${formatTime(diff)} ahead`;
+                diffLine.textContent = isHost
+                    ? `You are ${formatTime(diff)} ahead`
+                    : `Host is ${formatTime(diff)} ahead`;
 
             } else {
 
-                diffLine.textContent = `You are ${formatTime(-diff)} ahead`;
+                diffLine.textContent = isHost
+                    ? `Guest is ${formatTime(-diff)} ahead`
+                    : `You are ${formatTime(-diff)} ahead`;
 
             }
 
@@ -903,6 +1035,225 @@ function renderAll() {
         }
 
     }
+
+}
+
+
+/* =========================================================
+   CAPACITY CHECK + GUEST SLOT CLAIM
+========================================================= */
+
+async function checkAndClaimSlot(room) {
+
+    const userId = currentUser.id;
+
+    console.log("[WatchParty] Slot check:", {
+        currentUserId: userId,
+        hostUserId: room.host_user_id,
+        guestUserId: room.guest_user_id,
+        isHost: userId === room.host_user_id,
+        isGuest: userId === room.guest_user_id,
+        roomCode: room.room_code
+    });
+
+    if (userId === room.host_user_id) {
+
+        myRole = "host";
+
+        console.log("[WatchParty] Role: host — allowed");
+
+        return true;
+    }
+
+    if (room.guest_user_id === userId) {
+
+        myRole = "guest";
+
+        console.log("[WatchParty] Role: existing guest — allowed");
+
+        return true;
+    }
+
+    if (!room.guest_user_id) {
+
+        console.log("[WatchParty] Guest slot empty — attempting claim");
+
+        const { data, error } = await supabaseClient.rpc("claim_guest_slot", {
+            p_room_code: PARTY_ROOM_CODE,
+            p_user_id: userId
+        });
+
+        console.log("[WatchParty] RPC result:", { data, error });
+
+        if (!error && data === userId) {
+
+            myRole = "guest";
+
+            console.log("[WatchParty] Role: new guest — allowed");
+
+            return true;
+        }
+
+        console.log("[WatchParty] Claim failed — rejected");
+
+        return false;
+    }
+
+    console.log("[WatchParty] Guest slot occupied by another user — rejected");
+
+    return false;
+}
+
+
+async function releaseGuestSlot() {
+
+    if (!currentUser || myRole !== "guest") return;
+
+    leaving = true;
+
+    try {
+
+        await supabaseClient.rpc("release_guest_slot", {
+            p_room_code: PARTY_ROOM_CODE,
+            p_user_id: currentUser.id
+        });
+
+    } catch (e) {
+
+        console.warn("release_guest_slot failed:", e);
+
+    }
+
+}
+
+
+/* =========================================================
+   MEMBER RENDERING (Presence-driven)
+========================================================= */
+
+function renderMembersFromPresence(state) {
+
+    const seen = new Map();
+
+    Object.values(state).forEach(function (presences) {
+
+        presences.forEach(function (p) {
+
+            if (p && p.user_id && !seen.has(p.user_id)) {
+
+                seen.set(p.user_id, p);
+
+            }
+
+        });
+
+    });
+
+    const hostEntry = seen.get(roomData.host_user_id);
+
+    let guestEntry = null;
+
+    seen.forEach(function (p, id) {
+
+        if (id !== roomData.host_user_id) guestEntry = p;
+
+    });
+
+    if (guestEntry && roomData) {
+
+        roomData.guest_user_id = guestEntry.user_id;
+
+    }
+
+    const hostNameEl = document.getElementById("member-host-name");
+
+    const guestRow = document.getElementById("member-guest-row");
+
+    const guestNameEl = document.getElementById("member-guest-name");
+
+    if (hostNameEl) {
+
+        hostNameEl.textContent = (hostEntry && hostEntry.username) || hostUsername || "Host";
+
+    }
+
+    if (guestEntry) {
+
+        guestRow.classList.remove("waiting");
+
+        guestNameEl.textContent = guestEntry.username || "Guest";
+
+    } else {
+
+        guestRow.classList.add("waiting");
+
+        guestNameEl.textContent = "Waiting...";
+
+    }
+
+    const count = Math.min(seen.size, 2);
+
+    updateCapacity(count);
+
+    if (isHost && !leaving) {
+
+        if (!guestEntry && roomData.guest_user_id) {
+
+            if (!guestReleaseTimer) {
+
+                guestReleaseTimer = setTimeout(async function () {
+
+                    if (leaving) return;
+
+                    try {
+
+                        await supabaseClient.rpc("release_guest_slot", {
+                            p_room_code: PARTY_ROOM_CODE,
+                            p_user_id: roomData.guest_user_id
+                        });
+
+                        roomData.guest_user_id = null;
+
+                    } catch (e) {
+
+                        console.warn("Auto release failed:", e);
+
+                    }
+
+                    guestReleaseTimer = null;
+
+                }, 30000);
+
+            }
+
+        } else if (guestEntry) {
+
+            if (guestReleaseTimer) {
+
+                clearTimeout(guestReleaseTimer);
+
+                guestReleaseTimer = null;
+
+            }
+
+        }
+
+    }
+
+}
+
+
+function updateCapacity(count) {
+
+    const chip = document.getElementById("party-capacity-chip");
+
+    if (!chip) return;
+
+    const isFull = count >= 2;
+
+    chip.textContent = "👥 " + count + " / 2" + (isFull ? " FULL" : "");
+
+    chip.classList.toggle("full", isFull);
 
 }
 
@@ -948,14 +1299,14 @@ function renderComparisonPanel() {
     const myPos = document.getElementById("party-my-pos");
 
     const hTime = hostDisplayTime();
-    const mTime = myDisplayTime();
+    const rTime = isHost ? guestDisplayTime() : myDisplayTime();
 
     if (hostPos) {
         hostPos.textContent = hTime === null ? "--:--" : formatTime(hTime);
     }
 
     if (myPos) {
-        myPos.textContent = mTime === null ? "--:--" : formatTime(mTime);
+        myPos.textContent = rTime === null ? "--:--" : formatTime(rTime);
     }
 
 }
@@ -1037,6 +1388,12 @@ function handlePlayerEvent(data) {
 
     }
 
+    if (!isHost && myReady && (!wasReady || event === "play" || event === "pause")) {
+
+        broadcastGuestState();
+
+    }
+
     renderAll();
 
 }
@@ -1051,7 +1408,6 @@ async function loadPartyRoom() {
     const loading = document.getElementById("party-room-loading");
     const notFound = document.getElementById("party-room-notfound");
     const expired = document.getElementById("party-room-expired");
-    const info = document.getElementById("party-room-info");
 
     const { data, error } = await supabaseClient
         .from("watch_parties")
@@ -1083,8 +1439,6 @@ async function loadPartyRoom() {
     }
 
     loading.classList.add("d-none");
-
-    info.classList.remove("d-none");
 
     return data;
 
@@ -1211,6 +1565,28 @@ function broadcastHostState() {
 }
 
 
+function broadcastGuestState() {
+
+    if (isHost || !myReady) return;
+
+    if (!channelReady || !channel) return;
+
+    channel.send({
+        type: "broadcast",
+        event: "guest_activity",
+        payload: {
+            type: "guest_activity",
+            guestUserId: currentUser.id,
+            guestUsername: myUsername || "",
+            currentTime: myTime,
+            playing: myPlaying,
+            sentAt: Date.now()
+        }
+    });
+
+}
+
+
 function requestHostState() {
 
     if (isHost || !channelReady || !channel) return;
@@ -1256,14 +1632,55 @@ function handleHostActivity(payload) {
 }
 
 
+function handleGuestActivity(payload) {
+
+    if (!isHost) return;
+
+    if (!roomData || !payload) return;
+
+    if (payload.guestUserId === roomData.host_user_id) return;
+
+    const t = Number(payload.currentTime);
+
+    if (!Number.isFinite(t) || t < 0) return;
+
+    guestReady = true;
+    guestTime = t;
+    guestAt = Date.now();
+    guestPlaying = !!payload.playing;
+
+    if (payload.guestUsername) {
+
+        guestUsername = payload.guestUsername;
+
+    }
+
+    renderAll();
+
+}
+
+
 function setupRealtime() {
 
     channel = supabaseClient.channel(`watch-party-${PARTY_ROOM_CODE}`, {
-        config: { broadcast: { self: false } }
+        config: {
+            broadcast: { self: false },
+            presence: { key: currentUser.id }
+        }
+    });
+
+    channel.on("presence", { event: "sync" }, function () {
+
+        if (!leaving) renderMembersFromPresence(channel.presenceState());
+
     });
 
     channel.on("broadcast", { event: "host_activity" }, ({ payload }) => {
         handleHostActivity(payload);
+    });
+
+    channel.on("broadcast", { event: "guest_activity" }, ({ payload }) => {
+        handleGuestActivity(payload);
     });
 
     channel.on("broadcast", { event: "host_state_request" }, ({ payload }) => {
@@ -1272,11 +1689,18 @@ function setupRealtime() {
         broadcastHostState();
     });
 
-    channel.subscribe((status) => {
+    channel.subscribe(async (status) => {
 
         if (status !== "SUBSCRIBED") return;
 
         channelReady = true;
+
+        await channel.track({
+            user_id: currentUser.id,
+            username: isHost ? hostUsername : (myUsername || "Guest"),
+            role: myRole,
+            online_at: new Date().toISOString()
+        });
 
         if (isHost) {
 
@@ -1313,6 +1737,12 @@ function tick() {
 
     }
 
+    if (!isHost && myReady) {
+
+        broadcastGuestState();
+
+    }
+
     renderAll();
 
 }
@@ -1344,10 +1774,49 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     isHost = currentUser.id === room.host_user_id;
 
-    document.getElementById("party-diff-section").style.display =
-        isHost ? "none" : "block";
+    console.log("[WatchParty] Init:", {
+        currentUserId: currentUser.id,
+        hostUserId: room.host_user_id,
+        guestUserId: room.guest_user_id,
+        isHost: isHost
+    });
+
+    const allowed = await checkAndClaimSlot(room);
+
+    console.log("[WatchParty] Allowed:", allowed);
+
+    if (!allowed) {
+
+        document.getElementById("party-room-loading").classList.add("d-none");
+
+        document.getElementById("party-room-full").classList.remove("d-none");
+
+        return;
+    }
+
+    document.getElementById("party-room-info").classList.remove("d-none");
+
+    document.getElementById("party-diff-section").style.display = "block";
+
+    if (isHost) {
+
+        document.querySelector("#party-diff-section .party-ha-title").textContent = "Guest Position";
+
+        document.querySelector("#party-diff-section .party-diff-box:first-child .party-diff-label").textContent = "Your Position";
+
+        document.querySelector("#party-diff-section .party-diff-box:last-child .party-diff-label").textContent = "Guest Position";
+
+    }
 
     loadHostProfile(room.host_user_id);
+
+    if (!isHost) {
+
+        const myProfile = await getProfileByUserId(currentUser.id);
+
+        if (myProfile && myProfile.username) myUsername = myProfile.username;
+
+    }
 
     buildPlayer(room);
 
@@ -1356,6 +1825,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     setInterval(tick, 1000);
 
     renderAll();
+
+    window.addEventListener("beforeunload", function () {
+
+        if (myRole === "guest") releaseGuestSlot();
+
+    });
+
+    window.addEventListener("pagehide", function () {
+
+        if (myRole === "guest") releaseGuestSlot();
+
+    });
 
 });
 
