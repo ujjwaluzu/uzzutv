@@ -32,7 +32,7 @@ def media_info(request, type, id):
     if type not in ("movie", "tv"):
         return HttpResponse("Invalid type", status=400)
 
-    cache_key = f"media_info_{type}_{id}"
+    cache_key = f"media_info_v2_{type}_{id}"
     info = cache.get(cache_key)
 
     if info:
@@ -55,8 +55,18 @@ def media_info(request, type, id):
         "id": data.get("id"),
         "type": type,
         "title": data.get("title") or data.get("name", ""),
-        "poster_path": data.get("poster_path", "")
+        "poster_path": data.get("poster_path", ""),
+        "imdb_id": ""
     }
+
+    external = requests.get(
+        f"{BASE_URL}/{type}/{id}/external_ids",
+        params=params,
+        timeout=10
+    )
+
+    if external.status_code == 200:
+        info["imdb_id"] = external.json().get("imdb_id", "") or ""
 
     cache.set(cache_key, info, 43200)  # 12 hours
 

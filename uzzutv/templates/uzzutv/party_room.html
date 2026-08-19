@@ -11,27 +11,40 @@
 
 /* =========================================================
    WATCH PARTY ROOM
+   The site navbar is hidden on this page only so the
+   player gets the full viewport. (Rule is scoped to this
+   page's css block; layout.html is unchanged.)
 ========================================================= */
+
+.navbar{
+    display: none !important;
+}
 
 .party-room-page{
     min-height: calc(100vh - 160px);
-    max-width: 720px;
+    max-width: 1600px;
     margin: 0 auto;
-    padding: 72px 24px 60px;
-    color: white;
+    padding: 24px 32px 72px;
+    color: #ffffff;
+}
+
+/* ---------- PAGE HEADER ---------- */
+
+.party-room-header{
+    margin-bottom: 32px;
 }
 
 .party-room-heading{
-    font-size: 32px;
+    font-size: 38px;
     font-weight: 800;
-    letter-spacing: -.5px;
-    margin-bottom: 6px;
+    letter-spacing: -1px;
+    line-height: 1.15;
+    margin-bottom: 10px;
 }
 
 .party-room-code-line{
     color: #9ca3af;
     font-size: 15px;
-    margin-bottom: 30px;
 }
 
 .party-room-code-line strong{
@@ -40,105 +53,337 @@
     letter-spacing: 2px;
 }
 
-/* ---------- ROOM CARD ---------- */
+.party-room-code-sep{
+    color: #4b5563;
+    margin: 0 10px;
+    font-weight: 600;
+}
 
-.party-room-card{
+/* ---------- PLAYER + SIDEBAR LAYOUT ---------- */
+
+.party-room-layout{
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 360px;
+    gap: 24px;
+    align-items: stretch;
+}
+
+.party-room-main{
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.party-room-stage-loading{
+    aspect-ratio: 16/9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #6b7280;
+    font-size: 14px;
+    background: #101010;
+    border: 1px solid rgba(255,255,255,.06);
+    border-radius: 16px;
+}
+
+.party-room-player{
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16/9;
+    background: #000000;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,.09);
+    box-shadow: 0 24px 64px rgba(0,0,0,.55);
+}
+
+.party-room-player iframe{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* ---------- HOST ACTIVITY SIDEBAR ---------- */
+
+.party-room-side{
+    position: sticky;
+    top: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
+}
+
+.party-ha{
     background: #151515;
     border: 1px solid rgba(255,255,255,.08);
-    border-radius: 18px;
-    padding: 30px 30px 34px;
-    box-shadow: 0 2px 10px rgba(0,0,0,.35);
+    border-radius: 14px;
+    padding: 18px 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,.3);
 }
 
-.party-room-media-type{
-    display: inline-block;
-    background: rgba(255,60,60,.12);
-    border: 1px solid rgba(255,60,60,.35);
-    color: #ff3c3c;
-    font-size: 12px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    border-radius: 20px;
-    padding: 6px 14px;
-    margin-bottom: 16px;
-}
-
-.party-room-media-row{
+.party-ha-head{
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 14px;
-    padding: 13px 0;
+    gap: 10px;
+    padding-bottom: 14px;
+    margin-bottom: 16px;
     border-bottom: 1px solid rgba(255,255,255,.06);
-    flex-wrap: wrap;
 }
 
-.party-room-media-row:last-of-type{
-    border-bottom: none;
-}
-
-.party-room-media-label{
+.party-ha-title{
     color: #9ca3af;
-    font-size: 14px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
 }
 
-.party-room-media-value{
-    color: #ffffff;
-    font-size: 15px;
-    font-weight: 600;
+.party-live-badge{
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #22c55e;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    flex-shrink: 0;
 }
 
-.party-room-host{
+.party-live-badge .party-live-dot{
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #22c55e;
+    box-shadow: 0 0 0 3px rgba(34,197,94,.15);
+}
+
+.party-ha-user{
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-top: 22px;
-    background: rgba(255,255,255,.03);
-    border: 1px solid rgba(255,255,255,.08);
-    border-radius: 12px;
-    padding: 14px 18px;
-}
-
-.party-room-host-icon{
-    font-size: 22px;
-}
-
-.party-room-host-label{
-    color: #9ca3af;
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.party-room-host-name{
+    gap: 8px;
+    min-width: 0;
     color: #ffffff;
     font-size: 15px;
+    font-weight: 700;
+}
+
+#ha-username{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+}
+
+.party-host-badge{
+    flex-shrink: 0;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+    color: #c084fc;
+    background: rgba(168,85,247,.12);
+    border: 1px solid rgba(168,85,247,.35);
+    border-radius: 6px;
+    padding: 2px 8px;
+}
+
+.party-ha-status{
+    margin-top: 14px;
+    font-size: 14px;
     font-weight: 600;
-    margin-top: 2px;
 }
 
-/* ---------- PLAYER STAGE (next stage: VidFast + Realtime) ---------- */
-
-.party-room-stage{
-    margin-top: 20px;
-    background: #101010;
-    border: 1px dashed rgba(255,255,255,.12);
-    border-radius: 14px;
-    padding: 26px 20px;
-    text-align: center;
+.party-ha-status-loading{
     color: #6b7280;
-    font-size: 13px;
 }
 
-/* ---------- ROOM ACTIONS ---------- */
+.party-ha-status-playing{
+    color: #22c55e;
+}
 
-.party-room-actions{
+.party-ha-status-paused{
+    color: #f59e0b;
+}
+
+.party-ha-time{
+    margin-top: 6px;
+    font-size: 30px;
+    font-weight: 800;
+    color: #ffffff;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: .5px;
+    line-height: 1.15;
+}
+
+/* ---------- YOUR POSITION / COMPARISON ---------- */
+
+.party-diff-section{
     display: flex;
-    gap: 12px;
-    margin-top: 24px;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 14px;
 }
+
+.party-diff-grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.party-diff-box{
+    background: #101010;
+    border: 1px solid rgba(255,255,255,.06);
+    border-radius: 10px;
+    padding: 12px 14px;
+}
+
+.party-diff-label{
+    color: #6b7280;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+}
+
+.party-diff-value{
+    color: #ffffff;
+    font-size: 21px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: .3px;
+}
+
+.party-diff-line-wrap{
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(255,255,255,.06);
+}
+
+.party-ha-diff{
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 6px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #f59e0b;
+}
+
+/* ---------- RESERVED SPACE ---------- */
+
+.party-reserved{
+    flex: 1;
+    min-height: 110px;
+    background: rgba(255,255,255,.015);
+    border: 1px solid rgba(255,255,255,.05);
+    border-radius: 14px;
+}
+
+/* ---------- MEDIA INFORMATION ---------- */
+
+.party-media-card{
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
+    background: #151515;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 16px;
+    padding: 18px 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,.3);
+}
+
+.party-media-poster{
+    width: 54px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+    background: #101010;
+    border: 1px solid rgba(255,255,255,.07);
+    flex-shrink: 0;
+    display: none;
+}
+
+.party-media-body{
+    flex: 1;
+    min-width: 220px;
+}
+
+.party-media-title{
+    font-size: 19px;
+    font-weight: 800;
+    letter-spacing: -.3px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.party-media-meta{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 7px;
+}
+
+.party-media-type{
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #ff6b6b;
+    background: rgba(255,60,60,.10);
+    border: 1px solid rgba(255,60,60,.35);
+    border-radius: 6px;
+    padding: 3px 9px;
+}
+
+.party-media-ep{
+    color: #9ca3af;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.party-room-stats{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+}
+
+.party-room-chip{
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #101010;
+    border: 1px solid rgba(255,255,255,.07);
+    border-radius: 999px;
+    padding: 6px 13px;
+    color: #d1d5db;
+    font-size: 12.5px;
+    font-weight: 600;
+}
+
+.party-room-chip .party-chip-dot{
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #22c55e;
+    flex-shrink: 0;
+}
+
+/* ---------- BUTTONS ---------- */
 
 .party-room-btn{
     border: none;
@@ -174,19 +419,29 @@
     box-shadow: none;
 }
 
+.party-media-card .party-room-btn{
+    padding: 10px 18px;
+    font-size: 13.5px;
+    border-radius: 9px;
+    flex-shrink: 0;
+}
+
 /* ---------- STATES ---------- */
 
 .party-room-state{
+    max-width: 560px;
+    margin: 40px auto 0;
     background: #151515;
     border: 1px solid rgba(255,255,255,.08);
-    border-radius: 18px;
-    padding: 48px 30px;
+    border-radius: 20px;
+    padding: 56px 32px;
     text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,.5);
 }
 
 .party-room-state-icon{
     font-size: 44px;
-    margin-bottom: 12px;
+    margin-bottom: 14px;
 }
 
 .party-room-state-title{
@@ -198,29 +453,77 @@
 .party-room-state-text{
     color: #9ca3af;
     font-size: 14px;
-    margin-bottom: 26px;
+    margin-bottom: 28px;
 }
 
 .party-room-loading{
+    min-height: 45vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     text-align: center;
     color: #9ca3af;
-    padding: 60px 20px;
+    font-size: 15px;
 }
 
 /* ---------- RESPONSIVE ---------- */
 
+@media (max-width: 1280px){
+
+    .party-room-layout{
+        grid-template-columns: minmax(0, 1fr) 320px;
+    }
+
+}
+
+@media (max-width: 980px){
+
+    .party-room-layout{
+        grid-template-columns: 1fr;
+    }
+
+    .party-room-side{
+        position: static;
+    }
+
+    .party-reserved{
+        min-height: 80px;
+    }
+
+}
+
+@media (max-height: 820px) and (min-width: 981px){
+
+    .party-room-side{
+        position: static;
+    }
+
+    .party-reserved{
+        min-height: 80px;
+    }
+
+}
+
 @media (max-width: 560px){
 
     .party-room-page{
-        padding: 60px 16px 50px;
+        padding: 20px 16px 56px;
     }
 
-    .party-room-card{
-        padding: 24px 20px 26px;
+    .party-room-heading{
+        font-size: 30px;
     }
 
-    .party-room-actions .party-room-btn{
-        flex: 1;
+    .party-room-code-line{
+        font-size: 14px;
+    }
+
+    .party-media-card{
+        align-items: flex-start;
+    }
+
+    .party-media-card .party-room-btn{
+        width: 100%;
         text-align: center;
     }
 
@@ -233,11 +536,17 @@
 
 <div class="party-room-page">
 
-    <h1 class="party-room-heading">Watch Party</h1>
+    <header class="party-room-header">
 
-    <p class="party-room-code-line">
-        Room: <strong>{{ room_code|upper }}</strong>
-    </p>
+        <h1 class="party-room-heading"><span id="party-room-title-user">Watch Party</span>'s Watch Party</h1>
+
+        <p class="party-room-code-line">
+            Room: <strong>{{ room_code|upper }}</strong>
+            <span class="party-room-code-sep">•</span>
+            <span id="party-room-media-name">Loading...</span>
+        </p>
+
+    </header>
 
     <div id="party-room-loading" class="party-room-loading">
         Loading party...
@@ -283,69 +592,141 @@
 
     <div id="party-room-info" class="d-none">
 
-        <div class="party-room-card">
+        <div class="party-room-layout">
 
-            <div class="party-room-media-type" id="room-media-type"></div>
+            <div class="party-room-main">
 
-            <div class="party-room-media-row">
+                <div class="party-room-stage-loading" id="party-player-loading">
+                    ⏳ Loading player...
+                </div>
 
-                <span class="party-room-media-label">TMDB ID</span>
-
-                <span class="party-room-media-value" id="room-media-id"></span>
-
-            </div>
-
-            <div id="room-season-row" class="party-room-media-row">
-
-                <span class="party-room-media-label">Season</span>
-
-                <span class="party-room-media-value" id="room-season"></span>
-
-            </div>
-
-            <div id="room-episode-row" class="party-room-media-row">
-
-                <span class="party-room-media-label">Episode</span>
-
-                <span class="party-room-media-value" id="room-episode"></span>
-
-            </div>
-
-            <div class="party-room-host">
-
-                <div class="party-room-host-icon">👑</div>
-
-                <div>
-
-                    <div class="party-room-host-label">Host</div>
-
-                    <div class="party-room-host-name" id="room-host-name">
-                        Loading...
-                    </div>
-
+                <div class="party-room-player" id="party-player-wrap" style="display:none">
+                    <iframe id="party-player" allowfullscreen allow="autoplay; encrypted-media"></iframe>
                 </div>
 
             </div>
 
-        </div>
+            <aside class="party-room-side">
 
-        <!--
-             Stage 2 will place the synchronized VidFast iframe,
-             party members and host controls in this container.
-        -->
+                <!-- HOST ACTIVITY -->
 
-        <div class="party-room-stage" id="party-room-stage">
-            The synchronized player will appear here.
-        </div>
+                <div class="party-ha">
 
-        <div class="party-room-actions">
+                    <div class="party-ha-head">
 
-            <a
-                href="{% url 'party' %}"
-                class="party-room-btn party-room-btn-outline"
-            >
-                Back to Party
-            </a>
+                        <div class="party-ha-title">Host Activity</div>
+
+                        <div class="party-live-badge">
+                            <span class="party-live-dot"></span>
+                            Live
+                        </div>
+
+                    </div>
+
+                    <div class="party-ha-user">👤 <span id="ha-username">Loading...</span><span class="party-host-badge">Host</span></div>
+
+                    <div class="party-ha-status" id="ha-status">⏳ Loading...</div>
+
+                    <div class="party-ha-time" id="ha-time"></div>
+
+                </div>
+
+                <!-- YOUR POSITION + COMPARISON -->
+
+                <div class="party-diff-section" id="party-diff-section" style="display:none">
+
+                    <div class="party-ha">
+
+                        <div class="party-ha-title">Your Position</div>
+
+                        <div class="party-ha-status" id="your-status">⏳ Loading...</div>
+
+                        <div class="party-ha-time" id="your-time"></div>
+
+                    </div>
+
+                    <div class="party-ha">
+
+                        <div class="party-ha-title">Position Check</div>
+
+                        <div class="party-diff-grid">
+
+                            <div class="party-diff-box">
+                                <div class="party-diff-label">Host Position</div>
+                                <div class="party-diff-value" id="party-host-pos">--:--</div>
+                            </div>
+
+                            <div class="party-diff-box">
+                                <div class="party-diff-label">Your Position</div>
+                                <div class="party-diff-value" id="party-my-pos">--:--</div>
+                            </div>
+
+                        </div>
+
+                        <div class="party-diff-line-wrap">
+
+                            <div class="party-diff-label">Difference</div>
+
+                            <div class="party-ha-diff" id="party-diff-line"></div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- RESERVED SPACE -->
+
+                <div class="party-reserved"></div>
+
+            </aside>
+
+            <!-- MEDIA INFORMATION -->
+
+            <div class="party-media-card">
+
+                <img
+                    class="party-media-poster"
+                    id="party-media-poster"
+                    src=""
+                    alt=""
+                >
+
+                <div class="party-media-body">
+
+                    <div class="party-media-title" id="party-media-title">Loading...</div>
+
+                    <div class="party-media-meta">
+
+                        <span class="party-media-type" id="party-media-type">Movie</span>
+
+                        <span class="party-media-ep" id="party-media-ep"></span>
+
+                    </div>
+
+                    <div class="party-room-stats">
+
+                        <span class="party-room-chip">
+                            <span class="party-chip-dot"></span>
+                            Realtime · Live host position
+                        </span>
+
+                        <span class="party-room-chip">
+                            👥 Watching together
+                        </span>
+
+                    </div>
+
+                </div>
+
+                <a
+                    href="{% url 'party' %}"
+                    class="party-room-btn party-room-btn-outline"
+                >
+                    Back to Party
+                </a>
+
+            </div>
 
         </div>
 
@@ -357,6 +738,308 @@
 <script>
 
 const PARTY_ROOM_CODE = "{{ room_code|upper }}";
+
+const VIDFAST_ORIGINS = [
+    "https://vidfast.pro", "https://vidfast.in", "https://vidfast.io",
+    "https://vidfast.me", "https://vidfast.net", "https://vidfast.pm",
+    "https://vidfast.vc", "https://vidfast.bz"
+];
+
+
+/* =========================================================
+   STATE
+   The real player is the source of truth. All displayed
+   times are extrapolated between fresh player readings and
+   corrected whenever a fresh reading arrives.
+========================================================= */
+
+let roomData = null;
+let currentUser = null;
+let isHost = false;
+let hostUsername = "";
+
+let channel = null;
+let channelReady = false;
+
+let myReady = false;       // own player reported a valid currentTime
+let myTime = 0;            // last authoritative own currentTime
+let myPlaying = false;     // last authoritative own playing state
+let myAt = 0;              // Date.now() when myTime was read
+
+let hostReady = false;     // host activity has valid data (realtime for guests)
+let hostTime = 0;          // last authoritative host currentTime
+let hostPlaying = false;   // last authoritative host playing state
+let hostAt = 0;            // Date.now() when hostTime was received
+
+
+/* =========================================================
+   TIME HELPERS
+========================================================= */
+
+function formatTime(seconds) {
+
+    const total = Math.floor(Math.max(0, seconds));
+
+    const m = Math.floor(total / 60);
+
+    const s = total % 60;
+
+    return m + ":" + String(s).padStart(2, "0");
+
+}
+
+
+function setStatus(el, status) {
+
+    el.classList.toggle("party-ha-status-loading", status === "loading");
+
+    el.classList.toggle("party-ha-status-playing", status === "playing");
+
+    el.classList.toggle("party-ha-status-paused", status === "paused");
+
+}
+
+
+function myDisplayTime() {
+
+    if (!myReady) return null;
+
+    if (!myPlaying) return myTime;
+
+    return myTime + (Date.now() - myAt) / 1000;
+
+}
+
+
+function hostDisplayTime() {
+
+    if (isHost) return myDisplayTime();
+
+    if (!hostReady) return null;
+
+    if (!hostPlaying) return hostTime;
+
+    return hostTime + (Date.now() - hostAt) / 1000;
+
+}
+
+
+/* =========================================================
+   RENDER
+========================================================= */
+
+function renderAll() {
+
+    const haUser = document.getElementById("ha-username");
+    const haStatus = document.getElementById("ha-status");
+    const haTime = document.getElementById("ha-time");
+
+    haUser.textContent = hostUsername || "Party Host";
+
+    const hTime = hostDisplayTime();
+
+    if (hTime === null) {
+
+        setStatus(haStatus, "loading");
+        haStatus.textContent = "⏳ Loading...";
+        haTime.textContent = "";
+
+    } else {
+
+        const hPlaying = isHost ? myPlaying : hostPlaying;
+
+        setStatus(haStatus, hPlaying ? "playing" : "paused");
+        haStatus.textContent = hPlaying ? "▶ Playing" : "⏸ Paused";
+        haTime.textContent = formatTime(hTime);
+
+    }
+
+    const diffSection = document.getElementById("party-diff-section");
+
+    if (!isHost && diffSection) {
+
+        const yourStatus = document.getElementById("your-status");
+        const yourTime = document.getElementById("your-time");
+        const diffLine = document.getElementById("party-diff-line");
+
+        const mTime = myDisplayTime();
+
+        if (mTime === null) {
+
+            setStatus(yourStatus, "loading");
+            yourStatus.textContent = "⏳ Loading...";
+            yourTime.textContent = "";
+
+        } else {
+
+            setStatus(yourStatus, myPlaying ? "playing" : "paused");
+            yourStatus.textContent = myPlaying ? "▶ Playing" : "⏸ Paused";
+            yourTime.textContent = formatTime(mTime);
+
+        }
+
+        if (hTime !== null && mTime !== null) {
+
+            const diff = hTime - mTime;
+
+            if (Math.abs(diff) < 3) {
+
+                diffLine.textContent = "● In sync";
+
+            } else if (diff > 0) {
+
+                diffLine.textContent = `Host is ${formatTime(diff)} ahead`;
+
+            } else {
+
+                diffLine.textContent = `You are ${formatTime(-diff)} ahead`;
+
+            }
+
+        } else {
+
+            diffLine.textContent = "";
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   PRESENTATION ONLY (redesign helpers)
+   These reuse the existing state above and do NOT change
+   any watch party logic. They fill the new comparison
+   panel and media information card.
+========================================================= */
+
+function renderMediaCard(info, room) {
+
+    const title = document.getElementById("party-media-title");
+    const type = document.getElementById("party-media-type");
+    const ep = document.getElementById("party-media-ep");
+    const poster = document.getElementById("party-media-poster");
+
+    if (title) {
+        title.textContent = (info && info.title) ? info.title : "Media";
+    }
+
+    if (type) {
+        type.textContent = room.media_type === "movie" ? "Movie" : "Series";
+    }
+
+    if (ep && room.media_type === "tv") {
+        ep.textContent = `S${room.season} E${room.episode}`;
+    }
+
+    if (poster && info && info.poster_path) {
+        poster.src = "https://image.tmdb.org/t/p/w342" + info.poster_path;
+        poster.alt = (info.title || "Media") + " poster";
+        poster.style.display = "block";
+    }
+
+}
+
+
+function renderComparisonPanel() {
+
+    const hostPos = document.getElementById("party-host-pos");
+    const myPos = document.getElementById("party-my-pos");
+
+    const hTime = hostDisplayTime();
+    const mTime = myDisplayTime();
+
+    if (hostPos) {
+        hostPos.textContent = hTime === null ? "--:--" : formatTime(hTime);
+    }
+
+    if (myPos) {
+        myPos.textContent = mTime === null ? "--:--" : formatTime(mTime);
+    }
+
+}
+
+
+setInterval(renderComparisonPanel, 500);
+
+
+/* =========================================================
+   VIDFAST PLAYER MESSAGING
+========================================================= */
+
+function pollPlayer() {
+
+    const iframe = document.getElementById("party-player");
+
+    if (!iframe || !iframe.contentWindow) return;
+
+    iframe.contentWindow.postMessage({ command: "getStatus" }, "*");
+
+}
+
+
+window.addEventListener("message", (event) => {
+
+    if (!VIDFAST_ORIGINS.includes(event.origin) || !event.data) return;
+
+    if (event.data.type !== "PLAYER_EVENT" || !event.data.data) return;
+
+    handlePlayerEvent(event.data.data);
+
+});
+
+
+function handlePlayerEvent(data) {
+
+    const event = data.event;
+
+    const t = Number(data.currentTime);
+
+    const wasReady = myReady;
+
+    let hasFreshTime = false;
+
+    if (Number.isFinite(t) && t >= 0) {
+
+        myReady = true;
+        myTime = t;
+        myAt = Date.now();
+        hasFreshTime = true;
+
+    }
+
+    if (typeof data.playing === "boolean") {
+
+        myPlaying = data.playing;
+
+    } else if (typeof data.paused === "boolean") {
+
+        myPlaying = !data.paused;
+
+    } else if (event === "play") {
+
+        myPlaying = true;
+
+    } else if (event === "pause" || event === "ended") {
+
+        myPlaying = false;
+
+    } else if (event === "timeupdate" && hasFreshTime) {
+
+        myPlaying = true;
+
+    }
+
+    if (isHost && myReady && (!wasReady || event === "play" || event === "pause")) {
+
+        broadcastHostState();
+
+    }
+
+    renderAll();
+
+}
 
 
 /* =========================================================
@@ -382,7 +1065,7 @@ async function loadPartyRoom() {
 
         notFound.classList.remove("d-none");
 
-        return;
+        return null;
     }
 
     const expiresAt = new Date(data.expires_at);
@@ -396,63 +1079,241 @@ async function loadPartyRoom() {
 
         expired.classList.remove("d-none");
 
-        return;
+        return null;
     }
 
     loading.classList.add("d-none");
 
     info.classList.remove("d-none");
 
-    const isMovie = data.media_type === "movie";
-
-    document.getElementById("room-media-type").textContent =
-        isMovie ? "Movie" : "Series";
-
-    document.getElementById("room-media-id").textContent =
-        data.media_id;
-
-    const seasonRow = document.getElementById("room-season-row");
-    const episodeRow = document.getElementById("room-episode-row");
-
-    if (isMovie) {
-
-        seasonRow.style.display = "none";
-        episodeRow.style.display = "none";
-
-    } else {
-
-        document.getElementById("room-season").textContent =
-            data.season;
-
-        document.getElementById("room-episode").textContent =
-            data.episode;
-
-    }
-
-    loadHostName(data.host_user_id);
+    return data;
 
 }
 
 
 /* =========================================================
-   HOST USERNAME (from existing profiles table)
+   HOST PROFILE / USERNAME
 ========================================================= */
 
-async function loadHostName(hostUserId) {
+async function loadHostProfile(hostUserId) {
 
-    const hostName = document.getElementById("room-host-name");
+    const titleUser = document.getElementById("party-room-title-user");
 
     const profile = await getProfileByUserId(hostUserId);
 
     if (profile && profile.username) {
 
-        hostName.textContent = profile.username;
+        hostUsername = profile.username;
+
+        titleUser.textContent = profile.username;
 
     } else {
 
-        hostName.textContent = "Party Host";
+        hostUsername = "Party Host";
+
+        titleUser.textContent = "Party Host";
 
     }
+
+}
+
+
+/* =========================================================
+   PLAYER URL (VidFast)
+========================================================= */
+
+async function fetchMediaInfo(type, id) {
+
+    try {
+
+        const response = await fetch(`/media-info/${type}/${id}/`);
+
+        if (!response.ok) return null;
+
+        return await response.json();
+
+    } catch (err) {
+
+        console.error("Error loading media info:", err);
+
+        return null;
+
+    }
+
+}
+
+
+async function buildPlayer(room) {
+
+    const info = await fetchMediaInfo(room.media_type, room.media_id);
+
+    if (info && info.title) {
+
+        document.getElementById("party-room-media-name").textContent =
+            info.title;
+
+    }
+
+    if (info) {
+
+        renderMediaCard(info, room);
+
+    }
+
+    const imdb = info && info.imdb_id;
+
+    const loading = document.getElementById("party-player-loading");
+    const wrap = document.getElementById("party-player-wrap");
+
+    if (!imdb) {
+
+        loading.textContent = "⚠️ Unable to load the player for this party.";
+
+        return;
+    }
+
+    const src = room.media_type === "movie"
+        ? `https://vidfast.pro/movie/${imdb}?autoPlay=true&sub=en&mute=false`
+        : `https://vidfast.pro/tv/${imdb}/${room.season}/${room.episode}?autoPlay=true&sub=en&mute=false`;
+
+    loading.style.display = "none";
+
+    wrap.style.display = "block";
+
+    document.getElementById("party-player").src = src;
+
+}
+
+
+/* =========================================================
+   REALTIME (Supabase Realtime broadcast, no DB storage)
+========================================================= */
+
+function broadcastHostState() {
+
+    if (!isHost || !myReady) return;
+
+    if (!channelReady || !channel) return;
+
+    channel.send({
+        type: "broadcast",
+        event: "host_activity",
+        payload: {
+            type: "host_activity",
+            hostUserId: currentUser.id,
+            hostUsername: hostUsername || "",
+            currentTime: myTime,
+            playing: myPlaying,
+            sentAt: Date.now()
+        }
+    });
+
+}
+
+
+function requestHostState() {
+
+    if (isHost || !channelReady || !channel) return;
+
+    channel.send({
+        type: "broadcast",
+        event: "host_state_request",
+        payload: {
+            type: "host_state_request",
+            requesterUserId: currentUser.id,
+            sentAt: Date.now()
+        }
+    });
+
+}
+
+
+function handleHostActivity(payload) {
+
+    if (isHost) return;
+
+    if (!roomData || !payload) return;
+
+    if (payload.hostUserId !== roomData.host_user_id) return;
+
+    const t = Number(payload.currentTime);
+
+    if (!Number.isFinite(t) || t < 0) return;
+
+    hostReady = true;
+    hostTime = t;
+    hostAt = Date.now();
+    hostPlaying = !!payload.playing;
+
+    if (payload.hostUsername) {
+
+        hostUsername = payload.hostUsername;
+
+    }
+
+    renderAll();
+
+}
+
+
+function setupRealtime() {
+
+    channel = supabaseClient.channel(`watch-party-${PARTY_ROOM_CODE}`, {
+        config: { broadcast: { self: false } }
+    });
+
+    channel.on("broadcast", { event: "host_activity" }, ({ payload }) => {
+        handleHostActivity(payload);
+    });
+
+    channel.on("broadcast", { event: "host_state_request" }, ({ payload }) => {
+        if (!isHost) return;
+        if (payload && payload.requesterUserId === currentUser.id) return;
+        broadcastHostState();
+    });
+
+    channel.subscribe((status) => {
+
+        if (status !== "SUBSCRIBED") return;
+
+        channelReady = true;
+
+        if (isHost) {
+
+            broadcastHostState();
+
+        } else {
+
+            requestHostState();
+
+            for (let i = 1; i <= 5; i++) {
+
+                setTimeout(requestHostState, i * 1000);
+
+            }
+
+        }
+
+    });
+
+}
+
+
+/* =========================================================
+   TICKER (every second: poll player + broadcast + render)
+========================================================= */
+
+function tick() {
+
+    pollPlayer();
+
+    if (isHost && myReady) {
+
+        broadcastHostState();
+
+    }
+
+    renderAll();
 
 }
 
@@ -463,16 +1324,38 @@ async function loadHostName(hostUserId) {
 
 document.addEventListener("DOMContentLoaded", async () => {
 
-    const user = await getCurrentUser();
+    currentUser = await getCurrentUser();
 
-    if (!user) {
+    if (!currentUser) {
 
         window.location.href = "/auth/";
 
         return;
     }
 
-    loadPartyRoom();
+    const room = await loadPartyRoom();
+
+    if (!room) {
+
+        return;
+    }
+
+    roomData = room;
+
+    isHost = currentUser.id === room.host_user_id;
+
+    document.getElementById("party-diff-section").style.display =
+        isHost ? "none" : "block";
+
+    loadHostProfile(room.host_user_id);
+
+    buildPlayer(room);
+
+    setupRealtime();
+
+    setInterval(tick, 1000);
+
+    renderAll();
 
 });
 
