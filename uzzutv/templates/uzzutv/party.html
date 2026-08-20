@@ -387,11 +387,104 @@
     border-radius: 12px;
 }
 
+/* ---------- HOW TO USE ---------- */
+
+.party-guide{
+    margin-top: 44px;
+}
+
+.party-steps{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.party-step{
+    background: #151515;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 14px;
+    padding: 20px 20px 22px;
+    box-shadow: 0 2px 10px rgba(0,0,0,.35);
+}
+
+.party-step-num{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: linear-gradient(135deg,#ff3c3c,#c81e1e);
+    color: #ffffff;
+    font-weight: 800;
+    font-size: 14px;
+    margin-bottom: 12px;
+}
+
+.party-step-title{
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.party-step-text{
+    color: #9ca3af;
+    font-size: 13px;
+    line-height: 1.55;
+}
+
+.party-feature-grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 24px;
+}
+
+.party-feature{
+    background: #151515;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,.35);
+}
+
+.party-feature-emoji{
+    font-size: 26px;
+    margin-bottom: 10px;
+}
+
+.party-feature-title{
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.party-feature-text{
+    color: #9ca3af;
+    font-size: 13px;
+    line-height: 1.55;
+}
+
+.party-note{
+    margin-top: 24px;
+    padding: 14px 18px;
+    border: 1px dashed rgba(255,255,255,.14);
+    border-radius: 12px;
+    background: rgba(255,255,255,.02);
+    color: #9ca3af;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
 /* ---------- RESPONSIVE ---------- */
 
 @media (max-width: 900px){
 
     .party-grid{
+        grid-template-columns: 1fr;
+    }
+
+    .party-steps{
         grid-template-columns: 1fr;
     }
 
@@ -405,6 +498,10 @@
 
     .party-heading{
         font-size: 28px;
+    }
+
+    .party-feature-grid{
+        grid-template-columns: 1fr;
     }
 
     .party-created-card{
@@ -657,6 +754,88 @@
 
                 <div class="party-empty">Loading...</div>
 
+            </div>
+
+        </div>
+
+        <!-- ---------- HOW TO USE ---------- -->
+
+        <div class="party-guide">
+
+            <h2 class="party-section-title">How to Use</h2>
+
+            <div class="party-steps">
+
+                <div class="party-step">
+
+                    <div class="party-step-num">1</div>
+
+                    <div class="party-step-title">Create a party</div>
+
+                    <div class="party-step-text">
+                        Pick Movie or Series, enter the TMDB ID (plus season and episode for a series), then hit Create Watch Party. You'll get a 6-character room code and an invite link. The TMDB ID is the number in the title's URL on themoviedb.org — the same ID appears in the UzzUTV page URL too.
+                    </div>
+
+                </div>
+
+                <div class="party-step">
+
+                    <div class="party-step-num">2</div>
+
+                    <div class="party-step-title">Invite your friends</div>
+
+                    <div class="party-step-text">
+                        Share the room code or the invite link. Friends paste the code into the "Join a Watch Party" box on this page to jump in as the guest, or just open the invite link — it takes them straight to the room. Each room supports one host and one guest.
+                    </div>
+
+                </div>
+
+                <div class="party-step">
+
+                    <div class="party-step-num">3</div>
+
+                    <div class="party-step-title">Watch together</div>
+
+                    <div class="party-step-text">
+                        The host's player is the source of truth. Guests' players automatically sync to the host's position in real time — when the host pauses, plays or seeks, everyone follows along so you're all watching the same scene at the same time. Hit the 📹 Video Call button to chat face-to-face while you watch.
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- ---------- FEATURES ---------- -->
+
+            <div class="party-feature-grid">
+
+                <div class="party-feature">
+
+                    <div class="party-feature-emoji">🎬</div>
+
+                    <div class="party-feature-title">Watch Party</div>
+
+                    <div class="party-feature-text">
+                        A watch party keeps everyone's playback in sync with the host in real time. The members panel, live host position and position check all work together so you never miss a scene — pause, play and seek along with the host automatically.
+                    </div>
+
+                </div>
+
+                <div class="party-feature">
+
+                    <div class="party-feature-emoji">📹</div>
+
+                    <div class="party-feature-title">Video Call</div>
+
+                    <div class="party-feature-text">
+                        Click the 📹 Video Call button in the room to request a one-on-one call — the other person can accept or decline. Once connected, mute your mic, turn your camera on or off, or minimize the call into a small floating window without leaving the party. You'll need a camera and microphone, and you must allow browser access when prompted.
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="party-note">
+                Right now each room supports <b>one host and one guest</b> with a one-on-one video call. Bigger rooms are planned for the future.
             </div>
 
         </div>

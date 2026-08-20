@@ -6,8 +6,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/x-icon" href="https://img.icons8.com/?size=100&id=dpUQB4dX6yQC&format=png&color=000000">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
 <title>UzzUTV - Movies & TV Series</title>
 <meta name="description" content="UzzUTV is a modern streaming platform for movie and series lovers. Discover trending titles, explore genres and watch films and shows online.">
 <meta name="robots" content="index, follow">
@@ -41,179 +41,50 @@
 </script>
 
 <style>
-
 *{
 box-sizing:border-box;
 }
-.card{
-background:#020617;
-border-radius:10px;
-overflow:hidden;
-transition:0.25s;
-cursor:pointer;
-}
-
-.card:hover{
-transform:translateY(-6px) scale(1.02);
-box-shadow:0 15px 30px rgba(0,0,0,0.6);
-}
 body{
 margin:0;
-font-family:'Bangers', cursive;
-height:100vh;
-background-image:url("https://images.pexels.com/photos/16516/pexels-photo.jpg");
-background-size:cover;
-background-position:center;
-background-repeat:no-repeat;
+background:#050505;
+color:#fff;
+font-family:'Manrope', sans-serif;
 }
-body{
-min-height:100vh;
+.font-manrope{
+font-family:'Manrope', sans-serif;
 }
-/* dark overlay */
-.overlay{
-min-height:100vh;
+.border-gradient{
+position:relative;
 }
-.overlay{
-height:100vh;
-background:rgba(0,0,0,0.65);
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
-text-align:center;
-padding:20px;
-color:white;
+.border-gradient::before{
+content:"";
+position:absolute;
+inset:0;
+border-radius:inherit;
+padding:1px;
+background:linear-gradient(135deg, rgba(255,255,255,0.35), rgba(255,255,255,0.08) 40%, rgba(255,255,255,0.35));
+-webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+-webkit-mask-composite:xor;
+mask-composite:exclude;
+pointer-events:none;
 }
-
-h1{
-font-size:100px;
-line-break: loose;
-letter-spacing:3px;
-line-height: 1;
-background: linear-gradient(90deg,#22c55e,#4ade80);
--webkit-background-clip:text;
-color:transparent;
-text-shadow:
-0 0 1px #22c55e,
-0 0 2px #22c55e;
-}
-
-h4{
-font-size: 30px;
-line-height: 1;
-line-break: auto;
-color:#e5e7eb;
-margin-top: -22px;
-margin-bottom:20px;
-}
-#glow{
-color:#22c55e;
-margin:0 10px;
-font-size:30px;
-text-shadow:
-0 0 1px #22c55e,
-0 0 2px #22c55e;
-letter-spacing:1px;
-}
-p{
-font-size: 20px;
-max-width:800px;
-line-height:2;
-color:#d1d5db;
-}
-#gugu{
-    text-decoration: none;
-    color: inherit;
-    
-}
-button{
-font-family: 'Bangers', cursive;
-line-height: 2;
-line-break: auto;
-margin-top:30px;
-padding:14px 30px;
-font-size:20px;
-border:none;
-border-radius:6px;
-background:#22c55e;
-color:white;
-cursor:pointer;
-transition:0.3s;
-box-shadow:0 5px 20px rgba(34,197,94,0.5);
-}
-
-button:hover{
-background:#16a34a;
-transform:scale(1.05);
-}
-
-.overlay{
-animation:fadeIn 1.2s ease;
-}
-
-@keyframes fadeIn{
+@keyframes fadeSlideIn{
 from{
 opacity:0;
-transform:translateY(20px);
+transform:translateY(24px);
 }
 to{
 opacity:1;
 transform:translateY(0);
 }
 }
-
-/* Tablet */
-@media (max-width: 900px){
-
-h1{
-font-size:70px;
+@keyframes marquee-logos{
+0%{
+transform:translateX(0);
 }
-
-h4{
-font-size:24px;
+100%{
+transform:translateX(-50%);
 }
-
-p{
-font-size:18px;
-max-width:600px;
-line-height:1.7;
-}
-
-button{
-font-size:18px;
-padding:12px 24px;
-}
-
-}
-
-/* Mobile */
-@media (max-width: 600px){
-
-.overlay{
-padding:30px 20px;
-}
-
-h1{
-font-size:50px;
-}
-
-h4{
-font-size:20px;
-margin-bottom:15px;
-}
-
-p{
-font-size:16px;
-max-width:90%;
-line-height:1.6;
-}
-
-button{
-font-size:16px;
-padding:10px 22px;
-margin-top:20px;
-}
-
 }
 </style>
 
@@ -221,24 +92,169 @@ margin-top:20px;
 
 <body>
 
-<div class="overlay">
+<div
+  class="bg-center md:pt-32 md:pb-20 bg-[url(https://hoirqrkdgbmvpwutwuwj.supabase.co/storage/v1/object/public/assets/assets/a72ca2f3-9dd1-4fe4-84ba-fe86468a5237_3840w.webp?w=800&q=80)] bg-cover pt-24 pb-12 relative"
+  style="mask-image: linear-gradient(180deg, transparent, black 0%, black 70%, transparent); -webkit-mask-image: linear-gradient(180deg, transparent, black 0%, black 70%, transparent);">
+  <div class="lg:px-8 md:mt-20 md:mb-40 sm:px-6 max-w-7xl mt-12 mr-auto mb-20 ml-auto pr-4 pl-4">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+      <!-- Left Content -->
+      <div class="lg:col-span-7 space-y-4 sm:space-y-6">
+        <div class="[animation:fadeSlideIn_0.8s_ease-out_0.2s_both] animate">
+          <div
+            class="border-gradient inline-flex before:rounded-full bg-white/5 rounded-full pt-2 pr-3 sm:pr-4 pb-2 pl-3 sm:pl-4 backdrop-blur-lg gap-x-2 sm:gap-x-3 gap-y-2 sm:gap-y-3 items-center">
+            <span class="text-[10px] sm:text-xs tracking-wider uppercase flex items-center gap-1.5 sm:gap-2 font-sans text-zinc-300">
+                  Ultimate Streaming Platform
+                  <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" width="14" height="14" viewBox="0 0 24 24" data-icon="solar:star-bold-duotone" class="iconify text-white iconify--solar sm:w-4 sm:h-4"><path fill="currentColor" d="M18.483 16.767A8.5 8.5 0 0 1 8.118 7.081a1 1 0 0 1-.113.097c-.28.213-.63.292-1.33.45l-.635.144c-2.46.557-3.69.835-3.983 1.776c-.292.94.546 1.921 2.223 3.882l.434.507c.476.557.715.836.822 1.18c.107.345.071.717-.001 1.46l-.066.677c-.253 2.617-.38 3.925.386 4.506s1.918.052 4.22-1.009l.597-.274c.654-.302.981-.452 1.328-.452s.674.15 1.329.452l.595.274c2.303 1.06 3.455 1.59 4.22 1.01c.767-.582.64-1.89.387-4.507z" class=""></path><path fill="currentColor" d="m9.153 5.408l-.328.588c-.36.646-.54.969-.82 1.182q.06-.045.113-.097a8.5 8.5 0 0 0 10.366 9.686l-.02-.19c-.071-.743-.107-1.115 0-1.46c.107-.344.345-.623.822-1.18l.434-.507c1.677-1.96 2.515-2.941 2.222-3.882c-.292-.941-1.522-1.22-3.982-1.776l-.636-.144c-.699-.158-1.049-.237-1.33-.45c-.28-.213-.46-.536-.82-1.182l-.327-.588C13.58 3.136 12.947 2 12 2s-1.58 1.136-2.847 3.408" opacity=".5" class=""></path></svg>
+                </span>
+          </div>
+        </div>
 
-<h1><a id="gugu" href="https://ujjwaluzupvt.github.io/gugu/">UzzUTV</a></h1>
+        <h1
+          class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl leading-[0.9] [animation:fadeSlideIn_0.8s_ease-out_0.3s_both] font-medium tracking-tighter font-manrope drop-shadow-lg animate"
+          style="mask-image: linear-gradient(150deg, transparent, black 0%, black 40%, transparent); -webkit-mask-image: linear-gradient(150deg, transparent, black 0%, black 40%, transparent);">
+          Stream Movies &<br>
+          <span class="bg-clip-text font-medium text-transparent tracking-tighter font-manrope bg-gradient-to-br from-white to-[#ffcd75] pr-1">TV Series</span><br>
+              Free Online
+        </h1>
 
-<h4>Laugh  <span id="glow">Watch</span>  Repeat</h4>
+        <p
+          class="[animation:fadeSlideIn_0.8s_ease-out_0.4s_both] text-base sm:text-lg text-white/70 max-w-xl animate">
+          UzzUTV brings timeless classics and the latest trending releases together in one place. Discover titles, explore
+          genres, and dive into immersive stories filled with action, drama, thriller, and emotion.
+        </p>
 
-<p>
+        <div
+          class="flex flex-col sm:flex-row gap-3 sm:gap-4 [animation:fadeSlideIn_0.8s_ease-out_0.5s_both] animate">
+          <a href="{% url 'home' %}">
+          <button class="group inline-flex transition-all duration-300 hover:shadow-lg hover:bg-zinc-200 text-sm font-medium text-zinc-900 bg-white rounded-full pt-3 sm:pt-4 pr-6 sm:pr-8 pb-3 sm:pb-4 pl-6 sm:pl-8 shadow-[5.7px_5.7px_8.6px_rgba(0,_0,_0,_0.07),_13.7px_13.7px_10.9px_rgba(0,_0,_0,_0.099),_25.7px_25.7px_20.5px_rgba(0,_0,_0,_0.123),_45.8px_45.8px_36.6px_rgba(0,_0,_0,_0.147),_85.8px_85.8px_68.5px_rgba(0,_0,_0,_0.176),_205px_205px_163.4px_rgba(0,_0,_0,_0.246)] gap-x-2 sm:gap-x-3 gap-y-2 sm:gap-y-3 items-center justify-center">
+                <span class="font-sans">Start Watching</span>
+                <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" width="16" height="16" viewBox="0 0 24 24" data-icon="solar:arrow-right-bold-duotone" class="iconify group-hover:translate-x-1 transition-transform iconify--solar"><path fill="currentColor" fill-rule="evenodd" d="M3.25 12a.75.75 0 0 1 .75-.75h9.25v1.5H4a.75.75 0 0 1-.75-.75" clip-rule="evenodd" opacity=".5" class=""></path><path fill="currentColor" d="M13.25 12.75V18a.75.75 0 0 0 1.28.53l6-6a.75.75 0 0 0 0-1.06l-6-6a.75.75 0 0 0-1.28.53z" class=""></path></svg>
+              </button>
+          </a>
 
-<span id="glow"><a id="gugu" href="https://ujjwaluzupvt.github.io/gugu/">UzzUTV</a></span> is a modern streaming platform built for <span id="glow">movie and series lovers</span> who want instant access to their <span>favorite films and shows</span>. From timeless classics to the latest trending releases, UzzUTV brings together a vast collection of movies and series in one place.
+          <a href="{% url 'home' %}">
+          <button class="group inline-flex hover:text-white transition-all duration-300 hover:border-white hover:bg-white/5 text-sm font-medium text-zinc-300 border-white/20 border rounded-full pt-3 sm:pt-4 pr-6 sm:pr-8 pb-3 sm:pb-4 pl-6 sm:pl-8 gap-x-2 sm:gap-x-3 gap-y-2 sm:gap-y-3 items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" width="16" height="16" viewBox="0 0 24 24" data-icon="solar:play-bold-duotone" class="iconify iconify--solar"><path fill="currentColor" fill-rule="evenodd" d="M23 12c0-1.035-.53-2.07-1.591-2.647L8.597 2.385C6.534 1.264 4 2.724 4 5.033V12z" clip-rule="evenodd" class=""></path><path fill="currentColor" d="m8.597 21.615l12.812-6.968A2.99 2.99 0 0 0 23 12H4v6.967c0 2.31 2.534 3.769 4.597 2.648" opacity=".5" class=""></path></svg>
+                <span class="font-sans">Browse Series</span>
+              </button>
+          </a>
+        </div>
+      </div>
 
-<span id="glow">Discover</span> trending titles, explore different genres, and dive into immersive stories filled with <span id="glow">action, drama, thriller, and emotion.</span>
-</p>
-<div>
-<button><a style="text-decoration: none; color: white;" href="{% url 'home'%}">Full Site</a></button>
+      <!-- Right Stats -->
+      <div class="lg:col-span-5 space-y-4 sm:space-y-6">
+        <div
+          class="overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] border-gradient before:rounded-3xl bg-gradient-to-br from-white/10 via-white/0 to-white/10 w-full h-fit rounded-2xl sm:rounded-3xl relative shadow-[2.8px_2.8px_2.2px_rgba(0,_0,_0,_0.034),_6.7px_6.7px_5.3px_rgba(0,_0,_0,_0.048),_12.5px_12.5px_10px_rgba(0,_0,_0,_0.06),_22.3px_22.3px_17.9px_rgba(0,_0,_0,_0.072),_41.8px_41.8px_33.4px_rgba(0,_0,_0,_0.086),_100px_100px_80px_rgba(0,_0,_0,_0.12)]"
+          style="backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px)">
+          <div
+            class="[animation:fadeSlideIn_0.8s_ease-out_0.6s_both] pt-6 sm:pt-8 pr-6 sm:pr-8 pb-6 sm:pb-8 pl-6 sm:pl-8 relative animate">
+            <div class="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+              <div
+                class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl ring-1 flex items-center justify-center bg-white/10 ring-white/20">
+                <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" width="20" height="20"
+                  viewBox="0 0 24 24" data-icon="solar:target-bold-duotone"
+                  class="iconify text-white iconify--solar sm:w-6 sm:h-6">
+                  <path fill="currentColor" d="M22 12c0 5.523-4.477 10-10 10S2 17.523 2 12S6.477 2 12 2s10 4.477 10 10"
+                    opacity=".5" class=""></path>
+                  <path fill="currentColor"
+                    d="M9.25 12a.75.75 0 0 1 .75-.75h1.25V10a.75.75 0 0 1 1.5 0v1.25H14a.75.75 0 0 1 0 1.5h-1.25V14a.75.75 0 0 1-1.5 0v-1.25H10a.75.75 0 0 1-.75-.75m-7.222.75a10 10 0 0 1 0-1.5H5a.75.75 0 0 1 0 1.5zm10.722 9.222a10 10 0 0 1-1.5 0V19a.75.75 0 0 1 1.5 0zm9.222-10.722a10 10 0 0 1 0 1.5H19a.75.75 0 0 1 0-1.5zM12.75 2.028V5a.75.75 0 0 1-1.5 0V2.028a10 10 0 0 1 1.5 0"
+                    class=""></path>
+                </svg>
+              </div>
+              <div>
+                <div class="text-2xl sm:text-3xl tracking-tighter font-manrope font-medium">10,000+</div>
+                <div class="text-xs sm:text-sm text-white/70 font-sans">Movies & Series</div>
+              </div>
+            </div>
 
-</div>
+            <div class="space-y-3 sm:space-y-4 mb-4 sm:mb-6">
+              <div class="flex items-center justify-between">
+                <span class="text-xs sm:text-sm text-white/70 font-sans">Streaming Uptime</span>
+                <span class="text-xs sm:text-sm font-sans">99%</span>
+              </div>
+              <div class="h-1.5 sm:h-2 bg-zinc-800 rounded-full overflow-hidden">
+                <div class="h-full bg-gradient-to-r rounded-full from-white to-white/70" style="width: 99%;"></div>
+              </div>
+            </div>
 
+            <div class="h-px w-full bg-gradient-to-r from-transparent via-white/25 to-transparent my-3 sm:my-4"></div>
 
+            <div class="flex justify-between mb-3 sm:mb-4 gap-2">
+              <div
+                class="text-center px-1 sm:px-2 cursor-pointer transition-all duration-300 rounded-xl sm:rounded-2xl hover:bg-white/5 hover:-translate-y-0.5 flex-1">
+                <div
+                  class="text-xl sm:text-2xl leading-tight bg-gradient-to-r from-white/95 to-neutral-200/80 bg-clip-text text-transparent font-sans font-medium">
+                  4K</div>
+                <div class="text-[10px] sm:text-xs opacity-70 uppercase tracking-wide font-sans">Ultra HD</div>
+              </div>
+              <div class="w-px h-10 sm:h-12 my-auto bg-gradient-to-b from-transparent via-white/40 to-transparent">
+              </div>
+              <div
+                class="text-center px-1 sm:px-2 cursor-pointer transition-all duration-300 rounded-xl sm:rounded-2xl hover:bg-white/5 hover:-translate-y-0.5 flex-1">
+                <div
+                  class="text-xl sm:text-2xl leading-tight bg-gradient-to-r from-white/95 to-neutral-200/80 bg-clip-text text-transparent font-sans font-medium">
+                  24/7</div>
+                <div class="text-[10px] sm:text-xs opacity-70 uppercase tracking-wide font-sans">Streaming</div>
+              </div>
+              <div class="w-px h-10 sm:h-12 my-auto bg-gradient-to-b from-transparent via-white/40 to-transparent">
+              </div>
+              <div
+                class="text-center px-1 sm:px-2 cursor-pointer transition-all duration-300 rounded-xl sm:rounded-2xl hover:bg-white/5 hover:-translate-y-0.5 flex-1">
+                <div
+                  class="text-xl sm:text-2xl leading-tight bg-gradient-to-r from-white/95 to-neutral-200/80 bg-clip-text text-transparent font-sans font-medium">
+                  100%</div>
+                <div class="text-[10px] sm:text-xs opacity-70 uppercase tracking-wide font-sans">Free</div>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap gap-1.5 sm:gap-2">
+              <span class="inline-flex items-center gap-1 text-[10px] sm:text-xs px-2 py-1 rounded-full bg-white/10 border border-white/20 text-zinc-300 cursor-pointer transition-all duration-300 hover:-translate-y-px font-sans">
+                    <div class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white animate-pulse"></div>
+                    LIVE NOW
+                  </span>
+              <span class="inline-flex items-center gap-1 text-[10px] sm:text-xs px-2 py-1 rounded-full bg-white/10 border border-white/20 text-zinc-300 cursor-pointer transition-all duration-300 hover:-translate-y-px font-sans">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" class="iconify iconify--solar sm:w-3 sm:h-3"><path fill="currentColor" d="M18.483 16.767A8.5 8.5 0 0 1 8.118 7.081a1 1 0 0 1-.113.097c-.28.213-.63.292-1.33.45l-.635.144c-2.46.557-3.69.835-3.983 1.776c-.292.94.546 1.921 2.223 3.882l.434.507c.476.557.715.836.822 1.18c.107.345.071.717-.001 1.46l-.066.677c-.253 2.617-.38 3.925.386 4.506s1.918.052 4.22-1.009l.597-.274c.654-.302.981-.452 1.328-.452s.674.15 1.329.452l.595.274c2.303 1.06 3.455 1.59 4.22 1.01c.767-.582.64-1.89.387-4.507z" class=""></path><path fill="currentColor" d="m9.153 5.408l-.328.588c-.36.646-.54.969-.82 1.182q.06-.045.113-.097a8.5 8.5 0 0 0 10.366 9.686l-.02-.19c-.071-.743-.107-1.115 0-1.46c.107-.344.345-.623.822-1.18l.434-.507c1.677-1.96 2.515-2.941 2.222-3.882c-.292-.941-1.522-1.22-3.982-1.776l-.636-.144c-.699-.158-1.049-.237-1.33-.45c-.28-.213-.46-.536-.82-1.182l-.327-.588C13.58 3.136 12.947 2 12 2s-1.58 1.136-2.847 3.408" opacity=".5" class=""></path></svg>
+                    HD QUALITY
+                  </span>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="overflow-hidden transition-all duration-300 [animation:fadeSlideIn_0.8s_ease-out_0.7s_both] border-gradient before:rounded-3xl bg-gradient-to-br from-white/10 via-white/0 to-white/10 w-full h-fit rounded-2xl sm:rounded-3xl relative shadow-[4px_4px_6px_rgba(0,_0,_0,_0.049),_9.6px_9.6px_7.6px_rgba(0,_0,_0,_0.069),_18px_18px_14.3px_rgba(0,_0,_0,_0.086),_32px_32px_25.6px_rgba(0,_0,_0,_0.103),_60px_60px_47.8px_rgba(0,_0,_0,_0.123),_143px_143px_114.3px_rgba(0,_0,_0,_0.172)] animate"
+          style="backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px)">
+          <div class="pt-6 sm:pt-8 pr-6 sm:pr-8 pb-6 sm:pb-8 pl-6 sm:pl-8 relative">
+            <h3 class="text-base sm:text-lg mb-3 sm:mb-4 font-sans">Trending Genres</h3>
+            <div class="overflow-hidden relative">
+              <div
+                style="mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent); -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);"
+                class="">
+                <div class="flex gap-4 sm:gap-6 will-change-transform"
+                  style="animation: marquee-logos 30s linear infinite;">
+                  <div class="flex gap-4 sm:gap-6 shrink-0">
+                    <span class="inline-flex items-center justify-center text-zinc-400 mix-blend-screen font-semibold tracking-widest uppercase w-[120px] sm:w-[150px] h-[32px] sm:h-[40px] text-sm sm:text-base">Action</span>
+                    <span class="inline-flex items-center justify-center text-zinc-400 mix-blend-screen font-semibold tracking-widest uppercase w-[120px] sm:w-[150px] h-[32px] sm:h-[40px] text-sm sm:text-base">Comedy</span>
+                    <span class="inline-flex items-center justify-center text-zinc-400 mix-blend-screen font-semibold tracking-widest uppercase w-[120px] sm:w-[150px] h-[32px] sm:h-[40px] text-sm sm:text-base">Drama</span>
+                    <span class="inline-flex items-center justify-center text-zinc-400 mix-blend-screen font-semibold tracking-widest uppercase w-[120px] sm:w-[150px] h-[32px] sm:h-[40px] text-sm sm:text-base">Thriller</span>
+                    <span class="inline-flex items-center justify-center text-zinc-400 mix-blend-screen font-semibold tracking-widest uppercase w-[120px] sm:w-[150px] h-[32px] sm:h-[40px] text-sm sm:text-base">Sci-Fi</span>
+                    <span class="inline-flex items-center justify-center text-zinc-400 mix-blend-screen font-semibold tracking-widest uppercase w-[120px] sm:w-[150px] h-[32px] sm:h-[40px] text-sm sm:text-base">Horror</span>
+                  </div>
+                  <div class="flex gap-4 sm:gap-6 shrink-0">
+                    <span class="inline-flex items-center justify-center text-zinc-400 mix-blend-screen font-semibold tracking-widest uppercase w-[120px] sm:w-[150px] h-[32px] sm:h-[40px] text-sm sm:text-base">Action</span>
+                    <span class="inline-flex items-center justify-center text-zinc-400 mix-blend-screen font-semibold tracking-widest uppercase w-[120px] sm:w-[150px] h-[32px] sm:h-[40px] text-sm sm:text-base">Comedy</span>
+                    <span class="inline-flex items-center justify-center text-zinc-400 mix-blend-screen font-semibold tracking-widest uppercase w-[120px] sm:w-[150px] h-[32px] sm:h-[40px] text-sm sm:text-base">Drama</span>
+                    <span class="inline-flex items-center justify-center text-zinc-400 mix-blend-screen font-semibold tracking-widest uppercase w-[120px] sm:w-[150px] h-[32px] sm:h-[40px] text-sm sm:text-base">Thriller</span>
+                    <span class="inline-flex items-center justify-center text-zinc-400 mix-blend-screen font-semibold tracking-widest uppercase w-[120px] sm:w-[150px] h-[32px] sm:h-[40px] text-sm sm:text-base">Sci-Fi</span>
+                    <span class="inline-flex items-center justify-center text-zinc-400 mix-blend-screen font-semibold tracking-widest uppercase w-[120px] sm:w-[150px] h-[32px] sm:h-[40px] text-sm sm:text-base">Horror</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 </body>
