@@ -3,7 +3,61 @@
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'uzzutv/home.css' %}">
+<style>
+/* PRELOADER */
 
+#loader{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:#0c0c0c;
+display:flex;
+align-items:center;
+justify-content:center;
+z-index:9999;
+transition:opacity 0.5s ease;
+}
+
+.loader-content{
+text-align:center;
+}
+
+.logo{
+font-family:'Anton', 'Passero One', sans-serif;
+font-size:40px;
+color:white;
+margin-bottom:20px;
+letter-spacing:2px;
+text-transform:uppercase;
+}
+
+.logo .brand-red{ color:#ff3c3c; }
+
+/* spinner */
+
+.spinner{
+width:50px;
+height:50px;
+border:4px solid rgba(255,255,255,0.2);
+border-top:4px solid #ff3c3c;
+border-radius:50%;
+animation:spin 1s linear infinite;
+}
+
+@keyframes spin{
+to{ transform:rotate(360deg); }
+}
+
+/* fade out */
+
+#loader.fade-out{
+opacity:0;
+pointer-events:none;
+}
+
+</style>
 {% endblock %}
 
 {% block title %}UzzUTV - Movies & TV Series{% endblock %}
@@ -30,63 +84,11 @@
 }
 </script>
 {% endblock %}
-<style>
-/* PRELOADER */
-
-#loader{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:#0f172a;
-display:flex;
-align-items:center;
-justify-content:center;
-z-index:9999;
-transition:opacity 0.5s ease;
-}
-
-.loader-content{
-text-align:center;
-}
-
-.logo{
-font-family:'Passero One', sans-serif;
-font-size:40px;
-color:white;
-margin-bottom:20px;
-letter-spacing:2px;
-}
-
-/* spinner */
-
-.spinner{
-width:50px;
-height:50px;
-border:4px solid rgba(255,255,255,0.2);
-border-top:4px solid #fff;
-border-radius:50%;
-animation:spin 1s linear infinite;
-}
-
-@keyframes spin{
-to{ transform:rotate(360deg); }
-}
-
-/* fade out */
-
-#loader.fade-out{
-opacity:0;
-pointer-events:none;
-}
-
-</style>
 {% block body %}
 <h1 class="visually-hidden">UzzUTV - Watch Movies and TV Series Online</h1>
 <div id="loader">
   <div class="loader-content">
-    <div class="logo">UzzuTV</div>
+    <div class="logo">Uzz<span class="brand-red">UTV</span></div>
     <div class="spinner"></div>
   </div>
 </div>
@@ -102,34 +104,35 @@ pointer-events:none;
 
 <div class="hero-slide">
 
-<img class="hero-bg" alt="" fetchpriority="high"
+<img class="hero-bg" alt=""
+fetchpriority="high"
 src="https://image.tmdb.org/t/p/w1280{{ item.backdrop_path }}">
 
 <div class="hero-content">
 
 {% if item.logo %}
-<img class="hero-logo" alt="{% if item.title %}{{ item.title }}{% else %}{{ item.name }}{% endif %} logo" src="https://image.tmdb.org/t/p/w185{{ item.logo }}">
+<img class="hero-logo" alt="{% if item.title %}{{ item.title }}{% else %}{{ item.name }}{% endif %} logo" src="https://image.tmdb.org/t/p/w500{{ item.logo }}">
 {% else %}
-<h2 class="hero-title" style="font-family: 'Passero One', sans-serif;">
+<h2 class="hero-title">
 {% if item.title %}{{ item.title|truncatewords:3 }}{% else %}{{ item.name|truncatewords:3 }}{% endif %}
 </h2>
 {% endif %}
 
 <div class="hero-meta">
-⭐ {{ item.vote_average }} · {{ item.media_type.capitalize }} 
+<span class="hero-rating">★ {{ item.vote_average|floatformat:1 }}</span>
+<span class="hero-type">{{ item.media_type|upper }}</span>
 </div>
 
-<p class="p-mobile">{{ item.overview|truncatewords:25 }}</p>
+<p class="hero-desc">{{ item.overview|truncatewords:32 }}</p>
 
 <div class="hero-buttons">
 
 {% if item.media_type == "movie" %}
 <a href="{% url 'watchmov' item.id %}"
-onclick="saveContinue('{{item.id}}','movie','{{item.poster_path}}')">
-<button class="watch-btn">▶ Watch Now</button>
-</a>
+onclick="saveContinue('{{item.id}}','movie','{{item.poster_path}}')"
+class="watch-btn"><span class="material-icons">play_arrow</span> Watch Now</a>
 {% else %}
-<a class="watch-btn" href="{% url 'watchtv' item.id %}">▶ Watch Now</a>
+<a class="watch-btn" href="{% url 'watchtv' item.id %}"><span class="material-icons">play_arrow</span> Watch Now</a>
 {% endif %}
 
 {% if item.media_type == "movie" %}
@@ -150,15 +153,20 @@ onclick="saveContinue('{{item.id}}','movie','{{item.poster_path}}')">
 
 </div>
 
+<button class="hero-arrow hero-arrow-left" onclick="heroMove(-1)" aria-label="Previous slide">‹</button>
+<button class="hero-arrow hero-arrow-right" onclick="heroMove(1)" aria-label="Next slide">›</button>
+
+<div class="hero-dots" id="hero-dots"></div>
+
+</div>
 
 
-
-<!-- trending -->
+<!-- LATEST & TRENDING -->
  <div class="trending-section">
 
 <div class="slider-header">
 
-<h2 class="section-title">Latest & Trending</h2>
+<h2 class="section-title">Latest &amp; Trending</h2>
 
 <div class="slider-controls">
 <button onclick="slideLeft('top10-slider')"><span class="material-icons">chevron_left</span></button>
@@ -181,7 +189,7 @@ onclick="saveContinue('{{item.id}}','movie','{{item.poster_path}}')">
 <a href="{% url 'detail' 'tv' item.id %}">
 {% endif %}
 
-<img loading="lazy" decoding="async" alt="{% if item.title %}{{ item.title }}{% else %}{{ item.name }}{% endif %} poster" src="https://image.tmdb.org/t/p/w342{{ item.poster_path }}">
+<img loading="lazy" decoding="async" alt="{% if item.title %}{{ item.title }}{% else %}{{ item.name }}{% endif %} poster" {% if item.poster_path %}src="https://image.tmdb.org/t/p/w342{{ item.poster_path }}"{% else %}src="{% static 'uzzutv/images/logo.png' %}"{% endif %}>
 
 </a>
 
@@ -190,19 +198,19 @@ onclick="saveContinue('{{item.id}}','movie','{{item.poster_path}}')">
 {% endfor %}
 </div>
 </div>
-</div>
 
 
-<h4 style="color: #111111 ;">by Rashan Gang</h4>
+<div id="continue-home"></div>
 
-<!-- action -->
-
-
-<div id="mobile-fix" class="content-section">
+<!-- ACTION -->
+<div class="content-section">
 
 <div class="slider-header">
 
 <h2 class="section-title">Action</h2>
+
+<div class="header-actions">
+<a class="view-all" href="{% url 'category' 'action' %}">View All <span class="material-icons">arrow_forward</span></a>
 
 <div class="slider-controls">
 <button onclick="slideLeft('action-slider')">
@@ -213,33 +221,27 @@ onclick="saveContinue('{{item.id}}','movie','{{item.poster_path}}')">
 <span class="material-icons">chevron_right</span>
 </button>
 </div>
+</div>
 
 </div>
 
-
-<!-- SKELETON -->
-<div class="movie-row" id="action-skeleton">
-
-{% for i in "12345678" %}
-<div class="movie-card skeleton-card">
-<div class="skeleton-img"></div>
-</div>
-{% endfor %}
-
-</div>
 <div class="movie-row" id="action-slider">
 
-{% for item in action %}
+{% for item in action|slice:":10" %}
 
 <div class="movie-card">
 
 {% if item.media_type == "movie" %}
-<a href="{% url 'detail' 'movie' item.id %}">
+<a class="card-link" href="{% url 'detail' 'movie' item.id %}">
 {% else %}
-<a href="{% url 'detail' 'tv' item.id %}">
+<a class="card-link" href="{% url 'detail' 'tv' item.id %}">
 {% endif %}
 
-<img loading="lazy" decoding="async" alt="{% if item.title %}{{ item.title }}{% else %}{{ item.name }}{% endif %} poster" src="https://image.tmdb.org/t/p/w342{{ item.poster_path }}">
+<div class="card-poster">
+<img loading="lazy" decoding="async" alt="{% if item.title %}{{ item.title }}{% else %}{{ item.name }}{% endif %} poster" {% if item.poster_path %}src="https://image.tmdb.org/t/p/w342{{ item.poster_path }}"{% else %}src="{% static 'uzzutv/images/logo.png' %}"{% endif %}>
+<span class="card-gradient"></span>
+<span class="card-rating">★ {{ item.vote_average|floatformat:1 }}</span>
+</div>
 
 </a>
 
@@ -251,15 +253,15 @@ onclick="saveContinue('{{item.id}}','movie','{{item.poster_path}}')">
 
 </div>
 
-
-<div id="continue-home"></div>
-<!-- romance -->
-
+<!-- ROMANCE -->
 <div class="content-section">
 
 <div class="slider-header">
 
 <h2 class="section-title">Romance</h2>
+
+<div class="header-actions">
+<a class="view-all" href="{% url 'category' 'romance' %}">View All <span class="material-icons">arrow_forward</span></a>
 
 <div class="slider-controls">
 <button onclick="slideLeft('romance-slider')">
@@ -270,22 +272,27 @@ onclick="saveContinue('{{item.id}}','movie','{{item.poster_path}}')">
 <span class="material-icons">chevron_right</span>
 </button>
 </div>
+</div>
 
 </div>
 
 <div class="movie-row" id="romance-slider">
 
-{% for item in romance %}
+{% for item in romance|slice:":10" %}
 
 <div class="movie-card">
 
 {% if item.media_type == "movie" %}
-<a href="{% url 'detail' 'movie' item.id %}">
+<a class="card-link" href="{% url 'detail' 'movie' item.id %}">
 {% else %}
-<a href="{% url 'detail' 'tv' item.id %}">
+<a class="card-link" href="{% url 'detail' 'tv' item.id %}">
 {% endif %}
 
-<img loading="lazy" decoding="async" alt="{% if item.title %}{{ item.title }}{% else %}{{ item.name }}{% endif %} poster" src="https://image.tmdb.org/t/p/w342{{ item.poster_path }}">
+<div class="card-poster">
+<img loading="lazy" decoding="async" alt="{% if item.title %}{{ item.title }}{% else %}{{ item.name }}{% endif %} poster" {% if item.poster_path %}src="https://image.tmdb.org/t/p/w342{{ item.poster_path }}"{% else %}src="{% static 'uzzutv/images/logo.png' %}"{% endif %}>
+<span class="card-gradient"></span>
+<span class="card-rating">★ {{ item.vote_average|floatformat:1 }}</span>
+</div>
 
 </a>
 
@@ -297,12 +304,15 @@ onclick="saveContinue('{{item.id}}','movie','{{item.poster_path}}')">
 
 </div>
 
-<!-- comedy -->
+<!-- COMEDY -->
 <div class="content-section">
 
 <div class="slider-header">
 
 <h2 class="section-title">Comedy</h2>
+
+<div class="header-actions">
+<a class="view-all" href="{% url 'category' 'comedy' %}">View All <span class="material-icons">arrow_forward</span></a>
 
 <div class="slider-controls">
 <button onclick="slideLeft('comedy-slider')">
@@ -313,22 +323,27 @@ onclick="saveContinue('{{item.id}}','movie','{{item.poster_path}}')">
 <span class="material-icons">chevron_right</span>
 </button>
 </div>
+</div>
 
 </div>
 
 <div class="movie-row" id="comedy-slider">
 
-{% for item in comedy %}
+{% for item in comedy|slice:":10" %}
 
 <div class="movie-card">
 
 {% if item.media_type == "movie" %}
-<a href="{% url 'detail' 'movie' item.id %}">
+<a class="card-link" href="{% url 'detail' 'movie' item.id %}">
 {% else %}
-<a href="{% url 'detail' 'tv' item.id %}">
+<a class="card-link" href="{% url 'detail' 'tv' item.id %}">
 {% endif %}
 
-<img loading="lazy" decoding="async" alt="{% if item.title %}{{ item.title }}{% else %}{{ item.name }}{% endif %} poster" src="https://image.tmdb.org/t/p/w342{{ item.poster_path }}">
+<div class="card-poster">
+<img loading="lazy" decoding="async" alt="{% if item.title %}{{ item.title }}{% else %}{{ item.name }}{% endif %} poster" {% if item.poster_path %}src="https://image.tmdb.org/t/p/w342{{ item.poster_path }}"{% else %}src="{% static 'uzzutv/images/logo.png' %}"{% endif %}>
+<span class="card-gradient"></span>
+<span class="card-rating">★ {{ item.vote_average|floatformat:1 }}</span>
+</div>
 
 </a>
 
@@ -340,19 +355,15 @@ onclick="saveContinue('{{item.id}}','movie','{{item.poster_path}}')">
 
 </div>
 
-
-
-
-
-
-
-
-
+<!-- ANIMATION -->
 <div class="content-section">
 
 <div class="slider-header">
 
 <h2 class="section-title">Animation</h2>
+
+<div class="header-actions">
+<a class="view-all" href="{% url 'category' 'animation' %}">View All <span class="material-icons">arrow_forward</span></a>
 
 <div class="slider-controls">
 <button onclick="slideLeft('anime-slider')">
@@ -363,22 +374,27 @@ onclick="saveContinue('{{item.id}}','movie','{{item.poster_path}}')">
 <span class="material-icons">chevron_right</span>
 </button>
 </div>
+</div>
 
 </div>
 
 <div class="movie-row" id="anime-slider">
 
-{% for item in anime %}
+{% for item in anime|slice:":10" %}
 
 <div class="movie-card">
 
 {% if item.media_type == "movie" %}
-<a href="{% url 'detail' 'movie' item.id %}">
+<a class="card-link" href="{% url 'detail' 'movie' item.id %}">
 {% else %}
-<a href="{% url 'detail' 'tv' item.id %}">
+<a class="card-link" href="{% url 'detail' 'tv' item.id %}">
 {% endif %}
 
-<img loading="lazy" decoding="async" alt="{% if item.title %}{{ item.title }}{% else %}{{ item.name }}{% endif %} poster" src="https://image.tmdb.org/t/p/w342{{ item.poster_path }}">
+<div class="card-poster">
+<img loading="lazy" decoding="async" alt="{% if item.title %}{{ item.title }}{% else %}{{ item.name }}{% endif %} poster" {% if item.poster_path %}src="https://image.tmdb.org/t/p/w342{{ item.poster_path }}"{% else %}src="{% static 'uzzutv/images/logo.png' %}"{% endif %}>
+<span class="card-gradient"></span>
+<span class="card-rating">★ {{ item.vote_average|floatformat:1 }}</span>
+</div>
 
 </a>
 
@@ -396,39 +412,63 @@ onclick="saveContinue('{{item.id}}','movie','{{item.poster_path}}')">
 <script>
 window.addEventListener("DOMContentLoaded", () => {
 renderContinueHome("continue-home");
+buildHeroDots();
 });
 
-
-
-function slideLeftTop(){
-document.getElementById("top10-slider")
-.scrollBy({left:-600, behavior:"smooth"});
+function buildHeroDots(){
+const container = document.getElementById("hero-dots");
+const slides = document.querySelectorAll(".hero-slide");
+if(!container || slides.length === 0) return;
+container.innerHTML = "";
+slides.forEach((slide, i) => {
+const dot = document.createElement("button");
+dot.type = "button";
+dot.className = "hero-dot";
+dot.setAttribute("aria-label", "Go to slide " + (i + 1));
+if(i === 0) dot.classList.add("active");
+dot.addEventListener("click", () => goToSlide(i));
+container.appendChild(dot);
+});
 }
 
-function slideRightTop(){
-document.getElementById("top10-slider")
-.scrollBy({left:600, behavior:"smooth"});
-}
-let slides = document.querySelectorAll(".hero-slide");
-let index = 0;
+let heroIndex = 0;
+let heroSlides = document.querySelectorAll(".hero-slide");
 
-slides[0].classList.add("active");
+function activateSlide(i){
+heroSlides.forEach(s => s.classList.remove("active"));
+heroSlides[i].classList.add("active");
+const dots = document.querySelectorAll(".hero-dot");
+dots.forEach((d, di) => d.classList.toggle("active", di === i));
+}
+
+function goToSlide(i){
+heroIndex = i;
+activateSlide(i);
+}
+
+function heroMove(dir){
+if(heroSlides.length === 0) return;
+heroIndex = (heroIndex + dir + heroSlides.length) % heroSlides.length;
+activateSlide(heroIndex);
+}
 
 function showSlide(){
-
-slides.forEach(slide => slide.classList.remove("active"));
-
-slides[index].classList.add("active");
-
-index++;
-
-if(index >= slides.length){
-index = 0;
+if(heroSlides.length === 0) return;
+heroIndex = (heroIndex + 1) % heroSlides.length;
+activateSlide(heroIndex);
 }
 
+let heroTimer;
+if(heroSlides.length > 0){
+heroSlides[0].classList.add("active");
+heroTimer = setInterval(showSlide, 6000);
 }
 
-setInterval(showSlide, 5000);
+const heroWrapper = document.querySelector(".hero-wrapper");
+if(heroWrapper){
+heroWrapper.addEventListener("mouseenter", () => { clearInterval(heroTimer); });
+heroWrapper.addEventListener("mouseleave", () => { heroTimer = setInterval(showSlide, 6000); });
+}
 
 function slideLeft(id){
 const slider = document.getElementById(id);

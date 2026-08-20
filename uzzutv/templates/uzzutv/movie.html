@@ -150,11 +150,13 @@ onclick="saveContinue('{{movie.id}}','movie','{{movie.poster_path}}')">
 
 <div class="movie-card">
 
+<a class="card-link" href="{% url 'detail' 'movie' top.id %}">
 
-<a href="{% url 'detail' 'movie' top.id %}">
-
-
+<div class="card-poster">
 <img loading="lazy" decoding="async" alt="{{ top.title }} poster" src="https://image.tmdb.org/t/p/w342{{ top.poster_path }}">
+<span class="card-gradient"></span>
+<span class="card-rating">★ {{ top.vote_average|floatformat:1 }}</span>
+</div>
 
 </a>
 

@@ -738,8 +738,8 @@ def load_homepage_data2():
         timeout=10
     ).json().get("results", [])
 
-    # add logos for hero
-    for item in trending[:5]:
+    # add logos for hero (home.html shows hero|slice:"10:" = items 10-19)
+    for item in trending[10:20]:
 
         if item["media_type"] == "movie":
             item["logo"] = get_movie_logo(item["id"])
@@ -782,6 +782,120 @@ def home(request):
 
 
 
+
+
+# ----------------------------
+# CATEGORY PAGES (PAGINATED)
+# ----------------------------
+
+CATEGORY_CONFIG = {
+    "action":    {"movie_genre": 28,    "tv_genre": 10759, "title": "Action"},
+    "romance":   {"movie_genre": 10749, "tv_genre": 10749, "title": "Romance"},
+    "comedy":    {"movie_genre": 35,    "tv_genre": 35,    "title": "Comedy"},
+    "animation": {"movie_genre": 16,    "tv_genre": 16,    "title": "Animation"},
+}
+
+CATEGORY_PER_PAGE = 24
+
+
+def discover_source(media_type, genre, page):
+    """Cached TMDB discover results for a single media type + genre + page."""
+
+    cache_key = f"discover_{media_type}_{genre}_p{page}"
+    data = cache.get(cache_key)
+
+    if data is not None:
+        return data
+
+    params = {
+        "api_key": API_KEY,
+        "with_genres": genre,
+        "sort_by": "popularity.desc",
+        "vote_count.gte": 100,
+        "page": page,
+    }
+
+    try:
+        payload = requests.get(
+            f"{BASE_URL}/discover/{media_type}",
+            params=params,
+            timeout=10
+        ).json()
+        results = payload.get("results", [])
+        total_pages = payload.get("total_pages", 1)
+        for item in results:
+            item["media_type"] = media_type
+    except Exception:
+        results, total_pages = [], 1
+
+    cache.set(cache_key, (results, total_pages), 21600)
+
+    return results, total_pages
+
+
+def load_category_page(slug, page):
+    """30 items per page, mixed movie + TV, balanced round-robin feed."""
+
+    cfg = CATEGORY_CONFIG[slug]
+
+    cache_key = f"category_page_v2_{slug}_{page}"
+    data = cache.get(cache_key)
+
+    if data:
+        return data
+
+    movies, movie_total = discover_source("movie", cfg["movie_genre"], page)
+    tv, tv_total = discover_source("tv", cfg["tv_genre"], page)
+
+    combined = []
+    for i in range(max(len(movies), len(tv))):
+        if i < len(movies):
+            combined.append(movies[i])
+        if i < len(tv):
+            combined.append(tv[i])
+
+    items = combined[:CATEGORY_PER_PAGE]
+
+    total_items = (movie_total + tv_total) * 20
+    total_pages = max(1, -(-total_items // CATEGORY_PER_PAGE))
+
+    data = {"items": items, "total_pages": total_pages}
+    cache.set(cache_key, data, 21600)
+
+    return data
+
+
+def category(request, slug):
+
+    if slug not in CATEGORY_CONFIG:
+        raise Http404("Category not found")
+
+    try:
+        page = max(1, int(request.GET.get("page", 1)))
+    except (TypeError, ValueError):
+        page = 1
+
+    data = load_category_page(slug, page)
+
+    cfg = CATEGORY_CONFIG[slug]
+
+    pages = []
+    total = data["total_pages"]
+    for p in range(1, total + 1):
+        if p == 1 or p == total or abs(p - page) <= 2:
+            if pages and pages[-1] != "..." and p - 1 != pages[-1]:
+                pages.append("...")
+            pages.append(p)
+
+    return render(request, "uzzutv/category.html", {
+        "slug": slug,
+        "category_title": cfg["title"],
+        "items": data["items"],
+        "page": page,
+        "total_pages": total,
+        "per_page": CATEGORY_PER_PAGE,
+        "pages": pages,
+    })
 
 
 def detail(request, type, id):

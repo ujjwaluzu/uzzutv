@@ -30,6 +30,7 @@
 <link rel="preconnect" href="https://player.videasy.net">
 <link href="https://fonts.googleapis.com/css2?family=Passero+One&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
@@ -44,13 +45,19 @@
   --uzz-bg:#0b0b0b;
   --uzz-panel:#151515;
   --uzz-red:#ff3c3c;
+  --uzz-red-soft:rgba(255,60,60,.10);
   --uzz-muted:#9ca3af;
   --uzz-border:rgba(255,255,255,.08);
 }
 
+html{
+  scroll-behavior: smooth;
+}
+
 body{
-  background:#111111 !important;
+  background:#0c0c0c !important;
   font-family:"Inter", sans-serif;
+  overflow-x:hidden;
 }
 
 * {
@@ -59,13 +66,10 @@ body{
 }
 
 .bg-img{
-  height: 100vh;
-  width: 100vw;
-  object-fit:cover;
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: -1;
+  width: 100%;
+  max-width: 100%;
+  position: relative;
+  z-index: 0;
 }
 
 /* =========================================================
@@ -77,30 +81,19 @@ body{
   top: 0;
   z-index: 1050;
   background: transparent;
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-  padding: .65rem 1.25rem;
-}
-
-nav::after{
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 120px;
-  background: linear-gradient(to bottom, rgba(0,0,0,.72), transparent);
-  pointer-events: none;
-  z-index: -1;
+  padding: .55rem 1.4rem;
+  border-bottom: 1px solid rgba(255,255,255,.06);
 }
 
 .navbar-brand{
-  font-family: "Inter", sans-serif;
+  font-family: "Anton", "Inter", sans-serif;
   color: #ffffff !important;
-  font-size: 22px;
-  font-weight: 800;
-  letter-spacing: -.5px;
-  margin-right: 2rem;
+  font-size: 24px;
+  font-weight: 400;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-right: 2.25rem;
+  line-height: 1;
 }
 
 .navbar-brand .brand-red{
@@ -112,15 +105,15 @@ nav::after{
 }
 
 .navbar-nav{
-  gap: .25rem;
+  gap: .15rem;
 }
 
 .navbar-nav .nav-link{
   font-family: "Inter", sans-serif;
-  color: #d1d5db !important;
+  color: #c9ced6 !important;
   font-size: 14.5px;
   font-weight: 500;
-  padding: .55rem .95rem;
+  padding: .5rem .95rem;
   border-radius: 8px;
   position: relative;
   transition: color .2s ease, background-color .2s ease;
@@ -128,13 +121,12 @@ nav::after{
 
 .navbar-nav .nav-link:hover{
   color: #ffffff !important;
-  background: rgba(255,255,255,.05);
+  background: rgba(255,255,255,.06);
 }
 
 .navbar-nav .nav-link.active,
 .navbar-nav .nav-link.active:hover{
-  color: #ff3c3c !important;
-  background: rgba(255,60,60,.10);
+  color: #ffffff !important;
   font-weight: 600;
 }
 
@@ -143,10 +135,11 @@ nav::after{
   position: absolute;
   left: .95rem;
   right: .95rem;
-  bottom: .4rem;
+  bottom: .3rem;
   height: 2px;
   border-radius: 2px;
   background: #ff3c3c;
+  box-shadow: 0 0 8px rgba(255,60,60,.6);
 }
 
 /* AUTH AREA */
@@ -154,8 +147,8 @@ nav::after{
 .uzz-auth{
   display: flex;
   align-items: center;
-  gap: .75rem;
-  margin-left: 1rem;
+  gap: .6rem;
+  margin-left: .75rem;
 }
 
 .uzz-auth .btn{
@@ -163,16 +156,17 @@ nav::after{
   border: 1px solid rgba(255,255,255,.14);
   color: #ffffff;
   border-radius: 8px;
-  padding: .45rem 1.1rem;
+  padding: .45rem 1.15rem;
   font-size: 14px;
   font-weight: 600;
-  transition: background-color .2s ease, border-color .2s ease;
+  transition: background-color .2s ease, border-color .2s ease, transform .2s ease;
 }
 
 .uzz-auth .btn:hover{
   background: #ff3c3c;
   border-color: #ff3c3c;
   color: #ffffff;
+  transform: translateY(-1px);
 }
 
 #account-nav .navbar-text{
@@ -195,16 +189,16 @@ nav::after{
 }
 
 .uzz-search-input{
-  width: 250px;
-  background: #151515;
+  width: 230px;
+  background: rgba(21,21,21,.9);
   border: 1px solid rgba(255,255,255,.10);
-  border-radius: 8px;
-  padding: .5rem .9rem;
+  border-radius: 24px;
+  padding: .5rem 1.1rem;
   color: #ffffff;
   font-size: 14px;
   font-family: inherit;
   outline: none;
-  transition: border-color .2s ease, box-shadow .2s ease;
+  transition: border-color .2s ease, box-shadow .2s ease, width .2s ease;
 }
 
 .uzz-search-input::placeholder{
@@ -220,17 +214,18 @@ nav::after{
   background: #ff3c3c;
   border: none;
   color: #ffffff;
-  border-radius: 8px;
-  padding: .5rem 1.1rem;
+  border-radius: 24px;
+  padding: .5rem 1.25rem;
   font-size: 14px;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
-  transition: background-color .2s ease;
+  transition: background-color .2s ease, transform .2s ease;
 }
 
 .uzz-search-btn:hover{
   background: #ff2b2b;
+  transform: translateY(-1px);
 }
 
 /* =========================================================
@@ -240,7 +235,7 @@ nav::after{
 @media (max-width: 991px){
 
 .navbar{
-  padding: .5rem 1rem;
+  padding: .45rem 1rem;
 }
 
 .navbar-toggler{
@@ -254,12 +249,12 @@ nav::after{
 }
 
 .navbar-collapse{
-  background: #151515;
+  background: #141414;
   border: 1px solid rgba(255,255,255,.08);
   border-radius: 14px;
   padding: 16px;
   margin-top: 12px;
-  box-shadow: 0 20px 40px rgba(0,0,0,.45);
+  box-shadow: 0 20px 40px rgba(0,0,0,.5);
 }
 
 .navbar-nav .nav-link{
@@ -269,6 +264,11 @@ nav::after{
 
 .navbar-nav .nav-link.active{
   background: rgba(255,60,60,.12);
+  color: #ff3c3c !important;
+}
+
+.navbar-nav .nav-link.active::after{
+  display: none;
 }
 
 .uzz-auth{
@@ -327,10 +327,11 @@ nav::after{
 }
 
 .footer-logo{
-  font-family: "Inter", sans-serif;
+  font-family: "Anton", "Inter", sans-serif;
   font-size: 26px;
-  font-weight: 800;
-  letter-spacing: -.5px;
+  font-weight: 400;
+  letter-spacing: 1px;
+  text-transform: uppercase;
   margin-bottom: 14px;
   color: #ffffff;
 }
@@ -401,41 +402,6 @@ nav::after{
 </head>
 <body>
 
-<div class="bg-img">
-{% block body %}
-{% endblock %}
-
-
-<footer class="site-footer">
-  <div class="footer-container">
-
-    <h2 class="footer-logo">Uzz<span class="logo-red">UTV</span></h2>
-
-    <p class="footer-text">
-      UzzUTV does not store any files on our server, we only linked to the media which is hosted on 3rd party services.
-    </p>
-    <p class="footer-tip">
-      Tip: Use Brave Browser or ad blocker
-    </p>
-
-    <div class="footer-links">
-      <a href="{% url 'home' %}">Home</a>
-      <a href="{% url 'movie' %}">Movies</a>
-      <a href="{% url 'tv' %}">Series</a>
-      <a href="{% url 'watchlist' %}">Watchlist</a>
-      <a href="{% url 'terms' %}">Terms</a>
-      <a href="{% url 'dmca' %}">DMCA</a>
-    </div>
-
-    <p class="footer-copy">
-      © 2026 UzzUTV. All rights reserved.
-    </p>
-
-  </div>
-</footer>
-
-
-</div>
 <nav class="navbar navbar-expand-lg navbar-dark">
   <div class="container-fluid">
     <a class="navbar-brand" href="{% url 'index'%}">UzzU<span class="brand-red">TV</span></a>
@@ -448,7 +414,7 @@ nav::after{
           <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" aria-current="page" href="{% url 'home'%}">Home</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link {% if request.resolver_match.url_name == 'movie' or request.resolver_match.url_name == 'watchmov' or request.resolver_match.url_name == 'detail' and request.resolver_match.kwargs.type == 'movie' %}active{% endif %}" href="{% url 'movie'%}">Movie</a>
+          <a class="nav-link {% if request.resolver_match.url_name == 'movie' or request.resolver_match.url_name == 'watchmov' or request.resolver_match.url_name == 'detail' and request.resolver_match.kwargs.type == 'movie' %}active{% endif %}" href="{% url 'movie'%}">Movies</a>
         </li>
         <li class="nav-item">
           <a class="nav-link {% if request.resolver_match.url_name == 'tv' or request.resolver_match.url_name == 'watchtv' or request.resolver_match.url_name == 'detail' and request.resolver_match.kwargs.type == 'tv' %}active{% endif %}" href="{% url 'tv'%}">Series</a>
@@ -501,6 +467,44 @@ nav::after{
     </div>
   </div>
 </nav>
+
+
+<div class="bg-img">
+{% block body %}
+{% endblock %}
+
+
+<footer class="site-footer">
+  <div class="footer-container">
+
+    <h2 class="footer-logo">Uzz<span class="logo-red">UTV</span></h2>
+
+    <p class="footer-text">
+      UzzUTV does not store any files on our server, we only linked to the media which is hosted on 3rd party services.
+    </p>
+    <p class="footer-tip">
+      Tip: Use Brave Browser or ad blocker
+    </p>
+
+    <div class="footer-links">
+      <a href="{% url 'home' %}">Home</a>
+      <a href="{% url 'movie' %}">Movies</a>
+      <a href="{% url 'tv' %}">Series</a>
+      <a href="{% url 'watchlist' %}">Watchlist</a>
+      <a href="{% url 'terms' %}">Terms</a>
+      <a href="{% url 'dmca' %}">DMCA</a>
+    </div>
+
+    <p class="footer-copy">
+      © 2026 UzzUTV. All rights reserved.
+    </p>
+
+  </div>
+</footer>
+
+
+</div>
+
 
 
 

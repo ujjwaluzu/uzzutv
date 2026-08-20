@@ -11,6 +11,7 @@ urlpatterns=[
     path("home/", views.home, name="home"),
     path("party/", views.party, name="party"),
     path("party/<str:room_code>/", views.party_room, name="party_room"),
+    path("category/<slug:slug>/", views.category, name="category"),
     path("<str:type>/<int:id>/", views.detail, name="detail"),
     path("watchlist/", views.watchlist, name="watchlist"),
 path("rated/", views.rated, name="rated"),

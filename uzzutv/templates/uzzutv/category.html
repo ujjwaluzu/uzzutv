@@ -1,0 +1,100 @@
+{% extends 'uzzutv/layout.html' %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'uzzutv/home.css' %}">
+<link rel="stylesheet" href="{% static 'uzzutv/category.css' %}">
+{% endblock %}
+
+{% block title %}UzzUTV - {{ category_title }} Movies & Series{% endblock %}
+{% block meta_description %}Explore {{ category_title }} movies and TV series on UzzUTV. Discover what to watch next and stream your favourites instantly.{% endblock %}
+{% block canonical %}<link rel="canonical" href="https://uzzutv.pythonanywhere.com/category/{{ slug }}/">{% endblock %}
+{% block og_title %}UzzUTV - {{ category_title }} Movies & Series{% endblock %}
+{% block og_description %}Explore {{ category_title }} movies and TV series on UzzUTV. Discover what to watch next and stream your favourites instantly.{% endblock %}
+{% block og_url %}https://uzzutv.pythonanywhere.com/category/{{ slug }}/{% endblock %}
+
+{% block body %}
+
+<h1 class="visually-hidden">{{ category_title }} Movies & Series - UzzUTV</h1>
+
+<header class="category-hero">
+    <div class="category-hero-inner">
+        <p class="category-kicker">Browse by genre</p>
+        <h2 class="category-title">{{ category_title }}</h2>
+        <p class="category-sub">Movies &amp; TV series · {{ per_page }} per page</p>
+    </div>
+</header>
+
+{% if items %}
+
+<div class="category-grid">
+
+{% for item in items %}
+
+<div class="movie-card">
+
+{% if item.media_type == "movie" %}
+<a class="card-link" href="{% url 'detail' 'movie' item.id %}">
+{% else %}
+<a class="card-link" href="{% url 'detail' 'tv' item.id %}">
+{% endif %}
+
+<div class="card-poster">
+<img loading="lazy" decoding="async" alt="{% if item.title %}{{ item.title }}{% else %}{{ item.name }}{% endif %} poster" src="https://image.tmdb.org/t/p/w342{{ item.poster_path }}">
+<span class="card-gradient"></span>
+<span class="card-rating">★ {{ item.vote_average|floatformat:1 }}</span>
+</div>
+
+</a>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+{% else %}
+
+<div class="category-empty">
+    <p>No titles found on this page.</p>
+    <a class="view-all" href="{% url 'category' slug %}">Back to page 1</a>
+</div>
+
+{% endif %}
+
+
+{% if total_pages > 1 %}
+<nav class="pagination-wrap" aria-label="Category pages">
+
+    <div class="pagination">
+
+        {% if page > 1 %}
+        <a class="page-link page-arrow" href="{% url 'category' slug %}?page={{ page|add:"-1" }}" rel="prev">← Previous</a>
+        {% else %}
+        <span class="page-link page-arrow disabled" aria-disabled="true">← Previous</span>
+        {% endif %}
+
+        {% for p in pages %}
+            {% if p == "..." %}
+            <span class="page-gap">…</span>
+            {% elif p == page %}
+            <span class="page-link active" aria-current="page">{{ p }}</span>
+            {% else %}
+            <a class="page-link" href="{% url 'category' slug %}?page={{ p }}">{{ p }}</a>
+            {% endif %}
+        {% endfor %}
+
+        {% if page < total_pages %}
+        <a class="page-link page-arrow" href="{% url 'category' slug %}?page={{ page|add:"1" }}" rel="next">Next →</a>
+        {% else %}
+        <span class="page-link page-arrow disabled" aria-disabled="true">Next →</span>
+        {% endif %}
+
+    </div>
+
+    <p class="pagination-info">Page {{ page }} of {{ total_pages }}</p>
+
+</nav>
+{% endif %}
+
+{% endblock %}
