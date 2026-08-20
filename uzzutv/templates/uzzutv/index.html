@@ -1,13 +1,8 @@
 {% load static %}
-
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" type="image/x-icon" href="https://img.icons8.com/?size=100&id=dpUQB4dX6yQC&format=png&color=000000">
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="https://cdn.tailwindcss.com"></script>
 <title>UzzUTV - Movies & TV Series</title>
 <meta name="description" content="UzzUTV is a modern streaming platform for movie and series lovers. Discover trending titles, explore genres and watch films and shows online.">
 <meta name="robots" content="index, follow">
@@ -39,223 +34,545 @@
   }
 }
 </script>
-
+<link rel="icon" type="image/x-icon" href="https://img.icons8.com/?size=100&id=dpUQB4dX6yQC&format=png&color=000000">
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Anton&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- Iconify -->
+<script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+<!-- GSAP & Lenis -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.19/bundled/lenis.min.js"></script>
 <style>
-*{
-box-sizing:border-box;
-}
-body{
-margin:0;
-background:#050505;
-color:#fff;
-font-family:'Manrope', sans-serif;
-}
-.font-manrope{
-font-family:'Manrope', sans-serif;
-}
-.border-gradient{
-position:relative;
-}
-.border-gradient::before{
-content:"";
-position:absolute;
-inset:0;
-border-radius:inherit;
-padding:1px;
-background:linear-gradient(135deg, rgba(255,255,255,0.35), rgba(255,255,255,0.08) 40%, rgba(255,255,255,0.35));
--webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
--webkit-mask-composite:xor;
-mask-composite:exclude;
-pointer-events:none;
-}
-@keyframes fadeSlideIn{
-from{
-opacity:0;
-transform:translateY(24px);
-}
-to{
-opacity:1;
-transform:translateY(0);
-}
-}
-@keyframes marquee-logos{
-0%{
-transform:translateX(0);
-}
-100%{
-transform:translateX(-50%);
-}
-}
+/* Essential Lenis Scroll Resets (Required by library structure) */
+html.lenis { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
+.lenis.lenis-scrolling iframe { pointer-events: none; }
+html, body { overflow-x: clip; }
+
 </style>
-
 </head>
+<body class="text-[#e2e1d3] antialiased selection:bg-[#e2e1d3] selection:text-[#121212] font-['Inter',sans-serif] bg-[#121212] scroll-smooth">
 
-<body>
+    <!-- Header -->
+    <header class="fixed top-0 left-0 w-full z-50 px-6 py-8 mix-blend-difference flex justify-between items-center transition-transform duration-300" id="header">
+        <a href="{% url 'home' %}" class="font-['Anton',sans-serif] text-[clamp(1.25rem,2vw,1.5rem)] uppercase z-50 tracking-tight text-[#e2e1d3]">
+            UzzU<span style="color:#ff0a2f">TV</span>
+        </a>
 
-<div
-  class="bg-center md:pt-32 md:pb-20 bg-[url(https://hoirqrkdgbmvpwutwuwj.supabase.co/storage/v1/object/public/assets/assets/a72ca2f3-9dd1-4fe4-84ba-fe86468a5237_3840w.webp?w=800&q=80)] bg-cover pt-24 pb-12 relative"
-  style="mask-image: linear-gradient(180deg, transparent, black 0%, black 70%, transparent); -webkit-mask-image: linear-gradient(180deg, transparent, black 0%, black 70%, transparent);">
-  <div class="lg:px-8 md:mt-20 md:mb-40 sm:px-6 max-w-7xl mt-12 mr-auto mb-20 ml-auto pr-4 pl-4">
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-      <!-- Left Content -->
-      <div class="lg:col-span-7 space-y-4 sm:space-y-6">
-        <div class="[animation:fadeSlideIn_0.8s_ease-out_0.2s_both] animate">
-          <div
-            class="border-gradient inline-flex before:rounded-full bg-white/5 rounded-full pt-2 pr-3 sm:pr-4 pb-2 pl-3 sm:pl-4 backdrop-blur-lg gap-x-2 sm:gap-x-3 gap-y-2 sm:gap-y-3 items-center">
-            <span class="text-[10px] sm:text-xs tracking-wider uppercase flex items-center gap-1.5 sm:gap-2 font-sans text-zinc-300">
-                  Ultimate Streaming Platform
-                  <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" width="14" height="14" viewBox="0 0 24 24" data-icon="solar:star-bold-duotone" class="iconify text-white iconify--solar sm:w-4 sm:h-4"><path fill="currentColor" d="M18.483 16.767A8.5 8.5 0 0 1 8.118 7.081a1 1 0 0 1-.113.097c-.28.213-.63.292-1.33.45l-.635.144c-2.46.557-3.69.835-3.983 1.776c-.292.94.546 1.921 2.223 3.882l.434.507c.476.557.715.836.822 1.18c.107.345.071.717-.001 1.46l-.066.677c-.253 2.617-.38 3.925.386 4.506s1.918.052 4.22-1.009l.597-.274c.654-.302.981-.452 1.328-.452s.674.15 1.329.452l.595.274c2.303 1.06 3.455 1.59 4.22 1.01c.767-.582.64-1.89.387-4.507z" class=""></path><path fill="currentColor" d="m9.153 5.408l-.328.588c-.36.646-.54.969-.82 1.182q.06-.045.113-.097a8.5 8.5 0 0 0 10.366 9.686l-.02-.19c-.071-.743-.107-1.115 0-1.46c.107-.344.345-.623.822-1.18l.434-.507c1.677-1.96 2.515-2.941 2.222-3.882c-.292-.941-1.522-1.22-3.982-1.776l-.636-.144c-.699-.158-1.049-.237-1.33-.45c-.28-.213-.46-.536-.82-1.182l-.327-.588C13.58 3.136 12.947 2 12 2s-1.58 1.136-2.847 3.408" opacity=".5" class=""></path></svg>
-                </span>
-          </div>
-        </div>
+        <button class="relative z-50 w-8 h-4 flex flex-col justify-between items-end group focus:outline-none" aria-label="Toggle Menu" id="menu-btn">
+            <span id="hamburger-line-1" class="w-full h-[2px] bg-[#e2e1d3] origin-center transition-all duration-300 ease-in-out"></span>
+            <span id="hamburger-line-2" class="w-3/4 h-[2px] bg-[#e2e1d3] origin-center transition-all duration-300 ease-in-out group-hover:w-full"></span>
+            <span id="hamburger-line-3" class="w-full h-[2px] bg-[#e2e1d3] origin-center transition-all duration-300 ease-in-out"></span>
+        </button>
+    </header>
 
-        <h1
-          class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl leading-[0.9] [animation:fadeSlideIn_0.8s_ease-out_0.3s_both] font-medium tracking-tighter font-manrope drop-shadow-lg animate"
-          style="mask-image: linear-gradient(150deg, transparent, black 0%, black 40%, transparent); -webkit-mask-image: linear-gradient(150deg, transparent, black 0%, black 40%, transparent);">
-          Stream Movies &<br>
-          <span class="bg-clip-text font-medium text-transparent tracking-tighter font-manrope bg-gradient-to-br from-white to-[#ffcd75] pr-1">TV Series</span><br>
-              Free Online
-        </h1>
-
-        <p
-          class="[animation:fadeSlideIn_0.8s_ease-out_0.4s_both] text-base sm:text-lg text-white/70 max-w-xl animate">
-          UzzUTV brings timeless classics and the latest trending releases together in one place. Discover titles, explore
-          genres, and dive into immersive stories filled with action, drama, thriller, and emotion.
-        </p>
-
-        <div
-          class="flex flex-col sm:flex-row gap-3 sm:gap-4 [animation:fadeSlideIn_0.8s_ease-out_0.5s_both] animate">
-          <a href="{% url 'home' %}">
-          <button class="group inline-flex transition-all duration-300 hover:shadow-lg hover:bg-zinc-200 text-sm font-medium text-zinc-900 bg-white rounded-full pt-3 sm:pt-4 pr-6 sm:pr-8 pb-3 sm:pb-4 pl-6 sm:pl-8 shadow-[5.7px_5.7px_8.6px_rgba(0,_0,_0,_0.07),_13.7px_13.7px_10.9px_rgba(0,_0,_0,_0.099),_25.7px_25.7px_20.5px_rgba(0,_0,_0,_0.123),_45.8px_45.8px_36.6px_rgba(0,_0,_0,_0.147),_85.8px_85.8px_68.5px_rgba(0,_0,_0,_0.176),_205px_205px_163.4px_rgba(0,_0,_0,_0.246)] gap-x-2 sm:gap-x-3 gap-y-2 sm:gap-y-3 items-center justify-center">
-                <span class="font-sans">Start Watching</span>
-                <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" width="16" height="16" viewBox="0 0 24 24" data-icon="solar:arrow-right-bold-duotone" class="iconify group-hover:translate-x-1 transition-transform iconify--solar"><path fill="currentColor" fill-rule="evenodd" d="M3.25 12a.75.75 0 0 1 .75-.75h9.25v1.5H4a.75.75 0 0 1-.75-.75" clip-rule="evenodd" opacity=".5" class=""></path><path fill="currentColor" d="M13.25 12.75V18a.75.75 0 0 0 1.28.53l6-6a.75.75 0 0 0 0-1.06l-6-6a.75.75 0 0 0-1.28.53z" class=""></path></svg>
-              </button>
-          </a>
-
-          <a href="{% url 'home' %}">
-          <button class="group inline-flex hover:text-white transition-all duration-300 hover:border-white hover:bg-white/5 text-sm font-medium text-zinc-300 border-white/20 border rounded-full pt-3 sm:pt-4 pr-6 sm:pr-8 pb-3 sm:pb-4 pl-6 sm:pl-8 gap-x-2 sm:gap-x-3 gap-y-2 sm:gap-y-3 items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" width="16" height="16" viewBox="0 0 24 24" data-icon="solar:play-bold-duotone" class="iconify iconify--solar"><path fill="currentColor" fill-rule="evenodd" d="M23 12c0-1.035-.53-2.07-1.591-2.647L8.597 2.385C6.534 1.264 4 2.724 4 5.033V12z" clip-rule="evenodd" class=""></path><path fill="currentColor" d="m8.597 21.615l12.812-6.968A2.99 2.99 0 0 0 23 12H4v6.967c0 2.31 2.534 3.769 4.597 2.648" opacity=".5" class=""></path></svg>
-                <span class="font-sans">Browse Series</span>
-              </button>
-          </a>
-        </div>
-      </div>
-
-      <!-- Right Stats -->
-      <div class="lg:col-span-5 space-y-4 sm:space-y-6">
-        <div
-          class="overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] border-gradient before:rounded-3xl bg-gradient-to-br from-white/10 via-white/0 to-white/10 w-full h-fit rounded-2xl sm:rounded-3xl relative shadow-[2.8px_2.8px_2.2px_rgba(0,_0,_0,_0.034),_6.7px_6.7px_5.3px_rgba(0,_0,_0,_0.048),_12.5px_12.5px_10px_rgba(0,_0,_0,_0.06),_22.3px_22.3px_17.9px_rgba(0,_0,_0,_0.072),_41.8px_41.8px_33.4px_rgba(0,_0,_0,_0.086),_100px_100px_80px_rgba(0,_0,_0,_0.12)]"
-          style="backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px)">
-          <div
-            class="[animation:fadeSlideIn_0.8s_ease-out_0.6s_both] pt-6 sm:pt-8 pr-6 sm:pr-8 pb-6 sm:pb-8 pl-6 sm:pl-8 relative animate">
-            <div class="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
-              <div
-                class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl ring-1 flex items-center justify-center bg-white/10 ring-white/20">
-                <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" width="20" height="20"
-                  viewBox="0 0 24 24" data-icon="solar:target-bold-duotone"
-                  class="iconify text-white iconify--solar sm:w-6 sm:h-6">
-                  <path fill="currentColor" d="M22 12c0 5.523-4.477 10-10 10S2 17.523 2 12S6.477 2 12 2s10 4.477 10 10"
-                    opacity=".5" class=""></path>
-                  <path fill="currentColor"
-                    d="M9.25 12a.75.75 0 0 1 .75-.75h1.25V10a.75.75 0 0 1 1.5 0v1.25H14a.75.75 0 0 1 0 1.5h-1.25V14a.75.75 0 0 1-1.5 0v-1.25H10a.75.75 0 0 1-.75-.75m-7.222.75a10 10 0 0 1 0-1.5H5a.75.75 0 0 1 0 1.5zm10.722 9.222a10 10 0 0 1-1.5 0V19a.75.75 0 0 1 1.5 0zm9.222-10.722a10 10 0 0 1 0 1.5H19a.75.75 0 0 1 0-1.5zM12.75 2.028V5a.75.75 0 0 1-1.5 0V2.028a10 10 0 0 1 1.5 0"
-                    class=""></path>
-                </svg>
-              </div>
-              <div>
-                <div class="text-2xl sm:text-3xl tracking-tighter font-manrope font-medium">10,000+</div>
-                <div class="text-xs sm:text-sm text-white/70 font-sans">Movies & Series</div>
-              </div>
-            </div>
-
-            <div class="space-y-3 sm:space-y-4 mb-4 sm:mb-6">
-              <div class="flex items-center justify-between">
-                <span class="text-xs sm:text-sm text-white/70 font-sans">Streaming Uptime</span>
-                <span class="text-xs sm:text-sm font-sans">99%</span>
-              </div>
-              <div class="h-1.5 sm:h-2 bg-zinc-800 rounded-full overflow-hidden">
-                <div class="h-full bg-gradient-to-r rounded-full from-white to-white/70" style="width: 99%;"></div>
-              </div>
-            </div>
-
-            <div class="h-px w-full bg-gradient-to-r from-transparent via-white/25 to-transparent my-3 sm:my-4"></div>
-
-            <div class="flex justify-between mb-3 sm:mb-4 gap-2">
-              <div
-                class="text-center px-1 sm:px-2 cursor-pointer transition-all duration-300 rounded-xl sm:rounded-2xl hover:bg-white/5 hover:-translate-y-0.5 flex-1">
-                <div
-                  class="text-xl sm:text-2xl leading-tight bg-gradient-to-r from-white/95 to-neutral-200/80 bg-clip-text text-transparent font-sans font-medium">
-                  4K</div>
-                <div class="text-[10px] sm:text-xs opacity-70 uppercase tracking-wide font-sans">Ultra HD</div>
-              </div>
-              <div class="w-px h-10 sm:h-12 my-auto bg-gradient-to-b from-transparent via-white/40 to-transparent">
-              </div>
-              <div
-                class="text-center px-1 sm:px-2 cursor-pointer transition-all duration-300 rounded-xl sm:rounded-2xl hover:bg-white/5 hover:-translate-y-0.5 flex-1">
-                <div
-                  class="text-xl sm:text-2xl leading-tight bg-gradient-to-r from-white/95 to-neutral-200/80 bg-clip-text text-transparent font-sans font-medium">
-                  24/7</div>
-                <div class="text-[10px] sm:text-xs opacity-70 uppercase tracking-wide font-sans">Streaming</div>
-              </div>
-              <div class="w-px h-10 sm:h-12 my-auto bg-gradient-to-b from-transparent via-white/40 to-transparent">
-              </div>
-              <div
-                class="text-center px-1 sm:px-2 cursor-pointer transition-all duration-300 rounded-xl sm:rounded-2xl hover:bg-white/5 hover:-translate-y-0.5 flex-1">
-                <div
-                  class="text-xl sm:text-2xl leading-tight bg-gradient-to-r from-white/95 to-neutral-200/80 bg-clip-text text-transparent font-sans font-medium">
-                  100%</div>
-                <div class="text-[10px] sm:text-xs opacity-70 uppercase tracking-wide font-sans">Free</div>
-              </div>
-            </div>
-
-            <div class="flex flex-wrap gap-1.5 sm:gap-2">
-              <span class="inline-flex items-center gap-1 text-[10px] sm:text-xs px-2 py-1 rounded-full bg-white/10 border border-white/20 text-zinc-300 cursor-pointer transition-all duration-300 hover:-translate-y-px font-sans">
-                    <div class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white animate-pulse"></div>
-                    LIVE NOW
-                  </span>
-              <span class="inline-flex items-center gap-1 text-[10px] sm:text-xs px-2 py-1 rounded-full bg-white/10 border border-white/20 text-zinc-300 cursor-pointer transition-all duration-300 hover:-translate-y-px font-sans">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" class="iconify iconify--solar sm:w-3 sm:h-3"><path fill="currentColor" d="M18.483 16.767A8.5 8.5 0 0 1 8.118 7.081a1 1 0 0 1-.113.097c-.28.213-.63.292-1.33.45l-.635.144c-2.46.557-3.69.835-3.983 1.776c-.292.94.546 1.921 2.223 3.882l.434.507c.476.557.715.836.822 1.18c.107.345.071.717-.001 1.46l-.066.677c-.253 2.617-.38 3.925.386 4.506s1.918.052 4.22-1.009l.597-.274c.654-.302.981-.452 1.328-.452s.674.15 1.329.452l.595.274c2.303 1.06 3.455 1.59 4.22 1.01c.767-.582.64-1.89.387-4.507z" class=""></path><path fill="currentColor" d="m9.153 5.408l-.328.588c-.36.646-.54.969-.82 1.182q.06-.045.113-.097a8.5 8.5 0 0 0 10.366 9.686l-.02-.19c-.071-.743-.107-1.115 0-1.46c.107-.344.345-.623.822-1.18l.434-.507c1.677-1.96 2.515-2.941 2.222-3.882c-.292-.941-1.522-1.22-3.982-1.776l-.636-.144c-.699-.158-1.049-.237-1.33-.45c-.28-.213-.46-.536-.82-1.182l-.327-.588C13.58 3.136 12.947 2 12 2s-1.58 1.136-2.847 3.408" opacity=".5" class=""></path></svg>
-                    HD QUALITY
-                  </span>
-            </div>
-          </div>
-        </div>
-
-        <div
-          class="overflow-hidden transition-all duration-300 [animation:fadeSlideIn_0.8s_ease-out_0.7s_both] border-gradient before:rounded-3xl bg-gradient-to-br from-white/10 via-white/0 to-white/10 w-full h-fit rounded-2xl sm:rounded-3xl relative shadow-[4px_4px_6px_rgba(0,_0,_0,_0.049),_9.6px_9.6px_7.6px_rgba(0,_0,_0,_0.069),_18px_18px_14.3px_rgba(0,_0,_0,_0.086),_32px_32px_25.6px_rgba(0,_0,_0,_0.103),_60px_60px_47.8px_rgba(0,_0,_0,_0.123),_143px_143px_114.3px_rgba(0,_0,_0,_0.172)] animate"
-          style="backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px)">
-          <div class="pt-6 sm:pt-8 pr-6 sm:pr-8 pb-6 sm:pb-8 pl-6 sm:pl-8 relative">
-            <h3 class="text-base sm:text-lg mb-3 sm:mb-4 font-sans">Trending Genres</h3>
-            <div class="overflow-hidden relative">
-              <div
-                style="mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent); -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);"
-                class="">
-                <div class="flex gap-4 sm:gap-6 will-change-transform"
-                  style="animation: marquee-logos 30s linear infinite;">
-                  <div class="flex gap-4 sm:gap-6 shrink-0">
-                    <span class="inline-flex items-center justify-center text-zinc-400 mix-blend-screen font-semibold tracking-widest uppercase w-[120px] sm:w-[150px] h-[32px] sm:h-[40px] text-sm sm:text-base">Action</span>
-                    <span class="inline-flex items-center justify-center text-zinc-400 mix-blend-screen font-semibold tracking-widest uppercase w-[120px] sm:w-[150px] h-[32px] sm:h-[40px] text-sm sm:text-base">Comedy</span>
-                    <span class="inline-flex items-center justify-center text-zinc-400 mix-blend-screen font-semibold tracking-widest uppercase w-[120px] sm:w-[150px] h-[32px] sm:h-[40px] text-sm sm:text-base">Drama</span>
-                    <span class="inline-flex items-center justify-center text-zinc-400 mix-blend-screen font-semibold tracking-widest uppercase w-[120px] sm:w-[150px] h-[32px] sm:h-[40px] text-sm sm:text-base">Thriller</span>
-                    <span class="inline-flex items-center justify-center text-zinc-400 mix-blend-screen font-semibold tracking-widest uppercase w-[120px] sm:w-[150px] h-[32px] sm:h-[40px] text-sm sm:text-base">Sci-Fi</span>
-                    <span class="inline-flex items-center justify-center text-zinc-400 mix-blend-screen font-semibold tracking-widest uppercase w-[120px] sm:w-[150px] h-[32px] sm:h-[40px] text-sm sm:text-base">Horror</span>
-                  </div>
-                  <div class="flex gap-4 sm:gap-6 shrink-0">
-                    <span class="inline-flex items-center justify-center text-zinc-400 mix-blend-screen font-semibold tracking-widest uppercase w-[120px] sm:w-[150px] h-[32px] sm:h-[40px] text-sm sm:text-base">Action</span>
-                    <span class="inline-flex items-center justify-center text-zinc-400 mix-blend-screen font-semibold tracking-widest uppercase w-[120px] sm:w-[150px] h-[32px] sm:h-[40px] text-sm sm:text-base">Comedy</span>
-                    <span class="inline-flex items-center justify-center text-zinc-400 mix-blend-screen font-semibold tracking-widest uppercase w-[120px] sm:w-[150px] h-[32px] sm:h-[40px] text-sm sm:text-base">Drama</span>
-                    <span class="inline-flex items-center justify-center text-zinc-400 mix-blend-screen font-semibold tracking-widest uppercase w-[120px] sm:w-[150px] h-[32px] sm:h-[40px] text-sm sm:text-base">Thriller</span>
-                    <span class="inline-flex items-center justify-center text-zinc-400 mix-blend-screen font-semibold tracking-widest uppercase w-[120px] sm:w-[150px] h-[32px] sm:h-[40px] text-sm sm:text-base">Sci-Fi</span>
-                    <span class="inline-flex items-center justify-center text-zinc-400 mix-blend-screen font-semibold tracking-widest uppercase w-[120px] sm:w-[150px] h-[32px] sm:h-[40px] text-sm sm:text-base">Horror</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+    <!-- Fullscreen Menu Overlay -->
+    <div class="fixed flex flex-col transition-opacity duration-500 ease-in-out z-40 pr-10 pl-10 top-0 right-0 bottom-0 left-0 gap-x-6 gap-y-6 justify-center opacity-0 pointer-events-none bg-[#121212]" id="menu-overlay">
+        <nav class="flex flex-col text-[clamp(2rem,6vw,5rem)] uppercase leading-none tracking-tight font-['Anton',sans-serif] text-left gap-x-6 gap-y-6 text-[#e2e1d3]">
+            <a href="{% url 'home' %}" class="relative inline-block w-fit translate-y-8 opacity-0 menu-item after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-[1px] after:bottom-0 after:left-0 after:bg-current after:origin-bottom-right after:transition-transform after:duration-[400ms] after:ease-[cubic-bezier(0.86,0,0.07,1)] hover:after:scale-x-100 hover:after:origin-bottom-left">
+                Home
+            </a>
+            <a href="{% url 'movie' %}" class="relative inline-block w-fit translate-y-8 opacity-0 menu-item after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-[1px] after:bottom-0 after:left-0 after:bg-current after:origin-bottom-right after:transition-transform after:duration-[400ms] after:ease-[cubic-bezier(0.86,0,0.07,1)] hover:after:scale-x-100 hover:after:origin-bottom-left">
+                Movies
+            </a>
+            <a href="{% url 'tv' %}" class="relative inline-block w-fit translate-y-8 opacity-0 menu-item after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-[1px] after:bottom-0 after:left-0 after:bg-current after:origin-bottom-right after:transition-transform after:duration-[400ms] after:ease-[cubic-bezier(0.86,0,0.07,1)] hover:after:scale-x-100 hover:after:origin-bottom-left">
+                Series
+            </a>
+            <a href="{% url 'watchlist' %}" class="relative inline-block w-fit translate-y-8 opacity-0 menu-item after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-[1px] after:bottom-0 after:left-0 after:bg-current after:origin-bottom-right after:transition-transform after:duration-[400ms] after:ease-[cubic-bezier(0.86,0,0.07,1)] hover:after:scale-x-100 hover:after:origin-bottom-left">
+                Watchlist
+            </a>
+        </nav>
     </div>
-  </div>
-</div>
 
-</body>
-</html>
+    <main>
+        <!-- Hero Section -->
+        <section class="min-h-screen flex justify-center overflow-hidden w-full pt-0 pb-0 relative items-center" id="hero">
+            <div class="text-center w-full max-w-[94vw] mx-auto relative flex flex-col items-center justify-center">
+                <div class="absolute inset-0 flex justify-center items-center pointer-events-none z-0">
+                    <div class="text-[clamp(10rem,40vw,50rem)] font-['Anton',sans-serif] leading-none text-[#ff0a2f] blur-[40px] md:blur-[60px] opacity-70 select-none mix-blend-screen" id="hero-glow">
+                        TV
+                    </div>
+                </div>
+
+                <div class="relative z-10 max-w-[85vw] md:max-w-[70vw] text-center w-full">
+                    <h1 class="font-['Anton',sans-serif] text-[clamp(3.5rem,10vw,12rem)] uppercase text-[#e2e1d3] leading-none tracking-tight text-center">
+                        <div class="overflow-hidden text-center w-full">
+                            <span class="inline-block translate-y-full title-word">WATCH</span>
+                            <span class="inline-block translate-y-full title-word">MOVIES</span>
+                        </div>
+                        <div class="overflow-hidden text-center w-full">
+                            <span class="inline-block translate-y-full title-word">&amp;</span>
+                            <span class="inline-block translate-y-full title-word">SERIES</span>
+                        </div>
+                    </h1>
+                </div>
+            </div>
+        </section>
+
+        <!-- About / Video Intro -->
+        <section class="relative w-full min-h-screen py-40 md:py-32 px-4 flex justify-center items-center bg-[#0d1210] overflow-hidden">
+            <div class="absolute left-0 top-0 w-[40%] h-full bg-[#ff1a1a]/20 blur-[150px] pointer-events-none rounded-r-full transform -translate-x-1/2"></div>
+            <div class="absolute right-0 top-0 w-[40%] h-full bg-[#ff1a1a]/20 blur-[150px] pointer-events-none rounded-l-full transform translate-x-1/2"></div>
+            
+            <div class="relative z-10 flex flex-col items-center justify-center font-['Anton',sans-serif] uppercase text-[#ff1a1a] leading-[0.85] text-[clamp(3.5rem,10vw,10rem)] tracking-tight text-center select-none" style="text-shadow: 0 0 40px rgba(255,26,26,0.5), 0 0 80px rgba(255,26,26,0.2)">
+                
+                <div class="relative whitespace-nowrap">
+                    A STREAMING DESTINATION
+                    <svg class="absolute left-[15%] -bottom-[10%] w-[35%] h-auto text-white/95 drop-shadow-md z-20" viewBox="0 0 100 20" fill="none" stroke="currentColor" stroke-linecap="round">
+                        <path d="M0 10 Q 50 0 100 15" stroke-width="4"></path>
+                        <path d="M5 13 Q 50 3 95 18" stroke-width="2" opacity="0.6"></path>
+                    </svg>
+                </div>
+                
+                <div class="relative whitespace-nowrap mt-2">
+                    <svg class="absolute -left-[12%] bottom-[10%] w-[12%] h-auto text-white/95 drop-shadow-md z-20" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-linecap="round">
+                        <path d="M25 25 L75 75 M75 25 L25 75" stroke-width="8"></path>
+                        <path d="M30 20 L70 80 M80 30 L20 70" stroke-width="4" opacity="0.7"></path>
+                    </svg>
+                    BUILT FOR
+                    <svg class="absolute -right-[15%] top-[0%] w-[15%] h-auto text-white/95 drop-shadow-md z-20" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M30 70 L70 30 M70 30 L40 25 M70 30 L75 60" stroke-width="6"></path>
+                        <path d="M32 72 L72 32 M72 32 L42 27 M72 32 L77 62" stroke-width="3" opacity="0.6"></path>
+                    </svg>
+                </div>
+                
+                <div class="relative whitespace-nowrap mt-2">
+                    MOVIE
+                    <span class="text-[clamp(1.5rem,4vw,3.5rem)] z-20 whitespace-nowrap font-medium text-white tracking-tight absolute top-[-10%] left-[130%] -rotate-6 font-['Caveat',cursive]" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.6)); text-shadow: none">
+                        AND SERIES LOVERS
+                    </span>
+                </div>
+                
+                <div class="relative whitespace-nowrap mt-2">
+                    <span class="absolute left-[5%] top-[10%] text-white text-[clamp(1.5rem,4vw,3.5rem)] font-medium italic tracking-tight -rotate-12 z-20 font-['Caveat',cursive]" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.6)); text-shadow: none;">
+                        STREAM
+                    </span>
+                    FROM TIMELESS
+                    <span class="absolute left-[42%] top-[30%] text-white text-[clamp(1.5rem,4vw,3.5rem)] font-medium italic tracking-tight -rotate-3 z-20 whitespace-nowrap font-['Caveat',cursive]" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.6)); text-shadow: none">
+                        CLASSICS TO TRENDING RELEASES
+                    </span>
+                </div>
+                
+                <div class="relative whitespace-nowrap mt-2">
+                    ACTION, DRAMA
+                    <svg class="absolute right-[12%] top-[20%] w-[6%] h-auto text-white/95 drop-shadow-md z-20" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-linecap="round">
+                        <path d="M25 25 L75 75 M75 25 L25 75" stroke-width="10"></path>
+                    </svg>
+                </div>
+                
+                <div class="relative whitespace-nowrap mt-2">
+                    THRILLER &amp; MORE
+                </div>
+                
+            </div>
+        </section>
+
+        <!-- Portfolio Grid Section -->
+        <section class="z-20 reveal-up opacity-0 w-full pt-32 pr-[30px] pb-16 pl-[30px] relative translate-y-10">
+            <div class="w-full flex justify-between items-end mb-10">
+                <h2 class="font-['Anton',sans-serif] text-[clamp(3rem,6vw,6rem)] uppercase leading-none tracking-tight text-[#e2e1d3]">
+                    Trending Genres
+                </h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+                
+                <!-- Movie Genre 1 -->
+                <div class="relative aspect-square w-full overflow-hidden group cursor-pointer bg-[#0a0a0a]">
+                    {% if genre_movies.action.poster_path %}
+                    <img src="https://image.tmdb.org/t/p/w780{{ genre_movies.action.poster_path }}" alt="Action" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                    {% else %}
+                    <img src="https://images.pexels.com/photos/16516/pexels-photo.jpg" alt="Action" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                    {% endif %}
+                    <div class="absolute inset-0 bg-[#121212]/80 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-center items-center text-center p-6 backdrop-blur-sm">
+                        <h3 class="font-['Anton',sans-serif] text-[clamp(2.5rem,5vw,4rem)] text-white uppercase tracking-tight leading-none mb-3 translate-y-8 group-hover:translate-y-0 transition-transform duration-500 ease-out">
+                            Action
+                        </h3>
+                        <p class="font-['Inter',sans-serif] text-[#e2e1d3]/80 uppercase tracking-widest text-sm translate-y-8 group-hover:translate-y-0 transition-transform duration-500 ease-out delay-75 font-normal">
+                            Adrenaline Filled
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Movie Genre 2 -->
+                <div class="relative aspect-square w-full overflow-hidden group cursor-pointer bg-[#0a0a0a]">
+                    {% if genre_movies.comedy.poster_path %}
+                    <img src="https://image.tmdb.org/t/p/w780{{ genre_movies.comedy.poster_path }}" alt="Comedy" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                    {% else %}
+                    <img src="https://images.pexels.com/photos/2672097/pexels-photo-2672097.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Comedy" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                    {% endif %}
+                    <div class="absolute inset-0 bg-[#121212]/80 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-center items-center text-center p-6 backdrop-blur-sm">
+                        <h3 class="font-['Anton',sans-serif] text-[clamp(2.5rem,5vw,4rem)] text-white uppercase tracking-tight leading-none mb-3 translate-y-8 group-hover:translate-y-0 transition-transform duration-500 ease-out">
+                            Comedy
+                        </h3>
+                        <p class="font-['Inter',sans-serif] text-[#e2e1d3]/80 uppercase tracking-widest text-sm translate-y-8 group-hover:translate-y-0 transition-transform duration-500 ease-out delay-75 font-normal">
+                            Laugh Out Loud
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Movie Genre 3 -->
+                <div class="relative aspect-square w-full overflow-hidden group cursor-pointer bg-[#0a0a0a]">
+                    {% if genre_movies.thriller.poster_path %}
+                    <img src="https://image.tmdb.org/t/p/w780{{ genre_movies.thriller.poster_path }}" alt="Thriller" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                    {% else %}
+                    <img src="https://images.pexels.com/photos/3709371/pexels-photo-3709371.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Thriller" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                    {% endif %}
+                    <div class="absolute inset-0 bg-[#121212]/80 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-center items-center text-center p-6 backdrop-blur-sm">
+                        <h3 class="font-['Anton',sans-serif] text-[clamp(2.5rem,5vw,4rem)] text-white uppercase tracking-tight leading-none mb-3 translate-y-8 group-hover:translate-y-0 transition-transform duration-500 ease-out">
+                            Thriller
+                        </h3>
+                        <p class="font-['Inter',sans-serif] text-[#e2e1d3]/80 uppercase tracking-widest text-sm translate-y-8 group-hover:translate-y-0 transition-transform duration-500 ease-out delay-75 font-normal">
+                            Edge Of Your Seat
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Movie Genre 4 -->
+                <div class="relative aspect-square w-full overflow-hidden group cursor-pointer bg-[#0a0a0a]">
+                    {% if genre_movies.scifi.poster_path %}
+                    <img src="https://image.tmdb.org/t/p/w780{{ genre_movies.scifi.poster_path }}" alt="Sci-Fi" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                    {% else %}
+                    <img src="https://images.pexels.com/photos/436413/pexels-photo-436413.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Sci-Fi" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                    {% endif %}
+                    <div class="absolute inset-0 bg-[#121212]/80 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-center items-center text-center p-6 backdrop-blur-sm">
+                        <h3 class="font-['Anton',sans-serif] text-[clamp(2.5rem,5vw,4rem)] text-white uppercase tracking-tight leading-none mb-3 translate-y-8 group-hover:translate-y-0 transition-transform duration-500 ease-out">
+                            Sci-Fi
+                        </h3>
+                        <p class="font-['Inter',sans-serif] text-[#e2e1d3]/80 uppercase tracking-widest text-sm translate-y-8 group-hover:translate-y-0 transition-transform duration-500 ease-out delay-75 font-normal">
+                            Beyond Imagination
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Features Stack -->
+        <section class="flex flex-col z-20 py-24 md:py-32 relative items-center bg-[#ebebeb] min-h-screen justify-center w-full overflow-hidden">
+            <ul class="w-full flex flex-col items-center justify-center group/list">
+                
+                <!-- Item 1 -->
+                <li class="group/item relative w-full text-center flex items-center justify-center py-2 md:py-1">
+                    <span class="font-['Anton',sans-serif] text-[clamp(2.5rem,8vw,8rem)] leading-[0.85] uppercase tracking-tighter text-[#111111] md:text-[#c4c4c4] transition-all duration-500 ease-out md:group-hover/list:opacity-20 md:group-hover/item:!opacity-100 md:group-hover/item:!text-[#111111] cursor-pointer inline-block z-20 relative will-change-auto">
+                        ACTION
+                    </span>
+                    {% if genre_movies.action.stack_poster_path %}
+                    <img src="https://image.tmdb.org/t/p/w780{{ genre_movies.action.stack_poster_path }}" alt="Action" class="hidden md:block absolute left-4 top-1/2 -translate-y-1/2 w-[20vw] max-w-[350px] aspect-[16/10] object-cover rounded-2xl opacity-0 md:group-hover/item:opacity-100 transition-all duration-500 ease-out pointer-events-none z-10 shadow-[0_20px_50px_rgba(0,0,0,0.3)] scale-95 md:group-hover/item:scale-100 will-change-transform">
+                    {% else %}
+                    <img src="https://images.pexels.com/photos/16516/pexels-photo.jpg" alt="Action" class="hidden md:block absolute left-4 top-1/2 -translate-y-1/2 w-[20vw] max-w-[350px] aspect-[16/10] object-cover rounded-2xl opacity-0 md:group-hover/item:opacity-100 transition-all duration-500 ease-out pointer-events-none z-10 shadow-[0_20px_50px_rgba(0,0,0,0.3)] scale-95 md:group-hover/item:scale-100 will-change-transform">
+                    {% endif %}
+                </li>
+
+                <!-- Item 2 -->
+                <li class="group/item relative w-full text-center flex items-center justify-center py-2 md:py-1">
+                    <span class="font-['Anton',sans-serif] text-[clamp(2.5rem,8vw,8rem)] leading-[0.85] uppercase tracking-tighter text-[#111111] md:text-[#c4c4c4] transition-all duration-500 ease-out md:group-hover/list:opacity-20 md:group-hover/item:!opacity-100 md:group-hover/item:!text-[#111111] cursor-pointer inline-block z-20 relative will-change-auto">
+                        COMEDY
+                    </span>
+                    {% if genre_movies.comedy.stack_poster_path %}
+                    <img src="https://image.tmdb.org/t/p/w780{{ genre_movies.comedy.stack_poster_path }}" alt="Comedy" class="hidden md:block absolute left-4 top-1/2 -translate-y-1/2 w-[20vw] max-w-[350px] aspect-[16/10] object-cover rounded-2xl opacity-0 md:group-hover/item:opacity-100 transition-all duration-500 ease-out pointer-events-none z-10 shadow-[0_20px_50px_rgba(0,0,0,0.3)] scale-95 md:group-hover/item:scale-100 will-change-transform">
+                    {% else %}
+                    <img src="https://images.pexels.com/photos/2672097/pexels-photo-2672097.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Comedy" class="hidden md:block absolute left-4 top-1/2 -translate-y-1/2 w-[20vw] max-w-[350px] aspect-[16/10] object-cover rounded-2xl opacity-0 md:group-hover/item:opacity-100 transition-all duration-500 ease-out pointer-events-none z-10 shadow-[0_20px_50px_rgba(0,0,0,0.3)] scale-95 md:group-hover/item:scale-100 will-change-transform">
+                    {% endif %}
+                </li>
+
+                <!-- Item 3 -->
+                <li class="group/item relative w-full text-center flex items-center justify-center py-2 md:py-1">
+                    <span class="font-['Anton',sans-serif] text-[clamp(2.5rem,8vw,8rem)] leading-[0.85] uppercase tracking-tighter text-[#111111] md:text-[#c4c4c4] transition-all duration-500 ease-out md:group-hover/list:opacity-20 md:group-hover/item:!opacity-100 md:group-hover/item:!text-[#111111] cursor-pointer inline-block z-20 relative will-change-auto">
+                        THRILLER
+                    </span>
+                    {% if genre_movies.thriller.stack_poster_path %}
+                    <img src="https://image.tmdb.org/t/p/w780{{ genre_movies.thriller.stack_poster_path }}" alt="Thriller" class="hidden md:block absolute left-4 top-1/2 -translate-y-1/2 w-[20vw] max-w-[350px] aspect-[16/10] object-cover rounded-2xl opacity-0 md:group-hover/item:opacity-100 transition-all duration-500 ease-out pointer-events-none z-10 shadow-[0_20px_50px_rgba(0,0,0,0.3)] scale-95 md:group-hover/item:scale-100 will-change-transform">
+                    {% else %}
+                    <img src="https://images.pexels.com/photos/3709371/pexels-photo-3709371.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Thriller" class="hidden md:block absolute left-4 top-1/2 -translate-y-1/2 w-[20vw] max-w-[350px] aspect-[16/10] object-cover rounded-2xl opacity-0 md:group-hover/item:opacity-100 transition-all duration-500 ease-out pointer-events-none z-10 shadow-[0_20px_50px_rgba(0,0,0,0.3)] scale-95 md:group-hover/item:scale-100 will-change-transform">
+                    {% endif %}
+                </li>
+
+                <!-- Item 4 -->
+                <li class="group/item relative w-full text-center flex items-center justify-center py-2 md:py-1">
+                    <span class="font-['Anton',sans-serif] text-[clamp(2.5rem,8vw,8rem)] leading-[0.85] uppercase tracking-tighter text-[#111111] md:text-[#c4c4c4] transition-all duration-500 ease-out md:group-hover/list:opacity-20 md:group-hover/item:!opacity-100 md:group-hover/item:!text-[#111111] cursor-pointer inline-block z-20 relative will-change-auto">
+                        DRAMA
+                    </span>
+                    {% if genre_movies.drama.stack_poster_path %}
+                    <img src="https://image.tmdb.org/t/p/w780{{ genre_movies.drama.stack_poster_path }}" alt="Drama" class="hidden md:block absolute left-4 top-1/2 -translate-y-1/2 w-[20vw] max-w-[350px] aspect-[16/10] object-cover rounded-2xl opacity-0 md:group-hover/item:opacity-100 transition-all duration-500 ease-out pointer-events-none z-10 shadow-[0_20px_50px_rgba(0,0,0,0.3)] scale-95 md:group-hover/item:scale-100 will-change-transform">
+                    {% else %}
+                    <img src="https://images.pexels.com/photos/1790556/pexels-photo-1790556.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Drama" class="hidden md:block absolute left-4 top-1/2 -translate-y-1/2 w-[20vw] max-w-[350px] aspect-[16/10] object-cover rounded-2xl opacity-0 md:group-hover/item:opacity-100 transition-all duration-500 ease-out pointer-events-none z-10 shadow-[0_20px_50px_rgba(0,0,0,0.3)] scale-95 md:group-hover/item:scale-100 will-change-transform">
+                    {% endif %}
+                </li>
+
+                <!-- Item 5 -->
+                <li class="group/item relative w-full text-center flex items-center justify-center py-2 md:py-1">
+                    <span class="font-['Anton',sans-serif] text-[clamp(2.5rem,8vw,8rem)] leading-[0.85] uppercase tracking-tighter text-[#111111] md:text-[#c4c4c4] transition-all duration-500 ease-out md:group-hover/list:opacity-20 md:group-hover/item:!opacity-100 md:group-hover/item:!text-[#111111] cursor-pointer inline-block z-20 relative will-change-auto">
+                        HORROR
+                    </span>
+                    {% if genre_movies.horror.stack_poster_path %}
+                    <img src="https://image.tmdb.org/t/p/w780{{ genre_movies.horror.stack_poster_path }}" alt="Horror" class="hidden md:block absolute left-4 top-1/2 -translate-y-1/2 w-[20vw] max-w-[350px] aspect-[16/10] object-cover rounded-2xl opacity-0 md:group-hover/item:opacity-100 transition-all duration-500 ease-out pointer-events-none z-10 shadow-[0_20px_50px_rgba(0,0,0,0.3)] scale-95 md:group-hover/item:scale-100 will-change-transform">
+                    {% else %}
+                    <img src="https://images.pexels.com/photos/7991273/pexels-photo-7991273.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Horror" class="hidden md:block absolute left-4 top-1/2 -translate-y-1/2 w-[20vw] max-w-[350px] aspect-[16/10] object-cover rounded-2xl opacity-0 md:group-hover/item:opacity-100 transition-all duration-500 ease-out pointer-events-none z-10 shadow-[0_20px_50px_rgba(0,0,0,0.3)] scale-95 md:group-hover/item:scale-100 will-change-transform">
+                    {% endif %}
+                </li>
+
+                <!-- Item 6 -->
+                <li class="group/item relative w-full text-center flex items-center justify-center py-2 md:py-1">
+                    <span class="font-['Anton',sans-serif] text-[clamp(2.5rem,8vw,8rem)] leading-[0.85] uppercase tracking-tighter text-[#111111] md:text-[#c4c4c4] transition-all duration-500 ease-out md:group-hover/list:opacity-20 md:group-hover/item:!opacity-100 md:group-hover/item:!text-[#111111] cursor-pointer inline-block z-20 relative will-change-auto">
+                        SCI-FI
+                    </span>
+                    {% if genre_movies.scifi.stack_poster_path %}
+                    <img src="https://image.tmdb.org/t/p/w780{{ genre_movies.scifi.stack_poster_path }}" alt="Sci-Fi" class="hidden md:block absolute left-4 top-1/2 -translate-y-1/2 w-[20vw] max-w-[350px] aspect-[16/10] object-cover rounded-2xl opacity-0 md:group-hover/item:opacity-100 transition-all duration-500 ease-out pointer-events-none z-10 shadow-[0_20px_50px_rgba(0,0,0,0.3)] scale-95 md:group-hover/item:scale-100 will-change-transform">
+                    {% else %}
+                    <img src="https://images.pexels.com/photos/1200450/pexels-photo-1200450.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Sci-Fi" class="hidden md:block absolute left-4 top-1/2 -translate-y-1/2 w-[20vw] max-w-[350px] aspect-[16/10] object-cover rounded-2xl opacity-0 md:group-hover/item:opacity-100 transition-all duration-500 ease-out pointer-events-none z-10 shadow-[0_20px_50px_rgba(0,0,0,0.3)] scale-95 md:group-hover/item:scale-100 will-change-transform">
+                    {% endif %}
+                </li>
+
+                <!-- Item 7 -->
+                <li class="group/item relative w-full text-center flex items-center justify-center py-2 md:py-1">
+                    <span class="font-['Anton',sans-serif] text-[clamp(2.5rem,8vw,8rem)] leading-[0.85] uppercase tracking-tighter text-[#111111] md:text-[#c4c4c4] transition-all duration-500 ease-out md:group-hover/list:opacity-20 md:group-hover/item:!opacity-100 md:group-hover/item:!text-[#111111] cursor-pointer inline-block z-20 relative will-change-auto">
+                        ROMANCE
+                    </span>
+                    {% if genre_movies.romance.stack_poster_path %}
+                    <img src="https://image.tmdb.org/t/p/w780{{ genre_movies.romance.stack_poster_path }}" alt="Romance" class="hidden md:block absolute left-4 top-1/2 -translate-y-1/2 w-[20vw] max-w-[350px] aspect-[16/10] object-cover rounded-2xl opacity-0 md:group-hover/item:opacity-100 transition-all duration-500 ease-out pointer-events-none z-10 shadow-[0_20px_50px_rgba(0,0,0,0.3)] scale-95 md:group-hover/item:scale-100 will-change-transform">
+                    {% else %}
+                    <img src="https://images.pexels.com/photos/2923675/pexels-photo-2923675.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Romance" class="hidden md:block absolute left-4 top-1/2 -translate-y-1/2 w-[20vw] max-w-[350px] aspect-[16/10] object-cover rounded-2xl opacity-0 md:group-hover/item:opacity-100 transition-all duration-500 ease-out pointer-events-none z-10 shadow-[0_20px_50px_rgba(0,0,0,0.3)] scale-95 md:group-hover/item:scale-100 will-change-transform">
+                    {% endif %}
+                </li>
+                
+            </ul>
+        </section>
+
+        <!-- Testimonial / Statement -->
+        <section class="py-40 px-6 flex items-center justify-center bg-[#121212]">
+            <h2 class="font-['Anton',sans-serif] text-[clamp(2rem,5vw,6rem)] text-center max-w-6xl text-[#e2e1d3]/90 reveal-text leading-tight tracking-tight">
+                "UZZUTV IS THE MODERN STREAMING PLATFORM FOR MOVIE AND SERIES LOVERS.
+                FROM TIMELESS CLASSICS TO THE LATEST RELEASES, EVERYTHING IN ONE PLACE,
+                INSTANTLY AND FREE."
+            </h2>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="pt-20 px-4 md:px-10 pb-6 bg-[#0a0a0a] rounded-t-[2.5rem] mt-10">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-32">
+            <div>
+                <h4 class="font-medium text-xs tracking-widest text-[#e2e1d3]/50 mb-6 uppercase">
+                    Get In Touch
+                </h4>
+                <div class="flex items-center gap-4">
+                    <a href="#" class="w-12 h-12 rounded-full border border-[#e2e1d3]/20 flex items-center justify-center text-[#e2e1d3] hover:bg-[#e2e1d3] hover:text-[#121212] transition-colors" aria-label="X">
+                        <iconify-icon icon="simple-icons:x" class="text-2xl"></iconify-icon>
+                    </a>
+                    <a href="#" class="w-12 h-12 rounded-full border border-[#e2e1d3]/20 flex items-center justify-center text-[#e2e1d3] hover:bg-[#e2e1d3] hover:text-[#121212] transition-colors" aria-label="Instagram">
+                        <iconify-icon icon="simple-icons:instagram" class="text-2xl"></iconify-icon>
+                    </a>
+                    <a href="mailto:hello@uzzutv.pythonanywhere.com" class="w-12 h-12 rounded-full border border-[#e2e1d3]/20 flex items-center justify-center text-[#e2e1d3] hover:bg-[#e2e1d3] hover:text-[#121212] transition-colors" aria-label="Email">
+                        <iconify-icon icon="simple-icons:gmail" class="text-2xl"></iconify-icon>
+                    </a>
+                </div>
+            </div>
+            <div>
+                <h4 class="font-medium text-xs tracking-widest text-[#e2e1d3]/50 mb-6 uppercase">
+                    Explore
+                </h4>
+                <ul class="flex flex-col gap-3 text-lg">
+                    <li>
+                        <a href="{% url 'movie' %}" class="relative inline-block after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-[1px] after:bottom-0 after:left-0 after:bg-current after:origin-bottom-right after:transition-transform after:duration-[400ms] after:ease-[cubic-bezier(0.86,0,0.07,1)] hover:after:scale-x-100 hover:after:origin-bottom-left text-[#e2e1d3]/80 hover:text-[#e2e1d3]">
+                            Movies
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'tv' %}" class="relative inline-block after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-[1px] after:bottom-0 after:left-0 after:bg-current after:origin-bottom-right after:transition-transform after:duration-[400ms] after:ease-[cubic-bezier(0.86,0,0.07,1)] hover:after:scale-x-100 hover:after:origin-bottom-left text-[#e2e1d3]/80 hover:text-[#e2e1d3]">
+                            Series
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'watchlist' %}" class="relative inline-block after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-[1px] after:bottom-0 after:left-0 after:bg-current after:origin-bottom-right after:transition-transform after:duration-[400ms] after:ease-[cubic-bezier(0.86,0,0.07,1)] hover:after:scale-x-100 hover:after:origin-bottom-left text-[#e2e1d3]/80 hover:text-[#e2e1d3]">
+                            Watchlist
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-medium text-xs tracking-widest text-[#e2e1d3]/50 mb-6 uppercase">
+                    Support
+                </h4>
+                <ul class="flex flex-col gap-3 text-lg">
+                    <li>
+                        <a href="{% url 'terms' %}" class="relative inline-block after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-[1px] after:bottom-0 after:left-0 after:bg-current after:origin-bottom-right after:transition-transform after:duration-[400ms] after:ease-[cubic-bezier(0.86,0,0.07,1)] hover:after:scale-x-100 hover:after:origin-bottom-left text-[#e2e1d3]/80 hover:text-[#e2e1d3]">
+                            Terms
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'dmca' %}" class="relative inline-block after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-[1px] after:bottom-0 after:left-0 after:bg-current after:origin-bottom-right after:transition-transform after:duration-[400ms] after:ease-[cubic-bezier(0.86,0,0.07,1)] hover:after:scale-x-100 hover:after:origin-bottom-left text-[#e2e1d3]/80 hover:text-[#e2e1d3]">
+                            DMCA
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="flex items-start lg:justify-end">
+                <button class="w-16 h-16 rounded-full border border-[#e2e1d3]/20 flex items-center justify-center hover:bg-[#e2e1d3] hover:text-[#121212] transition-colors text-2xl" id="back-to-top" aria-label="Back to top">
+                    <iconify-icon icon="solar:arrow-up-linear"></iconify-icon>
+                </button>
+            </div>
+        </div>
+
+        <div class="border-t border-[#e2e1d3]/10 pt-10 flex flex-col md:flex-row justify-between items-end gap-6 overflow-hidden">
+            <p class="text-xs text-[#e2e1d3]/50 uppercase tracking-widest order-2 md:order-1 mb-2 md:mb-4 font-normal">
+                © 2026 UzzUTV. All rights reserved.
+            </p>
+            <h2 class="font-['Anton',sans-serif] text-[clamp(4rem,18vw,25rem)] text-[#e2e1d3] uppercase order-1 md:order-2 -mb-[2vw] md:-mb-[1vw] leading-none tracking-tight">
+                UZZUTV
+            </h2>
+        </div>
+    </footer>
+
+    <script>
+        // Setup preferences
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        // Initialize Lenis for Smooth Scroll
+        const lenis = new Lenis({
+            duration: 1.2,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            direction: 'vertical',
+            gestureDirection: 'vertical',
+            smooth: true,
+            mouseMultiplier: 1,
+            smoothTouch: false,
+            touchMultiplier: 2,
+            infinite: false,
+        });
+
+        function raf(time) {
+            lenis.raf(time);
+            requestAnimationFrame(raf);
+        }
+        requestAnimationFrame(raf);
+
+        // GSAP Initialization
+        gsap.registerPlugin(ScrollTrigger);
+
+        if (!reduceMotion) {
+            // Header Hide/Show on Scroll
+            let lastScrollY = window.scrollY;
+            const header = document.getElementById('header');
+
+            lenis.on('scroll', (e) => {
+                if (e.scrollY > 100 && e.scrollY > lastScrollY) {
+                    header.style.transform = 'translateY(-100%)';
+                } else {
+                    header.style.transform = 'translateY(0)';
+                }
+                lastScrollY = e.scrollY;
+            });
+
+            // Hero Animation Load
+            const heroTimeline = gsap.timeline();
+            heroTimeline.to('.title-word', {
+                y: 0,
+                duration: 1,
+                stagger: 0.1,
+                ease: "power4.out",
+                delay: 0.2
+            });
+
+            // Hero Parallax (Blurred Text)
+            gsap.to('#hero-glow', {
+                yPercent: 40,
+                ease: 'none',
+                scrollTrigger: {
+                    trigger: '#hero',
+                    start: 'top top',
+                    end: 'bottom top',
+                    scrub: true
+                }
+            });
+
+            // Reveal Up Elements
+            gsap.utils.toArray('.reveal-up').forEach(el => {
+                gsap.to(el, {
+                    y: 0,
+                    opacity: 1,
+                    duration: 1.2,
+                    ease: "power3.out",
+                    scrollTrigger: {
+                        trigger: el,
+                        start: "top 80%",
+                    }
+                });
+            });
+
+            // Text Reveal (Testimonial)
+            gsap.from('.reveal-text', {
+                opacity: 0,
+                y: 40,
+                duration: 1.5,
+                ease: "power2.out",
+                scrollTrigger: {
+                    trigger: '.reveal-text',
+                    start: "top 80%",
+                }
+            });
+        }
+
+        // Hamburger Menu Logic
+        const menuBtn = document.getElementById('menu-btn');
+        const menuOverlay = document.getElementById('menu-overlay');
+        const menuItems = document.querySelectorAll('.menu-item');
+        const line1 = document.getElementById('hamburger-line-1');
+        const line2 = document.getElementById('hamburger-line-2');
+        const line3 = document.getElementById('hamburger-line-3');
+        let isMenuOpen = false;
+
+        menuBtn.addEventListener('click', () => {
+            isMenuOpen = !isMenuOpen;
+
+            // Animate Hamburger
+            line1.classList.toggle('translate-y-[6px]');
+            line1.classList.toggle('rotate-45');
+            line2.classList.toggle('opacity-0');
+            line3.classList.toggle('-translate-y-[6px]');
+            line3.classList.toggle('-rotate-[45deg]');
+
+            if (isMenuOpen) {
+                // Open Menu Overlay
+                menuOverlay.classList.remove('opacity-0', 'pointer-events-none');
+                menuOverlay.classList.add('opacity-100', 'pointer-events-auto');
+                lenis.stop(); // Stop scrolling
+
+                gsap.to(menuItems, {
+                    y: 0,
+                    opacity: 1,
+                    duration: 0.6,
+                    stagger: 0.1,
+                    ease: "power3.out",
+                    delay: 0.2
+                });
+            } else {
+                // Close Menu Overlay
+                menuOverlay.classList.remove('opacity-100', 'pointer-events-auto');
+                menuOverlay.classList.add('opacity-0', 'pointer-events-none');
+                lenis.start(); // Resume scrolling
+
+                gsap.to(menuItems, {
+                    y: 32,
+                    opacity: 0,
+                    duration: 0.3,
+                    ease: "power2.in"
+                });
+            }
+        });
+
+        // Back to top
+        document.getElementById('back-to-top').addEventListener('click', () => {
+            lenis.scrollTo(0, { duration: 1.5, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
+        });
+    </script>
+
+    </body></html>

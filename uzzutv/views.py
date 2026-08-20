@@ -147,7 +147,78 @@ def load_homepage_data():
 
 
 def index(request):
-    return render(request, "uzzutv/index.html")
+    genre_movies = load_index_genre_movies()
+    return render(request, "uzzutv/index.html", {"genre_movies": genre_movies})
+
+
+def load_index_genre_movies():
+
+    cache_key = "index_genre_movies_v2"
+    data = cache.get(cache_key)
+
+    if data:
+        return data
+
+    genres = {
+        "action": 28,
+        "comedy": 35,
+        "thriller": 53,
+        "scifi": 878,
+        "drama": 18,
+        "horror": 27,
+        "romance": 10749
+    }
+
+    data = {}
+
+    used = set()
+
+    for name, gid in genres.items():
+
+        params = {
+            "api_key": API_KEY,
+            "with_genres": gid,
+            "sort_by": "popularity.desc",
+            "vote_count.gte": 300
+        }
+
+        try:
+
+            response = requests.get(
+                f"{BASE_URL}/discover/movie",
+                params=params,
+                timeout=10
+            )
+
+            results = response.json().get("results", [])
+
+            available = [
+                m for m in results if m["id"] not in used
+            ]
+
+            pick = available[0] if available else None
+            pick2 = available[1] if len(available) > 1 else None
+
+            if pick:
+                used.add(pick["id"])
+            if pick2:
+                used.add(pick2["id"])
+
+            data[name] = {
+                "poster_path": pick["poster_path"] if pick else None,
+                "stack_poster_path": pick2["poster_path"] if pick2 else None
+            }
+
+        except Exception:
+
+            data[name] = {
+                "poster_path": None,
+                "stack_poster_path": None
+            }
+
+    cache.set(cache_key, data, 21600)  # 6 hours
+
+    return data
 
 
 # ----------------------------
