@@ -307,94 +307,212 @@ body{
 }
 
 /* =========================================================
-   FOOTER
+   FOOTER (matches index page)
 ========================================================= */
 
 .site-footer{
-  background: #0b0b0b;
-  border-top: 1px solid rgba(255,255,255,.08);
-  color: white;
-  padding: 56px 20px 40px;
-  text-align: center;
-  width: 100%;
-  max-width: 100%;
-  overflow: hidden;
+  background:#0a0a0a;
+  color:#e2e1d3;
+  padding:80px 40px 24px;
+  margin-top:40px;
+  border-radius:2.5rem 2.5rem 0 0;
+  width:100%;
+  max-width:100%;
+  overflow:hidden;
 }
 
-.footer-container{
-  max-width: 860px;
-  margin: 0 auto;
+.footer-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:48px;
+  max-width:1400px;
+  margin:0 auto 128px;
 }
 
-.footer-logo{
-  font-family: "Anton", "Inter", sans-serif;
-  font-size: 26px;
-  font-weight: 400;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  margin-bottom: 14px;
-  color: #ffffff;
+.footer-heading{
+  font-size:12px;
+  font-weight:500;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:rgba(226,225,211,.5);
+  margin:0 0 24px;
 }
 
-.footer-logo .logo-red{
-  color: #ff3c3c;
+.footer-social{
+  display:flex;
+  align-items:center;
+  gap:16px;
 }
 
-.footer-text{
-  color: #9ca3af;
-  font-size: 14px;
-  line-height: 1.65;
-  max-width: 620px;
-  margin: 0 auto 10px;
-  opacity: 1;
+.footer-social a{
+  width:48px;
+  height:48px;
+  border-radius:50%;
+  border:1px solid rgba(226,225,211,.2);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#e2e1d3;
+  transition:background-color .25s ease, color .25s ease, transform .25s ease;
 }
 
-.footer-tip{
-  color: #d1d5db;
-  font-size: 14px;
-  margin: 0 auto;
+.footer-social a:hover{
+  background:#e2e1d3;
+  color:#121212;
+  transform:translateY(-2px);
 }
 
-.footer-links{
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 12px 28px;
-  flex-wrap: wrap;
-  max-width: 100%;
-  margin: 26px 0 30px;
+.footer-social svg{
+  width:20px;
+  height:20px;
+  fill:currentColor;
 }
 
-.footer-links a{
-  color: #cbd5e1;
-  text-decoration: none;
-  font-size: 14px;
-  transition: color .2s ease;
+.footer-list{
+  list-style:none;
+  margin:0;
+  padding:0;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:12px;
+  font-size:18px;
 }
 
-.footer-links a:hover{
-  color: #ff3c3c;
+.footer-list a{
+  position:relative;
+  display:inline-block;
+  color:rgba(226,225,211,.8);
+  text-decoration:none;
+  transition:color .2s ease;
+}
+
+.footer-list a::after{
+  content:"";
+  position:absolute;
+  left:0;
+  bottom:-2px;
+  width:100%;
+  height:1px;
+  background:currentColor;
+  transform:scaleX(0);
+  transform-origin:bottom right;
+  transition:transform .4s cubic-bezier(.86,0,.07,1);
+}
+
+.footer-list a:hover{
+  color:#e2e1d3;
+}
+
+.footer-list a:hover::after{
+  transform:scaleX(1);
+  transform-origin:bottom left;
+}
+
+.footer-top-col{
+  display:flex;
+  align-items:flex-start;
+  justify-content:flex-end;
+}
+
+.back-to-top{
+  width:64px;
+  height:64px;
+  border-radius:50%;
+  border:1px solid rgba(226,225,211,.2);
+  background:transparent;
+  color:#e2e1d3;
+  font-size:24px;
+  line-height:1;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:background-color .25s ease, color .25s ease, transform .25s ease;
+}
+
+.back-to-top:hover{
+  background:#e2e1d3;
+  color:#121212;
+  transform:translateY(-2px);
+}
+
+.footer-bottom{
+  border-top:1px solid rgba(226,225,211,.1);
+  padding-top:40px;
+  max-width:1400px;
+  margin:0 auto;
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  gap:24px;
+  overflow:hidden;
 }
 
 .footer-copy{
-  font-size: 13px;
-  color: #6b7280;
-  margin: 0;
+  order:1;
+  font-size:12px;
+  font-weight:400;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:rgba(226,225,211,.5);
+  margin:0 0 16px;
+}
+
+.footer-big-logo{
+  order:2;
+  font-family:"Anton","Inter",sans-serif;
+  font-weight:400;
+  font-size:clamp(4rem,18vw,25rem);
+  line-height:.8;
+  letter-spacing:-1px;
+  text-transform:uppercase;
+  color:#e2e1d3;
+  margin:0 -2vw -1vw 0;
+}
+
+@media (max-width: 991px){
+
+.footer-grid{
+  grid-template-columns:repeat(2,1fr);
+  gap:40px;
+  margin-bottom:80px;
+}
+
 }
 
 @media (max-width: 600px){
 
 .site-footer{
-  padding: 44px 16px 32px;
+  padding:56px 20px 16px;
+  border-radius:1.75rem 1.75rem 0 0;
 }
 
-.footer-logo{
-  font-size: 22px;
+.footer-grid{
+  grid-template-columns:1fr;
+  gap:32px;
+  margin-bottom:56px;
 }
 
-.footer-links{
-  gap: 10px 22px;
-  margin: 22px 0 26px;
+.footer-top-col{
+  justify-content:flex-start;
+}
+
+.footer-bottom{
+  flex-direction:column;
+  align-items:flex-start;
+  padding-top:28px;
+  gap:0;
+}
+
+.footer-copy{
+  order:2;
+  margin-bottom:16px;
+}
+
+.footer-big-logo{
+  order:1;
+  margin:0 -4vw -2vw 0;
 }
 
 }</style>
@@ -475,30 +593,53 @@ body{
 
 
 <footer class="site-footer">
-  <div class="footer-container">
+  <div class="footer-grid">
 
-    <h2 class="footer-logo">Uzz<span class="logo-red">UTV</span></h2>
-
-    <p class="footer-text">
-      UzzUTV does not store any files on our server, we only linked to the media which is hosted on 3rd party services.
-    </p>
-    <p class="footer-tip">
-      Tip: Use Brave Browser or ad blocker
-    </p>
-
-    <div class="footer-links">
-      <a href="{% url 'home' %}">Home</a>
-      <a href="{% url 'movie' %}">Movies</a>
-      <a href="{% url 'tv' %}">Series</a>
-      <a href="{% url 'watchlist' %}">Watchlist</a>
-      <a href="{% url 'terms' %}">Terms</a>
-      <a href="{% url 'dmca' %}">DMCA</a>
+    <div>
+      <h4 class="footer-heading">Get In Touch</h4>
+      <div class="footer-social">
+        <a href="#" aria-label="X">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg>
+        </a>
+        <a href="#" aria-label="Instagram">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C8.74 0 8.333.015 7.053.072 5.775.132 4.905.333 4.14.63c-.789.306-1.459.717-2.126 1.384S.935 3.35.63 4.14C.333 4.905.131 5.775.072 7.053.012 8.333 0 8.74 0 12s.015 3.667.072 4.947c.06 1.277.261 2.148.558 2.913.306.788.717 1.459 1.384 2.126.667.666 1.336 1.079 2.126 1.384.766.296 1.636.499 2.913.558C8.333 23.988 8.74 24 12 24s3.667-.015 4.947-.072c1.277-.06 2.148-.262 2.913-.558.788-.306 1.459-.718 2.126-1.384.666-.667 1.079-1.335 1.384-2.126.296-.765.499-1.636.558-2.913.06-1.28.072-1.687.072-4.947s-.015-3.667-.072-4.947c-.06-1.277-.262-2.149-.558-2.913-.306-.789-.718-1.459-1.384-2.126C21.319 1.347 20.651.935 19.86.63c-.765-.297-1.636-.499-2.913-.558C15.667.012 15.26 0 12 0zm0 2.16c3.203 0 3.585.016 4.85.071 1.17.055 1.805.249 2.227.415.562.217.96.477 1.382.896.419.42.679.819.896 1.381.164.422.36 1.057.413 2.227.057 1.266.07 1.646.07 4.85s-.015 3.585-.074 4.85c-.061 1.17-.256 1.805-.421 2.227-.224.562-.479.96-.899 1.382-.419.419-.824.679-1.38.896-.42.164-1.065.36-2.235.413-1.274.057-1.649.07-4.859.07-3.211 0-3.586-.015-4.859-.074-1.171-.061-1.816-.256-2.236-.421-.569-.224-.96-.479-1.379-.899-.421-.419-.69-.824-.9-1.38-.165-.42-.359-1.065-.42-2.235-.045-1.26-.061-1.649-.061-4.844 0-3.196.016-3.586.061-4.861.061-1.17.255-1.814.42-2.234.21-.57.479-.96.9-1.381.419-.419.81-.689 1.379-.898.42-.166 1.051-.361 2.221-.421 1.275-.045 1.65-.06 4.859-.06l.045.03zm0 3.678a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4zm7.846-10.405c0 .795-.646 1.44-1.44 1.44-.795 0-1.44-.646-1.44-1.44 0-.794.646-1.439 1.44-1.439.793-.001 1.44.645 1.44 1.439z"/></svg>
+        </a>
+        <a href="mailto:hello@uzzutv.pythonanywhere.com" aria-label="Email">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/></svg>
+        </a>
+      </div>
     </div>
 
+    <div>
+      <h4 class="footer-heading">Explore</h4>
+      <ul class="footer-list">
+        <li><a href="{% url 'movie' %}">Movies</a></li>
+        <li><a href="{% url 'tv' %}">Series</a></li>
+        <li><a href="{% url 'watchlist' %}">Watchlist</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <h4 class="footer-heading">Support</h4>
+      <ul class="footer-list">
+        <li><a href="{% url 'terms' %}">Terms</a></li>
+        <li><a href="{% url 'dmca' %}">DMCA</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-top-col">
+      <button type="button" class="back-to-top" id="back-to-top" aria-label="Back to top">
+        <span class="material-icons">arrow_upward</span>
+      </button>
+    </div>
+
+  </div>
+
+  <div class="footer-bottom">
     <p class="footer-copy">
       © 2026 UzzUTV. All rights reserved.
     </p>
-
+    <h2 class="footer-big-logo">UZZUTV</h2>
   </div>
 </footer>
 
@@ -612,6 +753,30 @@ async function updateAuthNavbar() {
     }
 
 }
+
+
+/* =========================================================
+   BACK TO TOP
+========================================================= */
+
+window.addEventListener("DOMContentLoaded", () => {
+
+    const backToTopBtn = document.getElementById("back-to-top");
+
+    if (backToTopBtn) {
+
+        backToTopBtn.addEventListener("click", () => {
+
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+
+        });
+
+    }
+
+});
 
 
 /* =========================================================

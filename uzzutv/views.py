@@ -1040,7 +1040,7 @@ def category(request, slug):
 
 def detail(request, type, id):
 
-    cache_key = f"detail_{type}_{id}"
+    cache_key = f"detail_v2_{type}_{id}"
     context = cache.get(cache_key)
 
     if not context:
@@ -1070,11 +1070,17 @@ def detail(request, type, id):
 
         genres = data.get("genres") or []
 
+        if type == "movie":
+            logo = get_movie_logo(id)
+        else:
+            logo = get_tv_logo(id)
+
         context = {
             "data": data,
             "type": type,
             "title_full": title_full,
             "meta_desc": meta_desc,
+            "logo": logo,
             "genres": [g.get("name", "") for g in genres],
             "cast": data["credits"]["cast"][:12],
             "recommendations": data["recommendations"]["results"][:14]
