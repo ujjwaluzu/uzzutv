@@ -21,7 +21,10 @@
     <div class="category-hero-inner">
         <p class="category-kicker">Browse by genre</p>
         <h2 class="category-title">{{ category_title }}</h2>
-        <p class="category-sub">Movies &amp; TV series · {{ per_page }} per page</p>
+        <p class="category-sub">
+            {% if media_type == "movie" %}Movies{% elif media_type == "tv" %}TV Series{% else %}Movies & TV Series{% endif %}
+            · {{ per_page }} per page
+        </p>
     </div>
 </header>
 

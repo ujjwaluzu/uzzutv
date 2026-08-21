@@ -186,7 +186,7 @@ html, body { overflow-x: clip; }
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
                 
                 <!-- Movie Genre 1 -->
-                <div class="relative aspect-square w-full overflow-hidden group cursor-pointer bg-[#0a0a0a]">
+                <a href="{% if genre_movies.action.id %}{% if genre_movies.action.media_type == 'tv' %}{% url 'watchtv' genre_movies.action.id %}{% else %}{% url 'watchmov' genre_movies.action.id %}{% endif %}{% else %}{% url 'category' 'action' %}{% endif %}" class="relative aspect-square w-full overflow-hidden group cursor-pointer bg-[#0a0a0a] block">
                     {% if genre_movies.action.poster_path %}
                     <img src="https://image.tmdb.org/t/p/w780{{ genre_movies.action.poster_path }}" alt="Action" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
                     {% else %}
@@ -200,10 +200,10 @@ html, body { overflow-x: clip; }
                             Adrenaline Filled
                         </p>
                     </div>
-                </div>
+                </a>
 
                 <!-- Movie Genre 2 -->
-                <div class="relative aspect-square w-full overflow-hidden group cursor-pointer bg-[#0a0a0a]">
+                <a href="{% if genre_movies.comedy.id %}{% if genre_movies.comedy.media_type == 'tv' %}{% url 'watchtv' genre_movies.comedy.id %}{% else %}{% url 'watchmov' genre_movies.comedy.id %}{% endif %}{% else %}{% url 'category' 'comedy' %}{% endif %}" class="relative aspect-square w-full overflow-hidden group cursor-pointer bg-[#0a0a0a] block">
                     {% if genre_movies.comedy.poster_path %}
                     <img src="https://image.tmdb.org/t/p/w780{{ genre_movies.comedy.poster_path }}" alt="Comedy" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
                     {% else %}
@@ -217,10 +217,10 @@ html, body { overflow-x: clip; }
                             Laugh Out Loud
                         </p>
                     </div>
-                </div>
+                </a>
 
                 <!-- Movie Genre 3 -->
-                <div class="relative aspect-square w-full overflow-hidden group cursor-pointer bg-[#0a0a0a]">
+                <a href="{% if genre_movies.thriller.id %}{% if genre_movies.thriller.media_type == 'tv' %}{% url 'watchtv' genre_movies.thriller.id %}{% else %}{% url 'watchmov' genre_movies.thriller.id %}{% endif %}{% else %}{% url 'category' 'thriller' %}{% endif %}" class="relative aspect-square w-full overflow-hidden group cursor-pointer bg-[#0a0a0a] block">
                     {% if genre_movies.thriller.poster_path %}
                     <img src="https://image.tmdb.org/t/p/w780{{ genre_movies.thriller.poster_path }}" alt="Thriller" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
                     {% else %}
@@ -234,10 +234,10 @@ html, body { overflow-x: clip; }
                             Edge Of Your Seat
                         </p>
                     </div>
-                </div>
+                </a>
 
                 <!-- Movie Genre 4 -->
-                <div class="relative aspect-square w-full overflow-hidden group cursor-pointer bg-[#0a0a0a]">
+                <a href="{% if genre_movies.scifi.id %}{% if genre_movies.scifi.media_type == 'tv' %}{% url 'watchtv' genre_movies.scifi.id %}{% else %}{% url 'watchmov' genre_movies.scifi.id %}{% endif %}{% else %}{% url 'category' 'scifi' %}{% endif %}" class="relative aspect-square w-full overflow-hidden group cursor-pointer bg-[#0a0a0a] block">
                     {% if genre_movies.scifi.poster_path %}
                     <img src="https://image.tmdb.org/t/p/w780{{ genre_movies.scifi.poster_path }}" alt="Sci-Fi" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
                     {% else %}
@@ -251,7 +251,7 @@ html, body { overflow-x: clip; }
                             Beyond Imagination
                         </p>
                     </div>
-                </div>
+                </a>
 
             </div>
         </section>
@@ -262,9 +262,11 @@ html, body { overflow-x: clip; }
                 
                 <!-- Item 1 -->
                 <li class="group/item relative w-full text-center flex items-center justify-center py-2 md:py-1">
-                    <span class="font-['Anton',sans-serif] text-[clamp(2.5rem,8vw,8rem)] leading-[0.85] uppercase tracking-tighter text-[#111111] md:text-[#c4c4c4] transition-all duration-500 ease-out md:group-hover/list:opacity-20 md:group-hover/item:!opacity-100 md:group-hover/item:!text-[#111111] cursor-pointer inline-block z-20 relative will-change-auto">
-                        ACTION
-                    </span>
+                    <a href="{% url 'category' 'action' %}" class="relative inline-block z-20">
+                        <span class="font-['Anton',sans-serif] text-[clamp(2.5rem,8vw,8rem)] leading-[0.85] uppercase tracking-tighter text-[#111111] md:text-[#c4c4c4] transition-all duration-500 ease-out md:group-hover/list:opacity-20 md:group-hover/item:!opacity-100 md:group-hover/item:!text-[#111111] cursor-pointer inline-block relative will-change-auto">
+                            ACTION
+                        </span>
+                    </a>
                     {% if genre_movies.action.stack_poster_path %}
                     <img src="https://image.tmdb.org/t/p/w780{{ genre_movies.action.stack_poster_path }}" alt="Action" class="hidden md:block absolute left-4 top-1/2 -translate-y-1/2 w-[20vw] max-w-[350px] aspect-[16/10] object-cover rounded-2xl opacity-0 md:group-hover/item:opacity-100 transition-all duration-500 ease-out pointer-events-none z-10 shadow-[0_20px_50px_rgba(0,0,0,0.3)] scale-95 md:group-hover/item:scale-100 will-change-transform">
                     {% else %}
@@ -274,9 +276,11 @@ html, body { overflow-x: clip; }
 
                 <!-- Item 2 -->
                 <li class="group/item relative w-full text-center flex items-center justify-center py-2 md:py-1">
-                    <span class="font-['Anton',sans-serif] text-[clamp(2.5rem,8vw,8rem)] leading-[0.85] uppercase tracking-tighter text-[#111111] md:text-[#c4c4c4] transition-all duration-500 ease-out md:group-hover/list:opacity-20 md:group-hover/item:!opacity-100 md:group-hover/item:!text-[#111111] cursor-pointer inline-block z-20 relative will-change-auto">
-                        COMEDY
-                    </span>
+                    <a href="{% url 'category' 'comedy' %}" class="relative inline-block z-20">
+                        <span class="font-['Anton',sans-serif] text-[clamp(2.5rem,8vw,8rem)] leading-[0.85] uppercase tracking-tighter text-[#111111] md:text-[#c4c4c4] transition-all duration-500 ease-out md:group-hover/list:opacity-20 md:group-hover/item:!opacity-100 md:group-hover/item:!text-[#111111] cursor-pointer inline-block relative will-change-auto">
+                            COMEDY
+                        </span>
+                    </a>
                     {% if genre_movies.comedy.stack_poster_path %}
                     <img src="https://image.tmdb.org/t/p/w780{{ genre_movies.comedy.stack_poster_path }}" alt="Comedy" class="hidden md:block absolute left-4 top-1/2 -translate-y-1/2 w-[20vw] max-w-[350px] aspect-[16/10] object-cover rounded-2xl opacity-0 md:group-hover/item:opacity-100 transition-all duration-500 ease-out pointer-events-none z-10 shadow-[0_20px_50px_rgba(0,0,0,0.3)] scale-95 md:group-hover/item:scale-100 will-change-transform">
                     {% else %}
@@ -286,9 +290,11 @@ html, body { overflow-x: clip; }
 
                 <!-- Item 3 -->
                 <li class="group/item relative w-full text-center flex items-center justify-center py-2 md:py-1">
-                    <span class="font-['Anton',sans-serif] text-[clamp(2.5rem,8vw,8rem)] leading-[0.85] uppercase tracking-tighter text-[#111111] md:text-[#c4c4c4] transition-all duration-500 ease-out md:group-hover/list:opacity-20 md:group-hover/item:!opacity-100 md:group-hover/item:!text-[#111111] cursor-pointer inline-block z-20 relative will-change-auto">
-                        THRILLER
-                    </span>
+                    <a href="{% url 'category' 'thriller' %}" class="relative inline-block z-20">
+                        <span class="font-['Anton',sans-serif] text-[clamp(2.5rem,8vw,8rem)] leading-[0.85] uppercase tracking-tighter text-[#111111] md:text-[#c4c4c4] transition-all duration-500 ease-out md:group-hover/list:opacity-20 md:group-hover/item:!opacity-100 md:group-hover/item:!text-[#111111] cursor-pointer inline-block relative will-change-auto">
+                            THRILLER
+                        </span>
+                    </a>
                     {% if genre_movies.thriller.stack_poster_path %}
                     <img src="https://image.tmdb.org/t/p/w780{{ genre_movies.thriller.stack_poster_path }}" alt="Thriller" class="hidden md:block absolute left-4 top-1/2 -translate-y-1/2 w-[20vw] max-w-[350px] aspect-[16/10] object-cover rounded-2xl opacity-0 md:group-hover/item:opacity-100 transition-all duration-500 ease-out pointer-events-none z-10 shadow-[0_20px_50px_rgba(0,0,0,0.3)] scale-95 md:group-hover/item:scale-100 will-change-transform">
                     {% else %}
@@ -298,9 +304,11 @@ html, body { overflow-x: clip; }
 
                 <!-- Item 4 -->
                 <li class="group/item relative w-full text-center flex items-center justify-center py-2 md:py-1">
-                    <span class="font-['Anton',sans-serif] text-[clamp(2.5rem,8vw,8rem)] leading-[0.85] uppercase tracking-tighter text-[#111111] md:text-[#c4c4c4] transition-all duration-500 ease-out md:group-hover/list:opacity-20 md:group-hover/item:!opacity-100 md:group-hover/item:!text-[#111111] cursor-pointer inline-block z-20 relative will-change-auto">
-                        DRAMA
-                    </span>
+                    <a href="{% url 'category' 'drama' %}" class="relative inline-block z-20">
+                        <span class="font-['Anton',sans-serif] text-[clamp(2.5rem,8vw,8rem)] leading-[0.85] uppercase tracking-tighter text-[#111111] md:text-[#c4c4c4] transition-all duration-500 ease-out md:group-hover/list:opacity-20 md:group-hover/item:!opacity-100 md:group-hover/item:!text-[#111111] cursor-pointer inline-block relative will-change-auto">
+                            DRAMA
+                        </span>
+                    </a>
                     {% if genre_movies.drama.stack_poster_path %}
                     <img src="https://image.tmdb.org/t/p/w780{{ genre_movies.drama.stack_poster_path }}" alt="Drama" class="hidden md:block absolute left-4 top-1/2 -translate-y-1/2 w-[20vw] max-w-[350px] aspect-[16/10] object-cover rounded-2xl opacity-0 md:group-hover/item:opacity-100 transition-all duration-500 ease-out pointer-events-none z-10 shadow-[0_20px_50px_rgba(0,0,0,0.3)] scale-95 md:group-hover/item:scale-100 will-change-transform">
                     {% else %}
@@ -310,9 +318,11 @@ html, body { overflow-x: clip; }
 
                 <!-- Item 5 -->
                 <li class="group/item relative w-full text-center flex items-center justify-center py-2 md:py-1">
-                    <span class="font-['Anton',sans-serif] text-[clamp(2.5rem,8vw,8rem)] leading-[0.85] uppercase tracking-tighter text-[#111111] md:text-[#c4c4c4] transition-all duration-500 ease-out md:group-hover/list:opacity-20 md:group-hover/item:!opacity-100 md:group-hover/item:!text-[#111111] cursor-pointer inline-block z-20 relative will-change-auto">
-                        HORROR
-                    </span>
+                    <a href="{% url 'category' 'horror' %}" class="relative inline-block z-20">
+                        <span class="font-['Anton',sans-serif] text-[clamp(2.5rem,8vw,8rem)] leading-[0.85] uppercase tracking-tighter text-[#111111] md:text-[#c4c4c4] transition-all duration-500 ease-out md:group-hover/list:opacity-20 md:group-hover/item:!opacity-100 md:group-hover/item:!text-[#111111] cursor-pointer inline-block relative will-change-auto">
+                            HORROR
+                        </span>
+                    </a>
                     {% if genre_movies.horror.stack_poster_path %}
                     <img src="https://image.tmdb.org/t/p/w780{{ genre_movies.horror.stack_poster_path }}" alt="Horror" class="hidden md:block absolute left-4 top-1/2 -translate-y-1/2 w-[20vw] max-w-[350px] aspect-[16/10] object-cover rounded-2xl opacity-0 md:group-hover/item:opacity-100 transition-all duration-500 ease-out pointer-events-none z-10 shadow-[0_20px_50px_rgba(0,0,0,0.3)] scale-95 md:group-hover/item:scale-100 will-change-transform">
                     {% else %}
@@ -322,9 +332,11 @@ html, body { overflow-x: clip; }
 
                 <!-- Item 6 -->
                 <li class="group/item relative w-full text-center flex items-center justify-center py-2 md:py-1">
-                    <span class="font-['Anton',sans-serif] text-[clamp(2.5rem,8vw,8rem)] leading-[0.85] uppercase tracking-tighter text-[#111111] md:text-[#c4c4c4] transition-all duration-500 ease-out md:group-hover/list:opacity-20 md:group-hover/item:!opacity-100 md:group-hover/item:!text-[#111111] cursor-pointer inline-block z-20 relative will-change-auto">
-                        SCI-FI
-                    </span>
+                    <a href="{% url 'category' 'scifi' %}" class="relative inline-block z-20">
+                        <span class="font-['Anton',sans-serif] text-[clamp(2.5rem,8vw,8rem)] leading-[0.85] uppercase tracking-tighter text-[#111111] md:text-[#c4c4c4] transition-all duration-500 ease-out md:group-hover/list:opacity-20 md:group-hover/item:!opacity-100 md:group-hover/item:!text-[#111111] cursor-pointer inline-block relative will-change-auto">
+                            SCI-FI
+                        </span>
+                    </a>
                     {% if genre_movies.scifi.stack_poster_path %}
                     <img src="https://image.tmdb.org/t/p/w780{{ genre_movies.scifi.stack_poster_path }}" alt="Sci-Fi" class="hidden md:block absolute left-4 top-1/2 -translate-y-1/2 w-[20vw] max-w-[350px] aspect-[16/10] object-cover rounded-2xl opacity-0 md:group-hover/item:opacity-100 transition-all duration-500 ease-out pointer-events-none z-10 shadow-[0_20px_50px_rgba(0,0,0,0.3)] scale-95 md:group-hover/item:scale-100 will-change-transform">
                     {% else %}
@@ -334,9 +346,11 @@ html, body { overflow-x: clip; }
 
                 <!-- Item 7 -->
                 <li class="group/item relative w-full text-center flex items-center justify-center py-2 md:py-1">
-                    <span class="font-['Anton',sans-serif] text-[clamp(2.5rem,8vw,8rem)] leading-[0.85] uppercase tracking-tighter text-[#111111] md:text-[#c4c4c4] transition-all duration-500 ease-out md:group-hover/list:opacity-20 md:group-hover/item:!opacity-100 md:group-hover/item:!text-[#111111] cursor-pointer inline-block z-20 relative will-change-auto">
-                        ROMANCE
-                    </span>
+                    <a href="{% url 'category' 'romance' %}" class="relative inline-block z-20">
+                        <span class="font-['Anton',sans-serif] text-[clamp(2.5rem,8vw,8rem)] leading-[0.85] uppercase tracking-tighter text-[#111111] md:text-[#c4c4c4] transition-all duration-500 ease-out md:group-hover/list:opacity-20 md:group-hover/item:!opacity-100 md:group-hover/item:!text-[#111111] cursor-pointer inline-block relative will-change-auto">
+                            ROMANCE
+                        </span>
+                    </a>
                     {% if genre_movies.romance.stack_poster_path %}
                     <img src="https://image.tmdb.org/t/p/w780{{ genre_movies.romance.stack_poster_path }}" alt="Romance" class="hidden md:block absolute left-4 top-1/2 -translate-y-1/2 w-[20vw] max-w-[350px] aspect-[16/10] object-cover rounded-2xl opacity-0 md:group-hover/item:opacity-100 transition-all duration-500 ease-out pointer-events-none z-10 shadow-[0_20px_50px_rgba(0,0,0,0.3)] scale-95 md:group-hover/item:scale-100 will-change-transform">
                     {% else %}

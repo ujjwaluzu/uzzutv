@@ -153,7 +153,7 @@ def index(request):
 
 def load_index_genre_movies():
 
-    cache_key = "index_genre_movies_v2"
+    cache_key = "index_genre_movies_v3"
     data = cache.get(cache_key)
 
     if data:
@@ -169,15 +169,22 @@ def load_index_genre_movies():
         "romance": 10749
     }
 
+    # these render as big cards that link straight to the watch page
+    tv_genres_for_cards = {
+        "action": 10759,
+        "comedy": 35,
+        "thriller": "9648|80",
+        "scifi": 10765
+    }
+
     data = {}
 
     used = set()
 
     for name, gid in genres.items():
 
-        params = {
+        base_params = {
             "api_key": API_KEY,
-            "with_genres": gid,
             "sort_by": "popularity.desc",
             "vote_count.gte": 300
         }
@@ -186,14 +193,39 @@ def load_index_genre_movies():
 
             response = requests.get(
                 f"{BASE_URL}/discover/movie",
-                params=params,
+                params={**base_params, "with_genres": gid},
                 timeout=10
             )
 
             results = response.json().get("results", [])
 
+            for m in results:
+                m["media_type"] = "movie"
+
+            candidates = results
+
+            if name in tv_genres_for_cards:
+
+                shows = requests.get(
+                    f"{BASE_URL}/discover/tv",
+                    params={**base_params, "with_genres": tv_genres_for_cards[name]},
+                    timeout=10
+                ).json().get("results", [])
+
+                for t in shows:
+                    t["media_type"] = "tv"
+
+                combined = []
+                for i in range(max(len(results), len(shows))):
+                    if i < len(results):
+                        combined.append(results[i])
+                    if i < len(shows):
+                        combined.append(shows[i])
+
+                candidates = combined
+
             available = [
-                m for m in results if m["id"] not in used
+                m for m in candidates if m["id"] not in used
             ]
 
             pick = available[0] if available else None
@@ -204,17 +236,29 @@ def load_index_genre_movies():
             if pick2:
                 used.add(pick2["id"])
 
-            data[name] = {
+            entry = {
                 "poster_path": pick["poster_path"] if pick else None,
                 "stack_poster_path": pick2["poster_path"] if pick2 else None
             }
 
+            if name in tv_genres_for_cards:
+                entry["id"] = pick["id"] if pick else None
+                entry["media_type"] = pick["media_type"] if pick else "movie"
+
+            data[name] = entry
+
         except Exception:
 
-            data[name] = {
+            entry = {
                 "poster_path": None,
                 "stack_poster_path": None
             }
+
+            if name in tv_genres_for_cards:
+                entry["id"] = None
+                entry["media_type"] = "movie"
+
+            data[name] = entry
 
     cache.set(cache_key, data, 21600)  # 6 hours
 
@@ -789,10 +833,16 @@ def home(request):
 # ----------------------------
 
 CATEGORY_CONFIG = {
-    "action":    {"movie_genre": 28,    "tv_genre": 10759, "title": "Action"},
-    "romance":   {"movie_genre": 10749, "tv_genre": 10749, "title": "Romance"},
-    "comedy":    {"movie_genre": 35,    "tv_genre": 35,    "title": "Comedy"},
-    "animation": {"movie_genre": 16,    "tv_genre": 16,    "title": "Animation"},
+    "action":     {"movie_genre": 28,    "tv_genre": 10759,     "title": "Action"},
+    "romance":    {"movie_genre": 10749, "tv_genre": 10749,     "title": "Romance"},
+    "comedy":     {"movie_genre": 35,    "tv_genre": 35,        "title": "Comedy"},
+    "animation":  {"movie_genre": 16,    "tv_genre": 16,        "title": "Animation"},
+    "thriller":   {"movie_genre": 53,    "tv_genre": "9648|80", "title": "Thriller"},
+    "drama":      {"movie_genre": 18,    "tv_genre": 18,        "title": "Drama"},
+    "horror":     {"movie_genre": 27,    "tv_genre": 9648,      "title": "Horror"},
+    "scifi":      {"movie_genre": 878,   "tv_genre": 10765,     "title": "Sci-Fi"},
+    "popular":    {"title": "Popular",    "special": "popular"},
+    "top_rated":  {"title": "Top Rated",  "special": "top_rated"},
 }
 
 CATEGORY_PER_PAGE = 24
@@ -865,6 +915,84 @@ def load_category_page(slug, page):
     return data
 
 
+def load_popular_page(page, media_type=None):
+    """Load popular movies + TV for a given page, optionally filtered by media_type."""
+    cache_key = f"category_popular_{media_type or 'all'}_p{page}"
+    data = cache.get(cache_key)
+
+    if data:
+        return data
+
+    movies = popularMovie()
+    tv = popular_tv()
+
+    # Add media_type
+    for m in movies:
+        m["media_type"] = "movie"
+    for t in tv:
+        t["media_type"] = "tv"
+
+    # Filter by media_type if specified
+    if media_type == "movie":
+        combined = movies
+    elif media_type == "tv":
+        combined = tv
+    else:
+        # Interleave movie + TV
+        combined = []
+        for i in range(max(len(movies), len(tv))):
+            if i < len(movies):
+                combined.append(movies[i])
+            if i < len(tv):
+                combined.append(tv[i])
+
+    items = combined[(page - 1) * CATEGORY_PER_PAGE:page * CATEGORY_PER_PAGE]
+    total_pages = max(1, -(-len(combined) // CATEGORY_PER_PAGE))
+
+    data = {"items": items, "total_pages": total_pages}
+    cache.set(cache_key, data, 3600)
+    return data
+
+
+def load_top_rated_page(page, media_type=None):
+    """Load top rated movies + TV for a given page, optionally filtered by media_type."""
+    cache_key = f"category_top_rated_{media_type or 'all'}_p{page}"
+    data = cache.get(cache_key)
+
+    if data:
+        return data
+
+    movies = topMovie()
+    tv = toprated_tv()
+
+    # Add media_type
+    for m in movies:
+        m["media_type"] = "movie"
+    for t in tv:
+        t["media_type"] = "tv"
+
+    # Filter by media_type if specified
+    if media_type == "movie":
+        combined = movies
+    elif media_type == "tv":
+        combined = tv
+    else:
+        # Interleave movie + TV
+        combined = []
+        for i in range(max(len(movies), len(tv))):
+            if i < len(movies):
+                combined.append(movies[i])
+            if i < len(tv):
+                combined.append(tv[i])
+
+    items = combined[(page - 1) * CATEGORY_PER_PAGE:page * CATEGORY_PER_PAGE]
+    total_pages = max(1, -(-len(combined) // CATEGORY_PER_PAGE))
+
+    data = {"items": items, "total_pages": total_pages}
+    cache.set(cache_key, data, 3600)
+    return data
+
+
 def category(request, slug):
 
     if slug not in CATEGORY_CONFIG:
@@ -875,9 +1003,20 @@ def category(request, slug):
     except (TypeError, ValueError):
         page = 1
 
-    data = load_category_page(slug, page)
+    # Get media_type filter from query string (movie, tv, or None for all)
+    media_type = request.GET.get("type")
+    if media_type not in ("movie", "tv"):
+        media_type = None
 
     cfg = CATEGORY_CONFIG[slug]
+
+    # Handle special categories
+    if cfg.get("special") == "popular":
+        data = load_popular_page(page, media_type)
+    elif cfg.get("special") == "top_rated":
+        data = load_top_rated_page(page, media_type)
+    else:
+        data = load_category_page(slug, page)
 
     pages = []
     total = data["total_pages"]
@@ -895,6 +1034,7 @@ def category(request, slug):
         "total_pages": total,
         "per_page": CATEGORY_PER_PAGE,
         "pages": pages,
+        "media_type": media_type,
     })
 
 

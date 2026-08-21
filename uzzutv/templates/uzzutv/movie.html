@@ -22,42 +22,50 @@
 
 <h1 class="visually-hidden">Watch Movies Online - UzzUTV</h1>
 
-
+<div id="loader">
+  <div class="loader-content">
+    <div class="logo">Uzz<span class="brand-red">UTV</span></div>
+    <div class="spinner"></div>
+  </div>
+</div>
 
 
 <div class="hero-wrapper">
 
 <div class="hero-slider">
 
-{% for movie in trendingMovie|slice:":8" %}
+{% for movie in trendingMovie|slice:":10" %}
 
 {% if movie.vote_average > 0 %}
 
 <div class="hero-slide">
 
-<img class="hero-bg" alt="" fetchpriority="high"
+<img class="hero-bg" alt=""
+fetchpriority="high"
 src="https://image.tmdb.org/t/p/w1280{{ movie.backdrop_path }}">
 
 <div class="hero-content">
 
-<h2 class="hero-title" style="font-family: 'Passero One', sans-serif;">
+{% if movie.logo %}
+<img class="hero-logo" alt="{{ movie.title }} logo" src="https://image.tmdb.org/t/p/w500{{ movie.logo }}">
+{% else %}
+<h2 class="hero-title">
 {{ movie.title|truncatewords:3 }}
 </h2>
+{% endif %}
 
 <div class="hero-meta">
-⭐ {{ movie.vote_average }} · {{ movie.media_type.capitalize }} 
+<span class="hero-rating">★ {{ movie.vote_average|floatformat:1 }}</span>
+<span class="hero-type">{{ movie.media_type|upper }}</span>
 </div>
 
-<p class="p-mobile">{{ movie.overview|truncatewords:25 }}</p>
+<p class="hero-desc">{{ movie.overview|truncatewords:32 }}</p>
 
 <div class="hero-buttons">
 
 <a href="{% url 'watchmov' movie.id %}"
-onclick="saveContinue('{{movie.id}}','movie','{{movie.poster_path}}')">
-
-<button class="watch-btn">▶ Watch Now</button>
-
-</a>
+onclick="saveContinue('{{movie.id}}','movie','{{movie.poster_path}}')"
+class="watch-btn"><span class="material-icons">play_arrow</span> Watch Now</a>
 
 <a class="info-btn" href="{% url 'detail' 'movie' movie.id %}">More Info</a>
 
@@ -73,87 +81,94 @@ onclick="saveContinue('{{movie.id}}','movie','{{movie.poster_path}}')">
 
 </div>
 
+<button class="hero-arrow hero-arrow-left" onclick="heroMove(-1)" aria-label="Previous slide">‹</button>
+<button class="hero-arrow hero-arrow-right" onclick="heroMove(1)" aria-label="Next slide">›</button>
+
+<div class="hero-dots" id="hero-dots"></div>
+
+</div>
 
 
 
 
-
-
-
-
-<!-- trending -->
- <div class="trending-section">
+<!-- Popular -->
+<div class="content-section trending-section">
 
 <div class="slider-header">
 
 <h2 class="section-title">Popular</h2>
 
+<div class="header-actions">
+<a class="view-all" href="{% url 'category' 'popular' %}?type=movie">View All <span class="material-icons">arrow_forward</span></a>
+
 <div class="slider-controls">
-<button onclick="slideLeft('top10-slider')"><span class="material-icons">chevron_left</span></button>
-<button onclick="slideRight('top10-slider')"><span class="material-icons">chevron_right</span></button>
+<button onclick="slideLeft('popular-slider')"><span class="material-icons">chevron_left</span></button>
+<button onclick="slideRight('popular-slider')"><span class="material-icons">chevron_right</span></button>
+</div>
 </div>
 
 </div>
 
-<div class="top10-row" id="top10-slider">
+<div class="movie-row" id="popular-slider">
 
-{% for popular in popularMovie|slice:":10" %}
+{% for popular in popularMovie|slice:":11" %}
 
-<div class="top10-card">
+<div class="movie-card">
 
-<span class="rank">{{ forloop.counter }}</span>
+<a class="card-link" href="{% url 'detail' 'movie' popular.id %}">
 
-
-<a href="{% url 'detail' 'movie' popular.id %}">
-
-
-<img loading="lazy" decoding="async" alt="{{ popular.title }} poster" src="https://image.tmdb.org/t/p/w342{{ popular.poster_path }}">
+<div class="card-poster">
+<img loading="lazy" decoding="async" alt="{{ popular.title }} poster" {% if popular.poster_path %}src="https://image.tmdb.org/t/p/w342{{ popular.poster_path }}"{% else %}src="{% static 'uzzutv/images/logo.png' %}"{% endif %}>
+<span class="card-gradient"></span>
+<span class="card-rating">★ {{ popular.vote_average|floatformat:1 }}</span>
+</div>
 
 </a>
 
 </div>
 
 {% endfor %}
+
 </div>
+
 </div>
-</div>
-
-
-<h4 style="color: #111111 ;">by Rashan Gang</h4>
 
 
 
-<!-- action -->
 
-
-<div id="mobile-fix" class="content-section">
+<!-- Top Rated -->
+<div class="content-section">
 
 <div class="slider-header">
 
 <h2 class="section-title">Top Rated</h2>
 
+<div class="header-actions">
+<a class="view-all" href="{% url 'category' 'top_rated' %}?type=movie">View All <span class="material-icons">arrow_forward</span></a>
+
 <div class="slider-controls">
-<button onclick="slideLeft('action-slider')">
+<button onclick="slideLeft('toprated-slider')">
 <span class="material-icons">chevron_left</span>
 </button>
 
-<button onclick="slideRight('action-slider')">
+<button onclick="slideRight('toprated-slider')">
 <span class="material-icons">chevron_right</span>
 </button>
 </div>
+</div>
 
 </div>
 
-<div class="movie-row" id="action-slider">
+<div class="movie-row" id="toprated-slider">
 
-{% for top in toprated %}
+{% for top in toprated|slice:":11" %}
 
 <div class="movie-card">
 
 <a class="card-link" href="{% url 'detail' 'movie' top.id %}">
 
 <div class="card-poster">
-<img loading="lazy" decoding="async" alt="{{ top.title }} poster" src="https://image.tmdb.org/t/p/w342{{ top.poster_path }}">
+<img loading="lazy" decoding="async" alt="{{ top.title }} poster" {% if top.poster_path %}src="https://image.tmdb.org/t/p/w342{{ top.poster_path }}"{% else %}src="{% static 'uzzutv/images/logo.png' %}"{% endif %}>
 <span class="card-gradient"></span>
 <span class="card-rating">★ {{ top.vote_average|floatformat:1 }}</span>
 </div>
@@ -167,45 +182,71 @@ onclick="saveContinue('{{movie.id}}','movie','{{movie.poster_path}}')">
 </div>
 
 </div>
+
 <div id="continue-movie"></div>
-
-
 
 
 
 <script>
 window.addEventListener("DOMContentLoaded", () => {
 renderContinueMovies("continue-movie");
+buildHeroDots();
 });
-function slideLeftTop(){
-document.getElementById("top10-slider")
-.scrollBy({left:-600, behavior:"smooth"});
+
+function buildHeroDots(){
+const container = document.getElementById("hero-dots");
+const slides = document.querySelectorAll(".hero-slide");
+if(!container || slides.length === 0) return;
+container.innerHTML = "";
+slides.forEach((slide, i) => {
+const dot = document.createElement("button");
+dot.type = "button";
+dot.className = "hero-dot";
+dot.setAttribute("aria-label", "Go to slide " + (i + 1));
+if(i === 0) dot.classList.add("active");
+dot.addEventListener("click", () => goToSlide(i));
+container.appendChild(dot);
+});
 }
 
-function slideRightTop(){
-document.getElementById("top10-slider")
-.scrollBy({left:600, behavior:"smooth"});
-}
-let slides = document.querySelectorAll(".hero-slide");
-let index = 0;
+let heroIndex = 0;
+let heroSlides = document.querySelectorAll(".hero-slide");
 
-slides[0].classList.add("active");
+function activateSlide(i){
+heroSlides.forEach(s => s.classList.remove("active"));
+heroSlides[i].classList.add("active");
+const dots = document.querySelectorAll(".hero-dot");
+dots.forEach((d, di) => d.classList.toggle("active", di === i));
+}
+
+function goToSlide(i){
+heroIndex = i;
+activateSlide(i);
+}
+
+function heroMove(dir){
+if(heroSlides.length === 0) return;
+heroIndex = (heroIndex + dir + heroSlides.length) % heroSlides.length;
+activateSlide(heroIndex);
+}
 
 function showSlide(){
-
-slides.forEach(slide => slide.classList.remove("active"));
-
-slides[index].classList.add("active");
-
-index++;
-
-if(index >= slides.length){
-index = 0;
+if(heroSlides.length === 0) return;
+heroIndex = (heroIndex + 1) % heroSlides.length;
+activateSlide(heroIndex);
 }
 
+let heroTimer;
+if(heroSlides.length > 0){
+heroSlides[0].classList.add("active");
+heroTimer = setInterval(showSlide, 6000);
 }
 
-setInterval(showSlide, 5000);
+const heroWrapper = document.querySelector(".hero-wrapper");
+if(heroWrapper){
+heroWrapper.addEventListener("mouseenter", () => { clearInterval(heroTimer); });
+heroWrapper.addEventListener("mouseleave", () => { heroTimer = setInterval(showSlide, 6000); });
+}
 
 function slideLeft(id){
 const slider = document.getElementById(id);
@@ -221,36 +262,21 @@ slider.scrollBy({left:600, behavior:"smooth"});
 }
 }
 
+
+window.addEventListener("load", function(){
+
+const loader = document.getElementById("loader");
+
+/* fade animation */
+loader.classList.add("fade-out");
+
+/* remove from DOM */
+setTimeout(() => {
+loader.style.display = "none";
+}, 1000);
+
+});
+
+
 </script>
 {% endblock%}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
