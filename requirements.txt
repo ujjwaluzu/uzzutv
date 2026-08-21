@@ -1,0 +1,4 @@
+Django==5.2.16
+python-dotenv==1.2.2
+requests==2.32.3
+supabase==2.31.0

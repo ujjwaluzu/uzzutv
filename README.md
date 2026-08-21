@@ -1,6 +1,6 @@
 # UzzUTV
 
-UzzUTV is a Netflix-style streaming platform built with Django that lets you discover, search, and watch movies and TV series. All content data is pulled live from **The Movie Database (TMDB) API**, with a responsive, mobile-friendly UI inspired by modern streaming apps. Accounts are powered by **Supabase**, giving you watchlist, Continue Watching, ratings, reviews, and public profiles.
+UzzUTV is a Netflix-style streaming platform built with Django that lets you discover, search, and watch movies and TV series. All content data is pulled live from **The Movie Database (TMDB) API**, with a responsive, mobile-friendly UI inspired by modern streaming apps. Accounts are powered by **Supabase**, giving you watchlist, Continue Watching, ratings, reviews, public profiles, and Watch Parties.
 
 ---
 
@@ -10,9 +10,18 @@ UzzUTV is a Netflix-style streaming platform built with Django that lets you dis
 - Trending, popular, and top-rated movies and TV shows
 - Genre rows (Action, Romance, Comedy, Anime) with a mixed movie + TV feed
 - Top 10 row and animated hero banners with movie/TV logos
+- Landing-page genre cards that jump straight into a random title from that genre
+
+### Genre Categories
+- Dedicated category pages at `/category/<slug>/` for Action, Romance, Comedy, Animation, Thriller, Drama, Horror, Sci-Fi — plus Popular and Top Rated
+- Each page mixes movies and TV shows in one balanced feed
+- Paginated browsing (24 titles per page)
 
 ### Details & Cast
-- Dedicated detail pages with full metadata, cast list, and recommendations
+- Dedicated detail pages with full metadata and a hero banner using the official title logo
+- Top Cast row with profile photos
+- "More Like This" recommendations row
+- Restyled Ratings & Reviews section matching the site theme
 
 ### Watch
 - Episode streaming for TV series with season/episode navigation
@@ -27,8 +36,13 @@ UzzUTV is a Netflix-style streaming platform built with Django that lets you dis
 - Watchlist, Continue Watching, ratings, and comments synced across devices
 
 ### Ratings & Reviews
-- Star-rating any movie or TV show on its detail page
-- Comment/review on detail pages, with paginated comment feeds
+- Star-rate any movie or TV show on its detail page
+- Rating summary with average score and a 5-star distribution bar chart
+- Comment/review on detail pages, with paginated comment feeds and author star ratings
+
+### Watch Party
+- Create or join watch parties at `/party/`
+- Synchronized playback rooms at `/party/<room_code>/` powered by Supabase Realtime
 
 ### Watchlist
 - Save favorites to watch later
@@ -41,6 +55,9 @@ UzzUTV is a Netflix-style streaming platform built with Django that lets you dis
 ### Continue Watching
 - Picks up where you left off in movies and TV episodes, across devices
 
+### SEO
+- Dynamic `robots.txt` and `sitemap.xml`
+
 ### Performance
 - Database-backed response caching (TMDB calls cached for hours)
 - GZip compression middleware
@@ -52,10 +69,10 @@ UzzUTV is a Netflix-style streaming platform built with Django that lets you dis
 
 | Layer      | Technology                          |
 |------------|-------------------------------------|
-| Backend    | Python, Django 4.2                  |
+| Backend    | Python, Django 5.2                  |
 | Frontend   | HTML5, CSS3, Bootstrap 5, JavaScript |
 | Data       | TMDB API (movies/TV metadata)       |
-| Auth/Data  | Supabase (auth, watchlist, ratings, comments, profiles) |
+| Auth/Data  | Supabase (auth, watchlist, ratings, comments, profiles, realtime) |
 | Database   | SQLite (Django)                     |
 | Caching    | Django DatabaseCache                |
 | Deploy     | PythonAnywhere (see `settings.py`)  |
@@ -82,7 +99,7 @@ venv\Scripts\activate        # Windows
 source venv/bin/activate     # macOS/Linux
 
 # 3. Install dependencies
-pip install django python-dotenv requests supabase
+pip install -r requirements.txt
 
 # 4. Set up environment variables (see below)
 # 5. Run migrations and cache table
@@ -118,6 +135,7 @@ CSRF_COOKIE_SECURE=False
 ```
 uzzutv/
 ├── manage.py
+├── requirements.txt
 ├── db.sqlite3
 ├── .env
 ├── stream/                # Django project settings
@@ -139,17 +157,21 @@ uzzutv/
 | `/`                       | Landing page                         |
 | `/home/`                  | Main browse page (hero + genre rows) |
 | `/movie/` `/tv/`          | Movies / TV shows                    |
+| `/category/<slug>/`       | Category page (mixed movies + TV, paginated): `action`, `romance`, `comedy`, `animation`, `thriller`, `drama`, `horror`, `scifi`, `popular`, `top_rated` |
 | `/<type>/<id>/`           | Detail page (cast, recommendations, rate & comment) |
 | `/movie/<id>/watch/`      | Movie player                         |
 | `/tv/<id>/watch/`         | TV player (season/episode select)    |
 | `/search/`                | Search                               |
 | `/watchlist/`             | Your saved titles                    |
 | `/rated/`                 | Your ratings (with `/rated/<user_id>/` public view) |
+| `/party/`                 | Watch Party dashboard (create/join)  |
+| `/party/<room_code>/`     | Watch Party room                     |
 | `/auth/`                  | Sign in / sign up                    |
 | `/profile/`               | Your profile (ratings, watchlist, comments) |
 | `/profile/<user_id>/`     | Public profile                       |
 | `/media-info/<type>/<id>/`| Media metadata JSON (used by profile pages) |
 | `/terms/` `/dmca/`        | Legal pages                          |
+| `/robots.txt` `/sitemap.xml` | SEO endpoints                     |
 
 ---
 
@@ -168,7 +190,6 @@ The project is configured for PythonAnywhere:
 
 ## Future Improvements
 
-- Watch Together functionality
 - Personalized recommendations
 - Better streaming player
 - Enhanced episode progress syncing
