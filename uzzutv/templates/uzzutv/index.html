@@ -46,6 +46,7 @@
 <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
 <!-- GSAP & Lenis -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.19/bundled/lenis.min.js"></script>
 <style>
@@ -138,8 +139,8 @@ body { min-width: 0; }
             <a href="{% url 'tv' %}" class="relative inline-block w-fit translate-y-8 opacity-0 menu-item after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-[1px] after:bottom-0 after:left-0 after:bg-current after:origin-bottom-right after:transition-transform after:duration-[400ms] after:ease-[cubic-bezier(0.86,0,0.07,1)] hover:after:scale-x-100 hover:after:origin-bottom-left">
                 Series
             </a>
-            <a href="{% url 'watchlist' %}" class="relative inline-block w-fit translate-y-8 opacity-0 menu-item after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-[1px] after:bottom-0 after:left-0 after:bg-current after:origin-bottom-right after:transition-transform after:duration-[400ms] after:ease-[cubic-bezier(0.86,0,0.07,1)] hover:after:scale-x-100 hover:after:origin-bottom-left">
-                Watchlist
+            <a href="{% url 'auth' %}" id="menu-account" class="relative inline-block w-fit translate-y-8 opacity-0 menu-item after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-[1px] after:bottom-0 after:left-0 after:bg-current after:origin-bottom-right after:transition-transform after:duration-[400ms] after:ease-[cubic-bezier(0.86,0,0.07,1)] hover:after:scale-x-100 hover:after:origin-bottom-left">
+                Login
             </a>
         </nav>
     </div>
@@ -634,6 +635,17 @@ body { min-width: 0; }
                 });
             }
         });
+
+        (async function updateLandingAccount(){
+            const account = document.getElementById('menu-account');
+            if (!account || !window.supabase) return;
+            const client = window.supabase.createClient('https://mmtmpsomnjjsveybirtl.supabase.co','sb_publishable_2bgeKFB31VSLyZCYwdvUaQ_bRNsa_gO');
+            const { data: { user } } = await client.auth.getUser();
+            if (!user) return;
+            const { data: profile } = await client.from('profiles').select('username').eq('id', user.id).maybeSingle();
+            account.href = '/profile/';
+            account.textContent = (profile && profile.username) ? profile.username : 'Profile';
+        })();
 
         // Back to top
         document.getElementById('back-to-top').addEventListener('click', () => {
