@@ -701,6 +701,30 @@
 .vc-call-wrap > *{
     pointer-events: auto;
 }
+.vc-call-wrap.vc-expanded{
+    inset:16px;
+    right:16px;
+    bottom:16px;
+    align-items:stretch;
+    justify-content:center;
+    padding:clamp(16px,3vw,42px);
+    background:rgba(8,8,10,.94);
+    border:1px solid rgba(255,255,255,.14);
+    border-radius:20px;
+    box-shadow:0 24px 80px rgba(0,0,0,.7);
+    backdrop-filter:blur(16px);
+}
+.vc-call-wrap.vc-expanded .vc-status-bar{ align-self:center; }
+.vc-call-wrap.vc-expanded .vc-tiles{ width:min(100%,1100px); align-items:stretch; margin:0 auto; gap:16px; }
+.vc-call-wrap.vc-expanded .vc-remote-tile{ flex:1 1 auto; width:auto; max-height:calc(100vh - 210px); aspect-ratio:16/10; }
+.vc-call-wrap.vc-expanded .vc-local-tile{ width:clamp(150px,20vw,260px); align-self:flex-end; }
+.vc-call-wrap.vc-expanded .vc-controls{ align-self:center; }
+@media(max-width:640px){
+    .vc-call-wrap.vc-expanded{ inset:8px; padding:12px; border-radius:14px; }
+    .vc-call-wrap.vc-expanded .vc-tiles{ flex-direction:column; max-height:calc(100vh - 150px); }
+    .vc-call-wrap.vc-expanded .vc-remote-tile{ width:100%; max-height:none; aspect-ratio:4/3; }
+    .vc-call-wrap.vc-expanded .vc-local-tile{ width:120px; margin-top:-62px; margin-right:8px; z-index:3; }
+}
 
 /* -- Status bar (above the tiles) -- */
 
@@ -2060,6 +2084,9 @@ body:has(.party-room-page){ overflow-x:hidden; }
                 <button class="vc-ctrl-btn party-player-fullscreen-btn vc-call-fullscreen-btn" id="party-player-fullscreen-btn" type="button" onclick="togglePartyFullscreen()" title="Enter fullscreen" aria-label="Enter fullscreen">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H3v5"/><path d="M16 3h5v5"/><path d="M21 16v5h-5"/><path d="M3 16v5h5"/></svg>
                 </button>
+                <button class="vc-ctrl-btn vc-expand-btn" id="vc-expand-btn" onclick="toggleVcExpand()" title="Expand video call" aria-label="Expand video call">
+                    <svg id="vc-expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 8 3 3"/><path d="M3 3h5"/><path d="M3 3v5"/><path d="m16 8 5-5"/><path d="M21 3h-5"/><path d="M21 3v5"/><path d="m8 16-5 5"/><path d="M3 21h5"/><path d="M3 21v-5"/><path d="m16 16 5 5"/><path d="M21 21h-5"/><path d="M21 21v-5"/></svg>
+                </button>
                 <button class="vc-ctrl-btn vc-minimize-btn" id="vc-minimize-btn" onclick="toggleMinimize()" title="Minimize" aria-label="Minimize video call">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3"/><path d="M21 8h-3a2 2 0 0 1-2-2V3"/><path d="M3 16h3a2 2 0 0 1 2 2v3"/><path d="M16 21v-3a2 2 0 0 1 2-2h3"/></svg>
                 </button>
@@ -2200,6 +2227,7 @@ let callTimeoutTimer = null;          // setTimeout handle for call timeout
 let wasConnected = false;             // tracks if we reached "connected" at least once
 let reconnectTimer = null;
 let vcMinimized = false;
+let vcExpanded = false;
 let vcDrag = null;
 let vcAccepting = false;
 let vcPresenceDisconnectTimer = null;
@@ -4713,6 +4741,7 @@ function openConnectedPanel() {
 
 function closeVcUi() {
     ["vc-call-wrap", "vc-outgoing-card", "vc-incoming-card", "vc-minimized", "vc-remote-tile", "vc-local-tile"].forEach(function (id) { var el = document.getElementById(id); if (el) el.classList.add("d-none"); });
+    var callWrap = document.getElementById("vc-call-wrap"); if (callWrap) callWrap.classList.remove("vc-expanded"); vcExpanded = false;
     ["vc-controls", "vc-status-bar"].forEach(function (id) { var el = document.getElementById(id); if (el) el.classList.add("vc-hidden"); });
     var tiles = document.getElementById("vc-tiles"); if (tiles) tiles.classList.remove("d-none");
     var launch = document.getElementById("vc-launch-btn"); if (launch) launch.classList.toggle("d-none", !isHost);
@@ -4938,6 +4967,20 @@ function toggleMinimize() {
     document.getElementById("vc-controls").classList.toggle("vc-hidden", vcMinimized);
     document.getElementById("vc-minimized").classList.toggle("d-none", !vcMinimized);
     if (vcMinimized) syncMinimizedVideo(); renderVcState();
+}
+
+function toggleVcExpand() {
+    if (!["accepted", "connecting", "connected", "disconnected", "reconnecting"].includes(vcCallState)) return;
+    var wrap = document.getElementById("vc-call-wrap");
+    var button = document.getElementById("vc-expand-btn");
+    if (!wrap) return;
+    vcExpanded = !vcExpanded;
+    wrap.classList.toggle("vc-expanded", vcExpanded);
+    if (button) {
+        button.title = vcExpanded ? "Restore video call size" : "Expand video call";
+        button.setAttribute("aria-label", vcExpanded ? "Restore video call size" : "Expand video call");
+    }
+    clampVcWindowToBounds();
 }
 
 /* The compact widget represents the other participant, not the local preview. */
