@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 520" role="img" aria-labelledby="title desc">
+  <title id="title">UzzUTV detail page ID example</title>
+  <desc id="desc">A dark UzzUTV detail page mockup with the movie ID highlighted in the address bar.</desc>
+  <rect width="1200" height="520" rx="24" fill="#0d0d0f"/>
+  <rect x="24" y="24" width="1152" height="472" rx="18" fill="#171719" stroke="#3a3a40" stroke-width="2"/>
+  <circle cx="56" cy="58" r="8" fill="#ff5f57"/><circle cx="82" cy="58" r="8" fill="#febc2e"/><circle cx="108" cy="58" r="8" fill="#28c840"/>
+  <rect x="150" y="39" width="950" height="38" rx="19" fill="#0d0d0f" stroke="#34343a"/>
+  <text x="178" y="64" fill="#9ca3af" font-family="Arial,sans-serif" font-size="17">uzzutv.com/movie/</text>
+  <rect x="326" y="45" width="60" height="27" rx="6" fill="#7f1d1d"/>
+  <text x="342" y="64" fill="#fff" font-family="Arial,sans-serif" font-size="17" font-weight="700">603</text>
+  <text x="394" y="64" fill="#9ca3af" font-family="Arial,sans-serif" font-size="17">/</text>
+  <rect x="54" y="112" width="1092" height="330" rx="14" fill="#101012"/>
+  <rect x="54" y="112" width="1092" height="120" rx="14" fill="#32191d"/>
+  <rect x="88" y="145" width="170" height="220" rx="10" fill="#59252b"/>
+  <text x="292" y="174" fill="#f5f5f5" font-family="Arial,sans-serif" font-size="30" font-weight="700">Movie detail page</text>
+  <text x="292" y="215" fill="#9ca3af" font-family="Arial,sans-serif" font-size="19">The number after /movie/ or /tv/ is the TMDB ID.</text>
+  <rect x="292" y="260" width="460" height="58" rx="10" fill="#3f171d" stroke="#ef4444" stroke-width="2"/>
+  <text x="316" y="296" fill="#fca5a5" font-family="Arial,sans-serif" font-size="20" font-weight="700">Use 603 as the Movie ID</text>
+  <text x="292" y="356" fill="#9ca3af" font-family="Arial,sans-serif" font-size="17">For a series, look for /tv/1399/ in the address bar.</text>
+  <text x="54" y="480" fill="#6b7280" font-family="Arial,sans-serif" font-size="15">Illustration: open a title's UzzUTV detail page and read the ID from the URL.</text>
+</svg>

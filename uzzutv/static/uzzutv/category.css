@@ -1,0 +1,190 @@
+/* =========================================================
+   CATEGORY PAGE
+========================================================= */
+
+.category-hero{
+    padding:56px 24px 36px;
+    background:
+        radial-gradient(60% 120% at 15% 0%, rgba(255,60,60,.16), transparent 60%),
+        linear-gradient(180deg, rgba(20,20,20,.6), #0c0c0c);
+    border-bottom:1px solid rgba(255,255,255,.06);
+}
+
+.category-hero-inner{
+    max-width:1400px;
+    margin:0 auto;
+}
+
+.category-kicker{
+    color:#ff3c3c;
+    font-size:12.5px;
+    font-weight:700;
+    letter-spacing:3px;
+    text-transform:uppercase;
+    margin:0 0 6px;
+}
+
+.category-title{
+    font-family:"Anton", sans-serif;
+    font-weight:400;
+    text-transform:uppercase;
+    font-size:clamp(2.4rem, 6vw, 4rem);
+    line-height:1;
+    color:#fff;
+    margin:0 0 8px;
+    letter-spacing:1px;
+}
+
+.category-sub{
+    color:#9ca3af;
+    font-size:14px;
+    margin:0;
+}
+
+.category-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(150px, 1fr));
+    gap:18px 16px;
+    max-width:1400px;
+    margin:0 auto;
+    padding:32px 24px 20px;
+}
+
+.category-grid .movie-card{
+    width:100%;
+}
+
+.category-empty{
+    max-width:1400px;
+    margin:0 auto;
+    padding:80px 24px;
+    text-align:center;
+    color:#9ca3af;
+    font-size:16px;
+}
+
+.category-empty .view-all{
+    margin-top:16px;
+}
+
+/* =========================================================
+   PAGINATION
+========================================================= */
+
+.pagination-wrap{
+    max-width:1400px;
+    margin:0 auto;
+    padding:28px 24px 56px;
+    text-align:center;
+}
+
+.pagination{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:8px;
+}
+
+.pagination .page-link,
+.pagination > a,
+.pagination > span{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width:40px;
+    height:40px;
+    padding:0 14px;
+    border-radius:12px;
+    background:rgba(255,255,255,.05);
+    border:1px solid rgba(255,255,255,.10);
+    color:#d7dae0;
+    font-size:14px;
+    font-weight:600;
+    text-decoration:none;
+    font-family:"Inter", sans-serif;
+    transition:background-color .2s ease, border-color .2s ease, color .2s ease, transform .2s ease, box-shadow .2s ease;
+}
+
+a.page-link:hover{
+    background:rgba(255,60,60,.14);
+    border-color:#ff3c3c;
+    color:#fff;
+    transform:translateY(-2px);
+    box-shadow:0 6px 18px rgba(255,60,60,.18);
+}
+
+.page-link.active,
+.pagination > .active{
+    background:linear-gradient(135deg, #ff3c3c, #ff2b2b);
+    border-color:#ff3c3c;
+    color:#fff;
+    cursor:default;
+    box-shadow:0 6px 22px rgba(255,60,60,.4);
+}
+
+.page-link.disabled{
+    opacity:.4;
+    cursor:not-allowed;
+    pointer-events:none;
+}
+
+.page-arrow{
+    padding:0 18px;
+    white-space:nowrap;
+    letter-spacing:.3px;
+}
+
+a.page-arrow:hover{
+    background:#ff3c3c;
+    border-color:#ff3c3c;
+    color:#fff;
+    box-shadow:0 6px 22px rgba(255,60,60,.35);
+}
+
+.page-gap{
+    color:#6b7280;
+    padding:0 2px;
+    font-size:14px;
+}
+
+.pagination-info{
+    margin-top:16px;
+    color:#8b93a1;
+    font-size:13px;
+    letter-spacing:.3px;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 767px){
+
+    .category-hero{
+        padding:48px 16px 28px;
+    }
+
+    .category-grid{
+        grid-template-columns:repeat(auto-fill, minmax(118px, 1fr));
+        gap:14px 10px;
+        padding:24px 14px 16px;
+    }
+
+    .pagination-wrap{
+        padding:16px 14px 40px;
+    }
+
+    .page-link{
+        min-width:36px;
+        height:36px;
+        font-size:13px;
+    }
+}
+
+@media (max-width: 400px){
+
+    .category-grid{
+        grid-template-columns:repeat(auto-fill, minmax(104px, 1fr));
+    }
+}
