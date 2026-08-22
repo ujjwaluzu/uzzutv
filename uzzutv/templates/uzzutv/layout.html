@@ -223,6 +223,16 @@ body{
   transition: background-color .2s ease, transform .2s ease;
 }
 
+.navbar-toggler,
+.navbar .uzz-auth .btn,
+.navbar .uzz-search-btn{
+  min-height:44px;
+}
+.navbar-toggler{ min-width:44px; }
+.navbar .container-fluid{ min-width:0; flex-wrap:wrap; }
+.navbar-brand{ flex:0 0 auto; }
+.navbar-collapse{ min-width:0; }
+
 .uzz-search-btn:hover{
   background: #ff2b2b;
   transform: translateY(-1px);
@@ -255,6 +265,9 @@ body{
   padding: 16px;
   margin-top: 12px;
   box-shadow: 0 20px 40px rgba(0,0,0,.5);
+  max-height:calc(100svh - 86px);
+  overflow-y:auto;
+  overscroll-behavior:contain;
 }
 
 .navbar-nav .nav-link{
@@ -298,12 +311,22 @@ body{
 
 .uzz-search-input{
   width: 100%;
+  min-width:0;
 }
 
 .uzz-search-btn{
   padding: .7rem 1rem;
 }
 
+}
+
+@media (min-width: 992px) and (max-width: 1199px){
+  .navbar{ padding-left:.8rem; padding-right:.8rem; }
+  .navbar-brand{ margin-right:1rem; }
+  .navbar-nav .nav-link{ padding-left:.55rem; padding-right:.55rem; }
+  .uzz-search{ margin-left:.5rem; }
+  .uzz-search-input{ width:170px; }
+  .uzz-search-btn{ padding-left:.9rem; padding-right:.9rem; }
 }
 
 /* =========================================================
@@ -469,6 +492,18 @@ body{
   text-transform:uppercase;
   color:#e2e1d3;
   margin:0 -2vw -1vw 0;
+  max-width:100%;
+  overflow-wrap:anywhere;
+}
+
+.site-footer{ min-width:0; overflow:hidden; }
+.footer-grid > *{ min-width:0; }
+.footer-bottom{ min-width:0; }
+
+@media (min-width: 601px){
+  .footer-bottom{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,2fr); align-items:end; }
+  .footer-copy{ grid-column:1; grid-row:1; align-self:end; }
+  .footer-big-logo{ grid-column:2; grid-row:1; width:100%; margin:0; text-align:right; font-size:clamp(4rem,16vw,16rem); line-height:.82; }
 }
 
 @media (max-width: 991px){
@@ -512,8 +547,22 @@ body{
 
 .footer-big-logo{
   order:1;
-  margin:0 -4vw -2vw 0;
+  width:100%;
+  margin:0;
+  text-align:left;
+  line-height:.84;
+  font-size:clamp(4rem,24vw,9rem);
 }
+
+.footer-copy{ line-height:1.5; margin:0 0 12px; }
+
+}
+
+@media (max-width: 360px){
+  .navbar{ padding-left:.65rem; padding-right:.65rem; }
+  .navbar-brand{ font-size:20px; margin-right:.5rem; }
+  .navbar-collapse{ padding:12px; }
+  .footer-social{ flex-wrap:wrap; }
 
 }</style>
 {% block head %}{% endblock %}
