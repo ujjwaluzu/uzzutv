@@ -108,6 +108,65 @@
     border: none;
 }
 
+.party-player-fullscreen-btn{
+    position: absolute;
+    left: 16px;
+    bottom: 16px;
+    z-index: 12;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    color: #ffffff;
+    background: rgba(15,15,15,.72);
+    border: 1px solid rgba(255,255,255,.18);
+    border-radius: 10px;
+    cursor: pointer;
+    opacity: .82;
+    transition: opacity .15s, background .15s, transform .15s;
+}
+.party-player-fullscreen-btn:hover,
+.party-player-fullscreen-btn:focus-visible{
+    opacity: 1;
+    background: rgba(30,30,30,.92);
+    transform: translateY(-1px);
+    outline: none;
+}
+.party-player-fullscreen-btn svg{ width: 18px; height: 18px; }
+.party-room-player:fullscreen,
+.party-room-player.is-fullscreen{
+    width: 100vw;
+    height: 100vh;
+    max-width: none;
+    aspect-ratio: auto;
+    border: 0;
+    border-radius: 0;
+    background: #000000;
+}
+.party-room-player:fullscreen .party-player-fullscreen-btn,
+.party-room-player.is-fullscreen .party-player-fullscreen-btn{ left: 24px; bottom: 24px; }
+.vc-call-fullscreen-btn{
+    position: relative;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    flex: 0 0 38px;
+    align-self: center;
+    margin: 0 2px;
+}
+.party-room-player:fullscreen .vc-call-fullscreen-btn,
+.party-room-player.is-fullscreen .vc-call-fullscreen-btn{ left:auto; right:auto; bottom:auto; }
+.vc-controls .vc-call-fullscreen-btn{
+    position: relative;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    flex: 0 0 40px;
+    margin: 0;
+}
+
 /* ---------- HOST ACTIVITY SIDEBAR ---------- */
 
 .party-room-side{
@@ -1319,7 +1378,7 @@
 .vc-drag-handle:active{ cursor:grabbing; }
 .vc-drag-handle span:first-child{ color:#9ca3af; letter-spacing:-3px; }
 #vc-drag-status{ margin-left:auto; color:#22c55e; font-size:10px; }
-.vc-tiles{ flex-wrap:wrap; max-width:430px; }
+.vc-tiles{ flex-wrap:wrap; max-width:520px; }
 .vc-tiles .vc-drag-handle{ flex-basis:100%; }
 @keyframes vc-card-in{ from{opacity:0;transform:translateY(10px) scale(.96)} to{opacity:1;transform:none} }
 @keyframes vc-ring{ 0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.42)} 50%{box-shadow:0 0 0 12px rgba(239,68,68,0)} }
@@ -1336,6 +1395,14 @@
 
     .vc-call-card{ width:calc(100% - 24px); margin:0 12px 12px; }
     .vc-drag-handle{ border-radius:12px 12px 0 0; }
+    .party-player-fullscreen-btn{ left:12px; bottom:calc(12px + env(safe-area-inset-bottom)); }
+    .vc-call-fullscreen-btn{ left:auto; right:auto; bottom:auto; }
+    .party-room-player:fullscreen .party-player-fullscreen-btn,
+    .party-room-player.is-fullscreen .party-player-fullscreen-btn{ left:12px; bottom:calc(12px + env(safe-area-inset-bottom)); }
+    .party-room-player:fullscreen .vc-call-fullscreen-btn,
+    .party-room-player.is-fullscreen .vc-call-fullscreen-btn{ left:auto; right:auto; bottom:auto; }
+    .party-room-player:fullscreen .vc-call-wrap,
+    .party-room-player.is-fullscreen .vc-call-wrap{ padding-bottom:env(safe-area-inset-bottom); }
 
     .vc-tiles{
         flex-direction: row;
@@ -1372,6 +1439,21 @@
     }
 
 }
+
+.party-room-guide{
+    margin-top: 32px;
+    padding: 20px 22px;
+    color: #d1d5db;
+    background: linear-gradient(180deg, #171717, #121212);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 16px;
+    box-shadow: 0 2px 10px rgba(0,0,0,.3);
+}
+.party-room-guide-title{ margin:0 0 10px; color:#fff; font-size:17px; font-weight:800; }
+.party-room-guide-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+.party-room-guide-item{ color:#9ca3af; font-size:12.5px; line-height:1.55; }
+.party-room-guide-item strong{ display:block; margin-bottom:3px; color:#f3f4f6; font-size:13px; }
+@media (max-width: 700px){ .party-room-guide-grid{ grid-template-columns:1fr; gap:12px; } }
 
 </style>
 {% endblock %}
@@ -1735,6 +1817,9 @@
                     <svg id="vc-cam-icon-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg>
                     <svg id="vc-cam-icon-off" class="d-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.66 6H14a2 2 0 0 1 2 2v2.34l1 .86 3.06 2.45A.5.5 0 0 0 21 14.38V7.62a.5.5 0 0 0-.75-.43L17 9.5"/><path d="M16 16a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h2"/><line x1="2" x2="22" y1="2" y2="22"/></svg>
                 </button>
+                <button class="vc-ctrl-btn party-player-fullscreen-btn vc-call-fullscreen-btn" id="party-player-fullscreen-btn" type="button" onclick="togglePartyFullscreen()" title="Enter fullscreen" aria-label="Enter fullscreen">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H3v5"/><path d="M16 3h5v5"/><path d="M21 16v5h-5"/><path d="M3 16v5h5"/></svg>
+                </button>
                 <button class="vc-ctrl-btn vc-minimize-btn" id="vc-minimize-btn" onclick="toggleMinimize()" title="Minimize" aria-label="Minimize video call">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3"/><path d="M21 8h-3a2 2 0 0 1-2-2V3"/><path d="M3 16h3a2 2 0 0 1 2 2v3"/><path d="M16 21v-3a2 2 0 0 1 2-2h3"/></svg>
                 </button>
@@ -1771,6 +1856,24 @@
     </div>
 
 </div>
+
+<section class="party-room-guide" aria-label="Watch Party and video call overview">
+    <h2 class="party-room-guide-title">How this Watch Party works</h2>
+    <div class="party-room-guide-grid">
+        <div class="party-room-guide-item">
+            <strong>Watch together</strong>
+            The host controls playback. Host Activity, Position Check, and guest playback stay synchronized automatically.
+        </div>
+        <div class="party-room-guide-item">
+            <strong>Video Call</strong>
+            The host selects Video Call. The guest receives an invitation and can Accept or Decline. After connecting, use the microphone, camera, minimize, and End Call controls.
+        </div>
+        <div class="party-room-guide-item">
+            <strong>Fullscreen movie</strong>
+            Use the UzzUTV fullscreen icon in the lower-left of the player. It keeps the VidFast movie and the existing call window together. VidFast's own iframe fullscreen button cannot display UzzUTV overlays.
+        </div>
+    </div>
+</section>
 
 
 <script>
@@ -4614,14 +4717,56 @@ function syncMinimizedVideo() {
 function handleVcLaunchClick() { if (vcCallState === "idle") startVideoCall(); else if (vcActive) toggleMinimize(); }
 function updateLaunchBtn() { var btn = document.getElementById("vc-launch-btn"), dot = document.getElementById("vc-launch-dot"); if (!btn) return; btn.classList.toggle("vc-launch-active", vcCallState !== "idle"); if (dot) dot.style.display = vcCallState !== "idle" ? "inline-block" : "none"; }
 
+function mountVcInPlayer() {
+    var player = document.getElementById("party-player-wrap");
+    var call = document.getElementById("vc-call-wrap");
+    if (player && call && call.parentElement !== player) player.appendChild(call);
+}
+
+function updatePartyFullscreenState() {
+    var player = document.getElementById("party-player-wrap");
+    var button = document.getElementById("party-player-fullscreen-btn");
+    if (!player) return;
+    var active = document.fullscreenElement === player;
+    player.classList.toggle("is-fullscreen", active);
+    if (button) {
+        button.title = active ? "Exit fullscreen" : "Enter fullscreen";
+        button.setAttribute("aria-label", active ? "Exit fullscreen" : "Enter fullscreen");
+    }
+    clampVcWindowToBounds();
+}
+
+function togglePartyFullscreen() {
+    var player = document.getElementById("party-player-wrap");
+    if (!player) return;
+    if (document.fullscreenElement === player) {
+        if (document.exitFullscreen) document.exitFullscreen().catch(function () {});
+        return;
+    }
+    if (player.requestFullscreen) player.requestFullscreen().catch(function (err) { console.warn("[WatchParty] Wrapper fullscreen unavailable", err); });
+}
+
+function clampVcWindowToBounds() {
+    var call = document.getElementById("vc-call-wrap");
+    if (!call || !call.style.left) return;
+    var player = document.getElementById("party-player-wrap");
+    var container = document.fullscreenElement === player && player ? player.getBoundingClientRect() : { left: 0, top: 0, right: window.innerWidth, bottom: window.innerHeight };
+    var rect = call.getBoundingClientRect(), margin = document.fullscreenElement === player ? 24 : 16;
+    call.style.left = Math.max(container.left + margin, Math.min(container.right - rect.width - margin, rect.left)) + "px";
+    call.style.top = Math.max(container.top + margin, Math.min(container.bottom - rect.height - margin, rect.top)) + "px";
+    call.style.right = "auto";
+    call.style.bottom = "auto";
+}
+
 function setupVcDragging() {
     var wrap = document.getElementById("vc-call-wrap"), handle = document.getElementById("vc-drag-handle"), minimized = document.getElementById("vc-minimized");
-    function clamp() { if (!wrap || !wrap.style.left) return; var rect = wrap.getBoundingClientRect(), margin = 16; wrap.style.left = Math.max(margin, Math.min(window.innerWidth - rect.width - margin, rect.left)) + "px"; wrap.style.top = Math.max(margin, Math.min(window.innerHeight - rect.height - margin, rect.top)) + "px"; wrap.style.right = "auto"; wrap.style.bottom = "auto"; }
+    function clamp() { clampVcWindowToBounds(); }
     function start(event) { if (window.innerWidth <= 640 || !wrap || event.button && event.button !== 0) return; var rect = wrap.getBoundingClientRect(); vcDrag = { x: event.clientX, y: event.clientY, left: rect.left, top: rect.top, moved: false, minimized: event.currentTarget === minimized }; wrap.setPointerCapture && wrap.setPointerCapture(event.pointerId); event.preventDefault(); }
     function move(event) { if (!vcDrag) return; vcDrag.moved = vcDrag.moved || Math.abs(event.clientX - vcDrag.x) > 3 || Math.abs(event.clientY - vcDrag.y) > 3; wrap.style.left = (vcDrag.left + event.clientX - vcDrag.x) + "px"; wrap.style.top = (vcDrag.top + event.clientY - vcDrag.y) + "px"; wrap.style.right = "auto"; wrap.style.bottom = "auto"; clamp(); }
     function end() { if (!vcDrag) return; var restore = vcDrag.minimized && !vcDrag.moved; vcDrag = null; clamp(); if (restore) toggleMinimize(); }
     if (handle) handle.addEventListener("pointerdown", start); if (minimized) minimized.addEventListener("pointerdown", function (e) { if (!e.target.closest("button")) start(e); });
     window.addEventListener("pointermove", move); window.addEventListener("pointerup", end); window.addEventListener("resize", clamp);
+    document.addEventListener("fullscreenchange", updatePartyFullscreenState);
     document.addEventListener("keydown", function (event) { if (event.key === "Escape" && vcCallState === "incoming") rejectIncomingCall(); else if (event.key === "Escape" && vcActive && !vcMinimized) toggleMinimize(); });
 }
 
@@ -4717,9 +4862,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     buildPlayer(room);
 
+    mountVcInPlayer();
+
     setupRealtime();
 
     setupVcDragging();
+    updatePartyFullscreenState();
 
     setInterval(tick, 1000);
 

@@ -760,6 +760,17 @@
     line-height: 1.6;
 }
 
+.party-id-guide{
+    margin: 18px 0 24px;
+    padding: 12px;
+    background: rgba(255,255,255,.025);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 14px;
+}
+.party-id-guide img{ display:block; width:100%; height:auto; border-radius:10px; }
+.party-id-guide figcaption{ padding:9px 4px 2px; color:#9ca3af; font-size:12px; line-height:1.5; }
+.party-fullscreen-guide-image{ display:block; width:100%; height:auto; margin:12px 0; border-radius:10px; border:1px solid rgba(255,255,255,.08); }
+
 /* ---------- RESPONSIVE ---------- */
 
 @media (max-width: 900px){
@@ -1102,6 +1113,15 @@
 
             <h2 class="party-section-title">How to Use</h2>
 
+            <div class="party-note" style="margin-top:0;margin-bottom:18px;">
+                In a room, the host starts the one-to-one Video Call and the guest chooses Accept or Decline. For movie fullscreen with the call still visible, use the UzzUTV fullscreen icon in the Watch Party player, not VidFast's internal iframe fullscreen button.
+            </div>
+
+            <figure class="party-id-guide">
+                <img src="{% static 'uzzutv/images/party-tmdb-id-guide.svg' %}" alt="Example UzzUTV detail page URL with the TMDB movie ID highlighted">
+                <figcaption>Finding the ID: open the movie or series detail page on UzzUTV and copy the number after <b>/movie/</b> or <b>/tv/</b>.</figcaption>
+            </figure>
+
             <div class="party-steps">
 
                 <div class="party-step">
@@ -1172,6 +1192,17 @@
                         Click the 📹 Video Call button in the room to request a one-on-one call — the other person can accept or decline. Once connected, mute your mic, turn your camera on or off, or minimize the call into a small floating window without leaving the party. You'll need a camera and microphone, and you must allow browser access when prompted.
                     </div>
 
+                </div>
+
+            </div>
+
+            <div class="party-feature-grid" style="margin-top:16px;">
+
+                <div class="party-feature">
+                    <div class="party-feature-icon"><span class="material-icons" aria-hidden="true">fullscreen</span></div>
+                    <div class="party-feature-title">UzzUTV fullscreen</div>
+                    <img class="party-fullscreen-guide-image" src="{% static 'uzzutv/images/party-fullscreen-guide.svg' %}" alt="Video call controls with the fullscreen button highlighted">
+                    <div class="party-feature-text">Use the fullscreen icon inside the Watch Party player. It enlarges the UzzUTV wrapper, keeping the VidFast movie and your existing call window together. VidFast's own iframe fullscreen cannot show UzzUTV overlays.</div>
                 </div>
 
             </div>
