@@ -9,11 +9,83 @@
 {% block css %}
 <style>
 .profile-page{
+    position: relative;
     min-height: calc(100vh - 160px);
     max-width: 1280px;
     margin: 0 auto;
     padding: 64px 24px 60px;
     color: white;
+}
+
+.profile-page::before{
+    content: "";
+    position: absolute;
+    top: -120px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 720px;
+    max-width: 100%;
+    height: 400px;
+    background: radial-gradient(closest-side, rgba(255,60,60,.12), transparent 70%);
+    pointer-events: none;
+}
+
+.profile-page > *{
+    position: relative;
+    z-index: 1;
+    animation: profileFadeUp .55s ease backwards;
+}
+
+.profile-page > *:nth-child(2){ animation-delay: .07s; }
+.profile-page > *:nth-child(3){ animation-delay: .14s; }
+.profile-page > *:nth-child(4){ animation-delay: .21s; }
+
+@keyframes profileFadeUp{
+    from{ opacity: 0; transform: translateY(14px); }
+    to{ opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- PAGE HERO ---------- */
+
+.profile-badge{
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,60,60,.10);
+    border: 1px solid rgba(255,60,60,.30);
+    color: #ff8080;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+    border-radius: 999px;
+    padding: 7px 15px;
+    margin-bottom: 18px;
+}
+
+.profile-badge .material-icons{
+    font-size: 16px;
+    color: #ff3c3c;
+}
+
+.profile-heading{
+    font-size: 40px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    margin-bottom: 10px;
+}
+
+.profile-heading span{
+    background: linear-gradient(135deg, #ff5c5c, #c81e1e);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.profile-subtitle{
+    color: #9ca3af;
+    font-size: 15.5px;
+    margin-bottom: 34px;
 }
 
 /* ---------- SETUP CARD ---------- */
@@ -26,6 +98,25 @@
     border-radius: 20px;
     padding: 40px 32px;
     box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    backdrop-filter: blur(12px);
+    text-align: center;
+}
+
+.profile-setup-icon{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, rgba(255,60,60,.20), rgba(200,30,30,.08));
+    border: 1px solid rgba(255,60,60,.30);
+    margin-bottom: 16px;
+}
+
+.profile-setup-icon .material-icons{
+    font-size: 30px;
+    color: #ff5c5c;
 }
 
 .profile-setup-title{
@@ -40,18 +131,35 @@
     margin-bottom: 24px;
 }
 
+.profile-setup-input-group{
+    position: relative;
+    text-align: left;
+}
+
+.profile-setup-input-group .material-icons{
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6b7280;
+    font-size: 20px;
+    pointer-events: none;
+}
+
 .profile-setup-input{
     background: #16181d !important;
     border: 1px solid rgba(255,255,255,0.1) !important;
     color: #ffffff !important;
     border-radius: 10px !important;
-    padding: 12px 14px !important;
-    transition: border-color 0.2s, box-shadow 0.2s;
+    padding: 12px 14px 12px 46px !important;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
 }
 
 .profile-setup-input:focus{
     border-color: #ff3c3c !important;
+    background: #1b1d23 !important;
     box-shadow: 0 0 0 3px rgba(255,60,60,0.15) !important;
+    outline: none;
 }
 
 .profile-setup-input::placeholder{
@@ -59,6 +167,10 @@
 }
 
 .profile-setup-btn{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
     width: 100%;
     padding: 13px;
     border: none;
@@ -67,8 +179,26 @@
     color: #ffffff;
     font-weight: 700;
     font-size: 16px;
+    font-family: inherit;
     cursor: pointer;
     transition: transform 0.15s, box-shadow 0.2s, opacity 0.2s;
+}
+
+.profile-setup-btn::before{
+    font-family: "Material Icons";
+    font-weight: normal;
+    font-style: normal;
+    display: inline-block;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    white-space: nowrap;
+    direction: ltr;
+    font-size: 19px;
+    content: "check";
+    -webkit-font-feature-settings: 'liga';
+    font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
 }
 
 .profile-setup-btn:hover{
@@ -88,11 +218,12 @@
     display: flex;
     align-items: center;
     gap: 26px;
-    background: rgba(255,255,255,0.03);
+    background: linear-gradient(180deg, #171717, #121212);
     border: 1px solid rgba(255,255,255,0.08);
     border-radius: 20px;
     padding: 30px 32px;
     flex-wrap: wrap;
+    box-shadow: 0 2px 10px rgba(0,0,0,.35);
 }
 
 .profile-avatar{
@@ -106,7 +237,9 @@
     justify-content: center;
     font-size: 40px;
     font-weight: 700;
+    font-family: "Anton", "Inter", sans-serif;
     flex-shrink: 0;
+    box-shadow: 0 0 0 4px rgba(255,60,60,.12), 0 0 34px rgba(255,60,60,.30);
 }
 
 .profile-identity{
@@ -123,7 +256,7 @@
 .profile-handle{
     color: #9ca3af;
     font-size: 15px;
-    margin-top: 4px;
+    margin-top: 6px;
 }
 
 .profile-stats{
@@ -135,22 +268,39 @@
 .profile-stat{
     background: rgba(255,255,255,0.04);
     border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 12px;
+    border-radius: 14px;
     padding: 12px 20px;
     text-align: center;
     min-width: 110px;
+    transition: border-color .25s ease, transform .25s ease, background .25s ease;
+}
+
+.profile-stat:hover{
+    transform: translateY(-3px);
+    border-color: rgba(255,60,60,.35);
+    background: rgba(255,60,60,.06);
 }
 
 .profile-stat-value{
     font-size: 24px;
     font-weight: 700;
-    color: #ff3c3c;
+    color: #ff5c5c;
+    text-shadow: 0 0 18px rgba(255,60,60,.35);
 }
 
 .profile-stat-label{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
     font-size: 12px;
     color: #9ca3af;
     margin-top: 2px;
+}
+
+.profile-stat-label .material-icons{
+    font-size: 15px;
+    color: #ff8080;
 }
 
 /* ---------- CONTENT SECTIONS ---------- */
@@ -183,6 +333,7 @@
     background: linear-gradient(180deg, #ff3c3c, #c81e1e);
     border-radius: 2px;
     flex-shrink: 0;
+    box-shadow: 0 0 10px rgba(255,60,60,.5);
 }
 
 .profile-slider{
@@ -247,9 +398,9 @@
 }
 
 .profile-card{
-    background: rgba(20,22,28,0.9);
+    background: linear-gradient(180deg, #171717, #121212);
     border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 12px;
+    border-radius: 14px;
     overflow: hidden;
     transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
     box-shadow: 0 2px 8px rgba(0,0,0,0.25);
@@ -297,8 +448,8 @@
     color: #d1d5db;
     font-size: 13px;
     font-weight: 500;
-    padding: 9px 22px;
-    border-radius: 8px;
+    padding: 8px 20px;
+    border-radius: 999px;
     text-decoration: none;
     transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
@@ -313,16 +464,18 @@
 /* ---------- COMMENTS ---------- */
 
 .profile-comment{
-    background: rgba(20,22,28,0.9);
+    background: linear-gradient(180deg, #171717, #121212);
     border: 1px solid rgba(255,255,255,0.07);
-    border-radius: 10px;
+    border-radius: 12px;
     padding: 12px 16px;
     margin-bottom: 10px;
-    transition: border-color 0.15s ease;
+    transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .profile-comment:hover{
     border-color: rgba(255,60,60,0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,.35);
 }
 
 .profile-comment-media{
@@ -420,10 +573,17 @@
     text-align: center;
     color: #8b909a;
     font-size: 14px;
-    padding: 28px 14px;
+    padding: 34px 14px;
     background: rgba(255,255,255,0.02);
     border: 1px dashed rgba(255,255,255,0.12);
     border-radius: 12px;
+}
+
+.profile-empty .material-icons{
+    display: block;
+    font-size: 34px;
+    color: #4b5563;
+    margin: 0 auto 10px;
 }
 
 .profile-login-prompt{
@@ -435,10 +595,57 @@
     margin-bottom: 12px;
 }
 
+.profile-login-btn{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: linear-gradient(135deg,#ff3c3c,#c81e1e);
+    border: none;
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 11px 28px;
+    border-radius: 10px;
+    margin-top: 16px;
+    transition: transform .15s ease, box-shadow .2s ease;
+}
+
+.profile-login-btn::before{
+    font-family: "Material Icons";
+    font-weight: normal;
+    font-style: normal;
+    content: "login";
+    font-size: 18px;
+    line-height: 1;
+    -webkit-font-feature-settings: 'liga';
+    font-feature-settings: 'liga';
+}
+
+.profile-login-btn:hover{
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(255,60,60,.35);
+    color: #ffffff;
+    text-decoration: none;
+}
+
 .profile-loading{
     text-align: center;
     padding: 80px 20px;
     color: #9ca3af;
+}
+
+.profile-loading .material-icons{
+    display: block;
+    font-size: 38px;
+    color: #ff3c3c;
+    margin: 0 auto 12px;
+    animation: profileSpin 1.1s linear infinite;
+}
+
+@keyframes profileSpin{
+    to{ transform: rotate(360deg); }
 }
 
 /* ---------- RESPONSIVE ---------- */
@@ -485,13 +692,33 @@
 
 <div class="profile-page">
 
+    <div id="profile-hero">
+
+        <span class="profile-badge">
+            <span class="material-icons" aria-hidden="true">person</span>
+            Your Space
+        </span>
+
+        <h1 class="profile-heading">My <span>Profile</span></h1>
+
+        <p class="profile-subtitle">
+            Your ratings, reviews and watchlist — all in one place.
+        </p>
+
+    </div>
+
     <div id="profile-loading" class="profile-loading">
+        <span class="material-icons" aria-hidden="true">sync</span>
         Loading your profile...
     </div>
 
     <div id="profile-setup" class="d-none">
 
         <div class="profile-setup-card">
+
+            <div class="profile-setup-icon">
+                <span class="material-icons" aria-hidden="true">badge</span>
+            </div>
 
             <div class="profile-setup-title">
                 Complete Your Profile
@@ -503,18 +730,24 @@
 
             <div id="setup-message" class="alert d-none"></div>
 
-            <label class="form-label text-secondary">
+            <label class="form-label text-secondary" for="setup-username">
                 Username
             </label>
 
-            <input
-                type="text"
-                id="setup-username"
-                class="form-control profile-setup-input"
-                placeholder="Choose a username"
-                maxlength="20"
-                autocomplete="off"
-            >
+            <div class="profile-setup-input-group">
+
+                <span class="material-icons" aria-hidden="true">alternate_email</span>
+
+                <input
+                    type="text"
+                    id="setup-username"
+                    class="form-control profile-setup-input"
+                    placeholder="Choose a username"
+                    maxlength="20"
+                    autocomplete="off"
+                >
+
+            </div>
 
             <div id="setup-feedback" class="mt-2 d-none"></div>
 
@@ -548,17 +781,26 @@
 
                 <div class="profile-stat">
                     <div class="profile-stat-value" id="stat-ratings">0</div>
-                    <div class="profile-stat-label">⭐ Ratings</div>
+                    <div class="profile-stat-label">
+                        <span class="material-icons" aria-hidden="true">star</span>
+                        Ratings
+                    </div>
                 </div>
 
                 <div class="profile-stat">
                     <div class="profile-stat-value" id="stat-comments">0</div>
-                    <div class="profile-stat-label">💬 Comments</div>
+                    <div class="profile-stat-label">
+                        <span class="material-icons" aria-hidden="true">forum</span>
+                        Comments
+                    </div>
                 </div>
 
                 <div class="profile-stat">
                     <div class="profile-stat-value" id="stat-watchlist">0</div>
-                    <div class="profile-stat-label">📺 Watchlist</div>
+                    <div class="profile-stat-label">
+                        <span class="material-icons" aria-hidden="true">live_tv</span>
+                        Watchlist
+                    </div>
                 </div>
 
             </div>
@@ -574,8 +816,12 @@
                 <a href="/rated/" class="profile-view-all-btn" id="rated-view-all" style="display:none;">View All →</a>
 
                 <div class="profile-slider-controls">
-                    <button type="button" onclick="profileSlideLeft('rated-slider')">❮</button>
-                    <button type="button" onclick="profileSlideRight('rated-slider')">❯</button>
+                    <button type="button" onclick="profileSlideLeft('rated-slider')" aria-label="Scroll left">
+                        <span class="material-icons" aria-hidden="true">chevron_left</span>
+                    </button>
+                    <button type="button" onclick="profileSlideRight('rated-slider')" aria-label="Scroll right">
+                        <span class="material-icons" aria-hidden="true">chevron_right</span>
+                    </button>
                 </div>
 
             </div>
@@ -593,8 +839,12 @@
                 <a href="/watchlist/" class="profile-view-all-btn" id="watchlist-view-all" style="display:none;">View All →</a>
 
                 <div class="profile-slider-controls">
-                    <button type="button" onclick="profileSlideLeft('watchlist-slider')">❮</button>
-                    <button type="button" onclick="profileSlideRight('watchlist-slider')">❯</button>
+                    <button type="button" onclick="profileSlideLeft('watchlist-slider')" aria-label="Scroll left">
+                        <span class="material-icons" aria-hidden="true">chevron_left</span>
+                    </button>
+                    <button type="button" onclick="profileSlideRight('watchlist-slider')" aria-label="Scroll right">
+                        <span class="material-icons" aria-hidden="true">chevron_right</span>
+                    </button>
                 </div>
 
             </div>
@@ -614,9 +864,15 @@
                 id="profile-comment-pagination"
                 style="display:none;"
             >
-                <button type="button" id="profile-comment-prev">← Previous</button>
+                <button type="button" id="profile-comment-prev">
+                    <span class="material-icons" style="font-size:16px;vertical-align:-3px;" aria-hidden="true">arrow_back</span>
+                    Previous
+                </button>
                 <span class="profile-comment-page-info" id="profile-comment-page-info">Page 1 of 1</span>
-                <button type="button" id="profile-comment-next">Next →</button>
+                <button type="button" id="profile-comment-next">
+                    Next
+                    <span class="material-icons" style="font-size:16px;vertical-align:-3px;" aria-hidden="true">arrow_forward</span>
+                </button>
             </div>
 
         </div>
@@ -1148,6 +1404,7 @@ async function renderRatings(ratings) {
 
         container.innerHTML = `
             <div class="profile-empty">
+                <span class="material-icons" aria-hidden="true">star_outline</span>
                 No ratings yet. Rate movies and TV shows to see them here.
             </div>
         `;
@@ -1229,6 +1486,7 @@ async function renderComments(comments) {
 
         container.innerHTML = `
             <div class="profile-empty">
+                <span class="material-icons" aria-hidden="true">chat_bubble_outline</span>
                 No comments yet.
             </div>
         `;
@@ -1346,6 +1604,7 @@ function renderWatchlist(watchlist) {
 
         container.innerHTML = `
             <div class="profile-empty">
+                <span class="material-icons" aria-hidden="true">video_library</span>
                 Your watchlist is empty.
             </div>
         `;
@@ -1438,8 +1697,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         loading.innerHTML = `
             <div class="profile-login-prompt">
+                <span class="material-icons" style="font-size:52px;color:#ff3c3c;display:block;margin-bottom:14px;" aria-hidden="true">lock_person</span>
                 <h2>Please log in to view your profile</h2>
-                <a href="/auth/" class="btn btn-outline-light">
+                <a href="/auth/" class="profile-login-btn">
                     Login
                 </a>
             </div>

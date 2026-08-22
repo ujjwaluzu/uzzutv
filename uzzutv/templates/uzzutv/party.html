@@ -14,6 +14,7 @@
 ========================================================= */
 
 .party-page{
+    position: relative;
     min-height: calc(100vh - 160px);
     max-width: 1080px;
     margin: 0 auto;
@@ -21,17 +22,75 @@
     color: white;
 }
 
+.party-page::before{
+    content: "";
+    position: absolute;
+    top: -120px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 720px;
+    max-width: 100%;
+    height: 400px;
+    background: radial-gradient(closest-side, rgba(255,60,60,.14), transparent 70%);
+    pointer-events: none;
+}
+
+.party-page > *{
+    position: relative;
+    z-index: 1;
+    animation: partyFadeUp .55s ease backwards;
+}
+
+.party-page > *:nth-child(2){ animation-delay: .07s; }
+.party-page > *:nth-child(3){ animation-delay: .14s; }
+.party-page > *:nth-child(4){ animation-delay: .21s; }
+
+@keyframes partyFadeUp{
+    from{ opacity: 0; transform: translateY(14px); }
+    to{ opacity: 1; transform: translateY(0); }
+}
+
+.party-badge{
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,60,60,.10);
+    border: 1px solid rgba(255,60,60,.30);
+    color: #ff8080;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+    border-radius: 999px;
+    padding: 7px 15px;
+    margin-bottom: 18px;
+}
+
+.party-badge .material-icons{
+    font-size: 16px;
+    color: #ff3c3c;
+}
+
 .party-heading{
-    font-size: 34px;
+    font-size: 40px;
     font-weight: 800;
-    letter-spacing: -.5px;
-    margin-bottom: 6px;
+    letter-spacing: -1px;
+    margin-bottom: 10px;
+}
+
+.party-heading span{
+    background: linear-gradient(135deg, #ff5c5c, #c81e1e);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
 }
 
 .party-subtitle{
     color: #9ca3af;
-    font-size: 15px;
-    margin-bottom: 34px;
+    font-size: 15.5px;
+    line-height: 1.6;
+    max-width: 540px;
+    margin-bottom: 40px;
 }
 
 /* ---------- CREATE / JOIN GRID ---------- */
@@ -39,33 +98,60 @@
 .party-grid{
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    margin-bottom: 44px;
+    gap: 22px;
+    margin-bottom: 48px;
 }
 
 .party-card{
-    background: #151515;
+    position: relative;
+    background: linear-gradient(180deg, #171717, #121212);
     border: 1px solid rgba(255,255,255,.08);
-    border-radius: 16px;
+    border-radius: 18px;
     padding: 26px 26px 28px;
     box-shadow: 0 2px 10px rgba(0,0,0,.35);
+    transition: border-color .25s ease, transform .25s ease, box-shadow .25s ease;
+}
+
+.party-card:hover{
+    transform: translateY(-3px);
+    border-color: rgba(255,60,60,.32);
+    box-shadow: 0 14px 34px rgba(0,0,0,.45);
+}
+
+.party-card-head{
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    margin-bottom: 20px;
+}
+
+.party-card-icon{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(255,60,60,.20), rgba(200,30,30,.08));
+    border: 1px solid rgba(255,60,60,.30);
+    flex-shrink: 0;
+}
+
+.party-card-icon .material-icons{
+    font-size: 22px;
+    color: #ff5c5c;
 }
 
 .party-card-title{
-    font-size: 19px;
+    font-size: 18px;
     font-weight: 700;
-    margin-bottom: 18px;
+    line-height: 1.25;
 }
 
-.party-card-title::before{
-    content: "";
-    display: inline-block;
-    width: 4px;
-    height: 18px;
-    background: linear-gradient(180deg, #ff3c3c, #c81e1e);
-    border-radius: 2px;
-    margin-right: 10px;
-    vertical-align: -2px;
+.party-card-sub{
+    color: #8b909a;
+    font-size: 12.5px;
+    margin-top: 2px;
 }
 
 .party-label{
@@ -84,16 +170,31 @@
     border-radius: 10px !important;
     padding: 12px 14px !important;
     font-size: 14px !important;
-    transition: border-color .2s, box-shadow .2s;
+    transition: border-color .2s, box-shadow .2s, background .2s;
 }
 
 .party-input:focus{
     border-color: #ff3c3c !important;
+    background: #16181d !important;
     box-shadow: 0 0 0 3px rgba(255,60,60,.15) !important;
+    outline: none;
 }
 
 .party-input::placeholder{
     color: #6b7280;
+}
+
+.party-input-code{
+    text-align: center;
+    text-transform: uppercase;
+    font-size: 20px !important;
+    font-weight: 800;
+    letter-spacing: 8px;
+    padding: 13px 14px !important;
+}
+
+.party-input-code:focus{
+    letter-spacing: 10px;
 }
 
 .party-error{
@@ -137,8 +238,15 @@
 }
 
 .party-seg-btn.active{
-    background: #ff3c3c;
+    background: linear-gradient(135deg, #ff3c3c, #c81e1e);
     color: #ffffff;
+    box-shadow: 0 4px 14px rgba(255,60,60,.35);
+}
+
+.party-seg-btn .material-icons{
+    font-size: 17px;
+    vertical-align: -3px;
+    margin-right: 6px;
 }
 
 /* ---------- TV FIELDS ---------- */
@@ -154,6 +262,10 @@
 /* ---------- BUTTONS ---------- */
 
 .party-btn{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
     width: 100%;
     border: none;
     border-radius: 10px;
@@ -166,6 +278,35 @@
     margin-top: 20px;
     cursor: pointer;
     transition: transform .15s, box-shadow .2s, opacity .2s;
+}
+
+.party-btn::before{
+    font-family: "Material Icons";
+    font-weight: normal;
+    font-style: normal;
+    display: inline-block;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    font-size: 19px;
+    -webkit-font-feature-settings: 'liga';
+    font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
+}
+
+.party-btn-cta-create::before{
+    content: "add_circle";
+}
+
+.party-btn-cta-join::before{
+    content: "login";
+}
+
+.party-btn-cta-enter::before{
+    content: "play_arrow";
 }
 
 .party-btn:hover{
@@ -209,34 +350,66 @@
 /* ---------- PARTY CREATED ---------- */
 
 .party-created-card{
+    position: relative;
     max-width: 560px;
     margin: 0 auto;
-    background: #151515;
-    border: 1px solid rgba(255,255,255,.08);
-    border-radius: 20px;
+    background: linear-gradient(180deg, #171717, #121212);
+    border: 1px solid rgba(255,255,255,.09);
+    border-radius: 22px;
     padding: 44px 36px;
     text-align: center;
-    box-shadow: 0 20px 60px rgba(0,0,0,.5);
+    box-shadow: 0 24px 70px rgba(0,0,0,.55);
+    overflow: hidden;
 }
 
-.party-created-emoji{
-    font-size: 48px;
-    margin-bottom: 8px;
+.party-created-card::before{
+    content: "";
+    position: absolute;
+    top: -90px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 340px;
+    height: 180px;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(255,60,60,.22), transparent);
+    pointer-events: none;
+}
+
+.party-created-icon{
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 74px;
+    height: 74px;
+    border-radius: 50%;
+    background: rgba(255,60,60,.12);
+    border: 1px solid rgba(255,60,60,.35);
+    box-shadow: 0 0 30px rgba(255,60,60,.25);
+    margin-bottom: 16px;
+}
+
+.party-created-icon .material-icons{
+    font-size: 38px;
+    color: #ff5c5c;
 }
 
 .party-created-title{
+    position: relative;
     font-size: 26px;
     font-weight: 800;
     margin-bottom: 6px;
 }
 
 .party-created-sub{
+    position: relative;
     color: #9ca3af;
     font-size: 14px;
     margin-bottom: 26px;
 }
 
 .party-room-code-label{
+    position: relative;
     color: #9ca3af;
     font-size: 12px;
     font-weight: 600;
@@ -245,30 +418,51 @@
     margin-bottom: 8px;
 }
 
-.party-room-code{
-    font-size: 42px;
-    font-weight: 800;
-    letter-spacing: 10px;
-    color: #ff3c3c;
+.party-code-frame{
+    display: inline-block;
+    border: 1px dashed rgba(255,60,60,.40);
+    background: rgba(255,60,60,.05);
+    border-radius: 14px;
+    padding: 10px 26px 4px;
     margin-bottom: 26px;
 }
 
+.party-room-code{
+    font-family: "Anton", "Inter", sans-serif;
+    font-size: 44px;
+    line-height: 1.2;
+    letter-spacing: 12px;
+    padding-left: 12px;
+    color: #ff3c3c;
+    text-shadow: 0 0 26px rgba(255,60,60,.45);
+}
+
 .party-invite-label{
+    position: relative;
     color: #d1d5db;
     font-size: 14px;
     margin-bottom: 10px;
 }
 
 .party-invite-url{
-    display: inline-block;
+    display: block;
+    max-width: 380px;
+    margin: 0 auto 24px;
     background: #101010;
     border: 1px solid rgba(255,255,255,.10);
-    border-radius: 8px;
+    border-radius: 10px;
     color: #9ca3af;
     font-size: 13px;
-    padding: 10px 16px;
-    margin-bottom: 22px;
+    padding: 11px 16px;
     word-break: break-all;
+    user-select: all;
+    cursor: pointer;
+    transition: border-color .2s, color .2s;
+}
+
+.party-invite-url:hover{
+    border-color: rgba(255,60,60,.40);
+    color: #d1d5db;
 }
 
 .party-created-actions{
@@ -289,34 +483,42 @@
 }
 
 .party-created-back{
-    display: block;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
     margin-top: 22px;
     color: #9ca3af;
     font-size: 13px;
     text-decoration: none;
+    transition: color .2s;
 }
 
 .party-created-back:hover{
     color: #ff3c3c;
 }
 
+.party-created-back .material-icons{
+    font-size: 16px;
+}
+
 /* ---------- YOUR PARTIES ---------- */
 
 .party-section-title{
+    display: flex;
+    align-items: center;
+    gap: 10px;
     font-size: 21px;
     font-weight: 700;
-    margin-bottom: 16px;
+    margin-bottom: 18px;
 }
 
 .party-section-title::before{
     content: "";
-    display: inline-block;
     width: 4px;
-    height: 18px;
-    background: linear-gradient(180deg, #ff3c3c, #c81e1e);
+    height: 20px;
     border-radius: 2px;
-    margin-right: 10px;
-    vertical-align: -2px;
+    background: linear-gradient(180deg, #ff3c3c, #c81e1e);
+    box-shadow: 0 0 10px rgba(255,60,60,.5);
 }
 
 .party-mine{
@@ -328,17 +530,35 @@
 .party-mine-card{
     display: flex;
     align-items: center;
-    gap: 18px;
-    background: #151515;
+    gap: 16px;
+    background: linear-gradient(180deg, #171717, #121212);
     border: 1px solid rgba(255,255,255,.08);
-    border-radius: 14px;
-    padding: 18px 20px;
-    flex-wrap: wrap;
+    border-radius: 16px;
+    padding: 16px 20px;
+    transition: border-color .2s ease, transform .2s ease, box-shadow .2s ease;
+}
+
+.party-mine-card:hover{
+    transform: translateY(-2px);
+    border-color: rgba(255,60,60,.30);
+    box-shadow: 0 10px 26px rgba(0,0,0,.4);
 }
 
 .party-mine-icon{
-    font-size: 26px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    background: rgba(255,60,60,.10);
+    border: 1px solid rgba(255,60,60,.25);
     flex-shrink: 0;
+}
+
+.party-mine-icon .material-icons{
+    color: #ff5c5c;
+    font-size: 24px;
 }
 
 .party-mine-info{
@@ -352,15 +572,43 @@
 }
 
 .party-mine-meta{
+    display: flex;
+    align-items: center;
+    gap: 8px;
     color: #9ca3af;
     font-size: 13px;
-    margin-top: 3px;
+    margin-top: 5px;
+    flex-wrap: wrap;
+}
+
+.party-mine-code{
+    display: inline-block;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 2.5px;
+    color: #ff8080;
+    background: rgba(255,60,60,.10);
+    border: 1px solid rgba(255,60,60,.25);
+    border-radius: 6px;
+    padding: 2px 9px 2px 6.5px;
+}
+
+.party-mine-se{
+    display: inline-block;
+    font-weight: 600;
+    font-size: 11.5px;
+    letter-spacing: .5px;
+    color: #d1d5db;
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.10);
+    border-radius: 6px;
+    padding: 2px 8px;
 }
 
 .party-mine-created{
     color: #6b7280;
     font-size: 12px;
-    margin-top: 3px;
+    margin-top: 4px;
 }
 
 .party-mine-actions{
@@ -372,19 +620,30 @@
 .party-mine-actions .party-btn{
     width: auto;
     margin-top: 0;
-    padding: 9px 18px;
+    padding: 9px 16px;
     font-size: 13px;
     border-radius: 8px;
+}
+
+.party-mine-actions .party-btn::before{
+    font-size: 16px;
 }
 
 .party-empty{
     text-align: center;
     color: #8b909a;
     font-size: 14px;
-    padding: 28px 14px;
+    padding: 34px 14px;
     background: rgba(255,255,255,.02);
     border: 1px dashed rgba(255,255,255,.12);
     border-radius: 12px;
+}
+
+.party-empty .material-icons{
+    display: block;
+    font-size: 34px;
+    color: #4b5563;
+    margin: 0 auto 10px;
 }
 
 /* ---------- HOW TO USE ---------- */
@@ -400,25 +659,32 @@
 }
 
 .party-step{
-    background: #151515;
+    background: linear-gradient(180deg, #171717, #121212);
     border: 1px solid rgba(255,255,255,.08);
-    border-radius: 14px;
+    border-radius: 16px;
     padding: 20px 20px 22px;
     box-shadow: 0 2px 10px rgba(0,0,0,.35);
+    transition: border-color .25s ease, transform .25s ease;
+}
+
+.party-step:hover{
+    transform: translateY(-3px);
+    border-color: rgba(255,60,60,.30);
 }
 
 .party-step-num{
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 28px;
-    height: 28px;
-    border-radius: 8px;
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
     background: linear-gradient(135deg,#ff3c3c,#c81e1e);
+    box-shadow: 0 6px 16px rgba(255,60,60,.35);
     color: #ffffff;
     font-weight: 800;
     font-size: 14px;
-    margin-bottom: 12px;
+    margin-bottom: 14px;
 }
 
 .party-step-title{
@@ -441,16 +707,34 @@
 }
 
 .party-feature{
-    background: #151515;
+    background: linear-gradient(180deg, #171717, #121212);
     border: 1px solid rgba(255,255,255,.08);
-    border-radius: 14px;
+    border-radius: 16px;
     padding: 20px;
     box-shadow: 0 2px 10px rgba(0,0,0,.35);
+    transition: border-color .25s ease, transform .25s ease;
 }
 
-.party-feature-emoji{
-    font-size: 26px;
-    margin-bottom: 10px;
+.party-feature:hover{
+    transform: translateY(-3px);
+    border-color: rgba(255,60,60,.30);
+}
+
+.party-feature-icon{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(255,60,60,.20), rgba(200,30,30,.08));
+    border: 1px solid rgba(255,60,60,.30);
+    margin-bottom: 12px;
+}
+
+.party-feature-icon .material-icons{
+    font-size: 22px;
+    color: #ff5c5c;
 }
 
 .party-feature-title{
@@ -489,7 +773,7 @@
     }
 
     .party-page{
-        padding: 64px 18px 50px;
+        padding: 56px 18px 50px;
     }
 
 }
@@ -497,7 +781,12 @@
 @media (max-width: 560px){
 
     .party-heading{
-        font-size: 28px;
+        font-size: 31px;
+    }
+
+    .party-badge{
+        font-size: 11px;
+        letter-spacing: 1.2px;
     }
 
     .party-feature-grid{
@@ -505,12 +794,22 @@
     }
 
     .party-created-card{
-        padding: 36px 22px;
+        padding: 38px 20px;
+    }
+
+    .party-code-frame{
+        padding: 8px 16px 2px;
     }
 
     .party-room-code{
         font-size: 34px;
         letter-spacing: 7px;
+        padding-left: 7px;
+    }
+
+    .party-input-code{
+        font-size: 17px !important;
+        letter-spacing: 5px;
     }
 
     .party-created-actions{
@@ -540,11 +839,20 @@
 
 <div class="party-page">
 
-    <h1 class="party-heading">Watch Party</h1>
+    <div id="party-header">
 
-    <p class="party-subtitle">
-        Watch movies and series together with your friends.
-    </p>
+        <span class="party-badge">
+            <span class="material-icons" aria-hidden="true">groups</span>
+            Watch Together
+        </span>
+
+        <h1 class="party-heading">Watch <span>Party</span></h1>
+
+        <p class="party-subtitle">
+            Watch movies and series together with your friends — perfectly in sync.
+        </p>
+
+    </div>
 
     <!-- ================================
          PARTY CREATED
@@ -554,7 +862,9 @@
 
         <div class="party-created-card">
 
-            <div class="party-created-emoji">🎉</div>
+            <div class="party-created-icon">
+                <span class="material-icons" aria-hidden="true">celebration</span>
+            </div>
 
             <div class="party-created-title">Watch Party Created</div>
 
@@ -562,11 +872,13 @@
 
             <div class="party-room-code-label">Room Code</div>
 
-            <div class="party-room-code" id="created-room-code"></div>
+            <div class="party-code-frame">
+                <div class="party-room-code" id="created-room-code"></div>
+            </div>
 
             <div class="party-invite-label">Invite your friends:</div>
 
-            <div class="party-invite-url" id="created-invite-url"></div>
+            <div class="party-invite-url" id="created-invite-url" title="Click to select"></div>
 
             <div class="party-created-actions">
 
@@ -580,7 +892,7 @@
 
                 <button
                     type="button"
-                    class="party-btn"
+                    class="party-btn party-btn-cta-enter"
                     id="created-enter-btn"
                 >
                     Enter Party
@@ -591,6 +903,7 @@
             <div class="party-copied" id="created-copied">Copied!</div>
 
             <a href="{% url 'party' %}" class="party-created-back">
+                <span class="material-icons" aria-hidden="true">arrow_back</span>
                 Create another party
             </a>
 
@@ -610,7 +923,18 @@
 
             <div class="party-card">
 
-                <div class="party-card-title">Create Watch Party</div>
+                <div class="party-card-head">
+
+                    <div class="party-card-icon">
+                        <span class="material-icons" aria-hidden="true">add_circle</span>
+                    </div>
+
+                    <div>
+                        <div class="party-card-title">Create Watch Party</div>
+                        <div class="party-card-sub">Start a new synced room</div>
+                    </div>
+
+                </div>
 
                 <div class="party-label">What do you want to watch?</div>
 
@@ -621,7 +945,7 @@
                         class="party-seg-btn active"
                         data-mode="movie"
                     >
-                        Movie
+                        <span class="material-icons" aria-hidden="true">movie</span>Movie
                     </button>
 
                     <button
@@ -629,7 +953,7 @@
                         class="party-seg-btn"
                         data-mode="tv"
                     >
-                        Series
+                        <span class="material-icons" aria-hidden="true">live_tv</span>Series
                     </button>
 
                 </div>
@@ -702,7 +1026,7 @@
 
                 <button
                     type="button"
-                    class="party-btn"
+                    class="party-btn party-btn-cta-create"
                     id="create-party-btn"
                 >
                     Create Watch Party
@@ -714,7 +1038,18 @@
 
             <div class="party-card">
 
-                <div class="party-card-title">Join a Watch Party</div>
+                <div class="party-card-head">
+
+                    <div class="party-card-icon">
+                        <span class="material-icons" aria-hidden="true">meeting_room</span>
+                    </div>
+
+                    <div>
+                        <div class="party-card-title">Join a Watch Party</div>
+                        <div class="party-card-sub">Got a code from a friend?</div>
+                    </div>
+
+                </div>
 
                 <label class="party-label" for="join-code">
                     Enter the party code:
@@ -723,7 +1058,7 @@
                 <input
                     type="text"
                     id="join-code"
-                    class="form-control party-input"
+                    class="form-control party-input party-input-code"
                     placeholder="AB7K92"
                     maxlength="10"
                     autocomplete="off"
@@ -734,7 +1069,7 @@
 
                 <button
                     type="button"
-                    class="party-btn"
+                    class="party-btn party-btn-cta-join"
                     id="join-party-btn"
                 >
                     Join Party
@@ -752,7 +1087,10 @@
 
             <div class="party-mine" id="my-parties-list">
 
-                <div class="party-empty">Loading...</div>
+                <div class="party-empty">
+                    <span class="material-icons" aria-hidden="true">hourglass_empty</span>
+                    Loading...
+                </div>
 
             </div>
 
@@ -810,7 +1148,9 @@
 
                 <div class="party-feature">
 
-                    <div class="party-feature-emoji">🎬</div>
+                    <div class="party-feature-icon">
+                        <span class="material-icons" aria-hidden="true">theaters</span>
+                    </div>
 
                     <div class="party-feature-title">Watch Party</div>
 
@@ -822,7 +1162,9 @@
 
                 <div class="party-feature">
 
-                    <div class="party-feature-emoji">📹</div>
+                    <div class="party-feature-icon">
+                        <span class="material-icons" aria-hidden="true">videocam</span>
+                    </div>
 
                     <div class="party-feature-title">Video Call</div>
 
@@ -1328,6 +1670,7 @@ async function loadMyParties() {
 
         container.innerHTML = `
             <div class="party-empty">
+                <span class="material-icons" aria-hidden="true">error_outline</span>
                 Unable to load your parties.
             </div>
         `;
@@ -1341,6 +1684,7 @@ async function loadMyParties() {
 
         container.innerHTML = `
             <div class="party-empty">
+                <span class="material-icons" aria-hidden="true">movie_filter</span>
                 You haven't created any parties yet.
             </div>
         `;
@@ -1355,8 +1699,9 @@ async function loadMyParties() {
         const isMovie = party.media_type === "movie";
 
         const meta = isMovie
-            ? `Room: ${party.room_code}`
-            : `Room: ${party.room_code} &nbsp;·&nbsp; S${party.season} · E${party.episode}`;
+            ? `<span class="party-mine-code">${party.room_code}</span>`
+            : `<span class="party-mine-code">${party.room_code}</span>
+               <span class="party-mine-se">S${party.season} · E${party.episode}</span>`;
 
         const card = document.createElement("div");
 
@@ -1365,7 +1710,9 @@ async function loadMyParties() {
         card.innerHTML = `
 
             <div class="party-mine-icon">
-                ${isMovie ? "🎬" : "📺"}
+                <span class="material-icons" aria-hidden="true">
+                    ${isMovie ? "movie" : "live_tv"}
+                </span>
             </div>
 
             <div class="party-mine-info">
@@ -1388,7 +1735,7 @@ async function loadMyParties() {
 
                 <button
                     type="button"
-                    class="party-btn"
+                    class="party-btn party-btn-cta-enter"
                     data-action="enter"
                     data-code="${party.room_code}"
                 >
