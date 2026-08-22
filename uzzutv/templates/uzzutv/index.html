@@ -56,6 +56,43 @@ html.lenis { height: auto; }
 .lenis.lenis-stopped { overflow: hidden; }
 .lenis.lenis-scrolling iframe { pointer-events: none; }
 html, body { overflow-x: clip; }
+*, *::before, *::after { box-sizing: border-box; }
+body { min-width: 0; }
+
+/* Responsive landing-page and footer guardrails. */
+#hero{ min-height:100svh; }
+#about-section, #genres-section, #features-section, #statement-section{ max-width:100%; }
+#index-footer{ min-width:0; overflow:hidden; }
+#index-footer .footer-link-group, #index-footer .footer-social-group{ min-width:0; }
+#index-footer .footer-social-group{ display:flex; flex-wrap:wrap; }
+#index-footer .footer-logo{ max-width:100%; overflow-wrap:anywhere; }
+
+@media (max-width: 767px){
+    #header{ padding:1.25rem 1rem; }
+    #hero{ min-height:clamp(560px, 100svh, 820px); padding:5rem .75rem 2rem; }
+    #hero h1{ max-width:100%; font-size:clamp(3rem, 15vw, 7rem); }
+    #about-section{ min-height:auto; padding:7rem 1rem; }
+    #about-section .about-copy{ width:100%; max-width:100%; font-size:clamp(2.35rem, 12vw, 5rem); }
+    #about-section .whitespace-nowrap{ white-space:normal; }
+    #about-section .about-copy > div{ max-width:100%; }
+    #genres-section{ padding:5rem 1rem 3rem; }
+    #genres-section h2{ font-size:clamp(2.8rem, 12vw, 5rem); text-align:center; }
+    #features-section{ min-height:auto; padding:6rem 1rem; }
+    #features-section .whitespace-nowrap{ white-space:normal; }
+    #statement-section{ padding:7rem 1rem; }
+    #index-footer{ margin-top:2rem; padding:4rem 1rem 1.25rem; border-radius:1.5rem 1.5rem 0 0; }
+    #index-footer .footer-grid{ grid-template-columns:1fr; gap:2.5rem; margin-bottom:4rem; }
+    #index-footer .footer-bottom{ align-items:flex-start; gap:1.5rem; padding-top:2rem; }
+    #index-footer .footer-logo{ font-size:clamp(4.5rem, 25vw, 10rem); line-height:.82; margin:0; }
+}
+
+@media (max-width: 420px){
+    #hero h1{ font-size:clamp(2.75rem, 14vw, 4.5rem); }
+    #about-section .about-copy{ font-size:clamp(2rem, 11vw, 3.5rem); line-height:.95; }
+    #about-section .about-copy span{ max-width:90vw; }
+    #index-footer .footer-social-group a{ width:42px; height:42px; }
+    #index-footer .footer-logo{ font-size:clamp(3.8rem, 23vw, 7rem); }
+}
 
 </style>
 </head>
@@ -118,11 +155,11 @@ html, body { overflow-x: clip; }
         </section>
 
         <!-- About / Video Intro -->
-        <section class="relative w-full min-h-screen py-40 md:py-32 px-4 flex justify-center items-center bg-[#0d1210] overflow-hidden">
+        <section id="about-section" class="relative w-full min-h-screen py-40 md:py-32 px-4 flex justify-center items-center bg-[#0d1210] overflow-hidden">
             <div class="absolute left-0 top-0 w-[40%] h-full bg-[#ff1a1a]/20 blur-[150px] pointer-events-none rounded-r-full transform -translate-x-1/2"></div>
             <div class="absolute right-0 top-0 w-[40%] h-full bg-[#ff1a1a]/20 blur-[150px] pointer-events-none rounded-l-full transform translate-x-1/2"></div>
             
-            <div class="relative z-10 flex flex-col items-center justify-center font-['Anton',sans-serif] uppercase text-[#ff1a1a] leading-[0.85] text-[clamp(3.5rem,10vw,10rem)] tracking-tight text-center select-none" style="text-shadow: 0 0 40px rgba(255,26,26,0.5), 0 0 80px rgba(255,26,26,0.2)">
+            <div class="about-copy relative z-10 flex flex-col items-center justify-center font-['Anton',sans-serif] uppercase text-[#ff1a1a] leading-[0.85] text-[clamp(3.5rem,10vw,10rem)] tracking-tight text-center select-none" style="text-shadow: 0 0 40px rgba(255,26,26,0.5), 0 0 80px rgba(255,26,26,0.2)">
                 
                 <div class="relative whitespace-nowrap">
                     A STREAMING DESTINATION
@@ -176,7 +213,7 @@ html, body { overflow-x: clip; }
         </section>
 
         <!-- Portfolio Grid Section -->
-        <section class="z-20 reveal-up opacity-0 w-full pt-32 pr-[30px] pb-16 pl-[30px] relative translate-y-10">
+        <section id="genres-section" class="z-20 reveal-up opacity-0 w-full pt-32 pr-[30px] pb-16 pl-[30px] relative translate-y-10">
             <div class="w-full flex justify-between items-end mb-10">
                 <h2 class="font-['Anton',sans-serif] text-[clamp(3rem,6vw,6rem)] uppercase leading-none tracking-tight text-[#e2e1d3]">
                     Trending Genres
@@ -257,7 +294,7 @@ html, body { overflow-x: clip; }
         </section>
 
         <!-- Features Stack -->
-        <section class="flex flex-col z-20 py-24 md:py-32 relative items-center bg-[#ebebeb] min-h-screen justify-center w-full overflow-hidden">
+        <section id="features-section" class="flex flex-col z-20 py-24 md:py-32 relative items-center bg-[#ebebeb] min-h-screen justify-center w-full overflow-hidden">
             <ul class="w-full flex flex-col items-center justify-center group/list">
                 
                 <!-- Item 1 -->
@@ -362,7 +399,7 @@ html, body { overflow-x: clip; }
         </section>
 
         <!-- Testimonial / Statement -->
-        <section class="py-40 px-6 flex items-center justify-center bg-[#121212]">
+        <section id="statement-section" class="py-40 px-6 flex items-center justify-center bg-[#121212]">
             <h2 class="font-['Anton',sans-serif] text-[clamp(2rem,5vw,6rem)] text-center max-w-6xl text-[#e2e1d3]/90 reveal-text leading-tight tracking-tight">
                 "UZZUTV IS THE MODERN STREAMING PLATFORM FOR MOVIE AND SERIES LOVERS.
                 FROM TIMELESS CLASSICS TO THE LATEST RELEASES, EVERYTHING IN ONE PLACE,
@@ -372,9 +409,9 @@ html, body { overflow-x: clip; }
     </main>
 
     <!-- Footer -->
-    <footer class="pt-20 px-4 md:px-10 pb-6 bg-[#0a0a0a] rounded-t-[2.5rem] mt-10">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-32">
-            <div>
+    <footer id="index-footer" class="pt-20 px-4 md:px-10 pb-6 bg-[#0a0a0a] rounded-t-[2.5rem] mt-10">
+        <div class="footer-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-32">
+            <div class="footer-social-group">
                 <h4 class="font-medium text-xs tracking-widest text-[#e2e1d3]/50 mb-6 uppercase">
                     Get In Touch
                 </h4>
@@ -390,7 +427,7 @@ html, body { overflow-x: clip; }
                     </a>
                 </div>
             </div>
-            <div>
+            <div class="footer-link-group">
                 <h4 class="font-medium text-xs tracking-widest text-[#e2e1d3]/50 mb-6 uppercase">
                     Explore
                 </h4>
@@ -412,7 +449,7 @@ html, body { overflow-x: clip; }
                     </li>
                 </ul>
             </div>
-            <div>
+            <div class="footer-link-group">
                 <h4 class="font-medium text-xs tracking-widest text-[#e2e1d3]/50 mb-6 uppercase">
                     Support
                 </h4>
@@ -429,18 +466,18 @@ html, body { overflow-x: clip; }
                     </li>
                 </ul>
             </div>
-            <div class="flex items-start lg:justify-end">
+            <div class="footer-link-group flex items-start lg:justify-end">
                 <button class="w-16 h-16 rounded-full border border-[#e2e1d3]/20 flex items-center justify-center hover:bg-[#e2e1d3] hover:text-[#121212] transition-colors text-2xl" id="back-to-top" aria-label="Back to top">
                     <iconify-icon icon="solar:arrow-up-linear"></iconify-icon>
                 </button>
             </div>
         </div>
 
-        <div class="border-t border-[#e2e1d3]/10 pt-10 flex flex-col md:flex-row justify-between items-end gap-6 overflow-hidden">
+        <div class="footer-bottom border-t border-[#e2e1d3]/10 pt-10 flex flex-col md:flex-row justify-between items-end gap-6 overflow-hidden">
             <p class="text-xs text-[#e2e1d3]/50 uppercase tracking-widest order-2 md:order-1 mb-2 md:mb-4 font-normal">
                 © 2026 UzzUTV. All rights reserved.
             </p>
-            <h2 class="font-['Anton',sans-serif] text-[clamp(4rem,18vw,25rem)] text-[#e2e1d3] uppercase order-1 md:order-2 -mb-[2vw] md:-mb-[1vw] leading-none tracking-tight">
+            <h2 class="footer-logo font-['Anton',sans-serif] text-[clamp(4rem,18vw,25rem)] text-[#e2e1d3] uppercase order-1 md:order-2 -mb-[2vw] md:-mb-[1vw] leading-none tracking-tight">
                 UZZUTV
             </h2>
         </div>
