@@ -1461,6 +1461,225 @@
 .party-room-guide-item strong{ display:block; margin-bottom:3px; color:#f3f4f6; font-size:13px; }
 @media (max-width: 700px){ .party-room-guide-grid{ grid-template-columns:1fr; gap:12px; } }
 
+/* ---------- POLISHED ROOM SHELL ---------- */
+
+body:has(.party-room-page){
+    background:
+        radial-gradient(circle at 12% 4%, rgba(127,29,29,.16), transparent 34rem),
+        #0b0b0c !important;
+}
+.party-room-page{
+    position:relative;
+    isolation:isolate;
+    width:100%;
+    max-width:1680px;
+    padding:clamp(24px,4vw,52px) clamp(16px,3vw,40px) 80px;
+}
+.party-room-page::before{
+    content:"";
+    position:absolute;
+    z-index:-1;
+    top:0;
+    left:50%;
+    width:min(100vw,1500px);
+    height:420px;
+    transform:translateX(-50%);
+    background:radial-gradient(ellipse at top, rgba(255,60,60,.10), transparent 68%);
+    pointer-events:none;
+}
+.party-room-header{ margin-bottom:clamp(20px,3vw,34px); }
+.party-room-heading{
+    color:#f8fafc;
+    font-size:clamp(28px,3.2vw,44px);
+    line-height:1.08;
+    letter-spacing:-1.5px;
+}
+.party-room-code-line{ display:flex; align-items:center; flex-wrap:wrap; gap:8px; color:#9ca3af; }
+.party-room-code-line strong{ display:inline-flex; align-items:center; min-height:30px; padding:4px 10px; border-radius:8px; background:rgba(255,60,60,.10); border:1px solid rgba(255,60,60,.25); }
+.party-room-side{ gap:16px; }
+.party-ha, .party-media-card, .party-room-guide{
+    background:linear-gradient(145deg, rgba(25,25,27,.96), rgba(15,15,17,.96));
+    border-color:rgba(255,255,255,.10);
+    box-shadow:0 12px 34px rgba(0,0,0,.22);
+}
+.party-ha-head{ border-bottom-color:rgba(255,255,255,.09); }
+.party-room-side .vc-launch-btn{ min-height:46px; border-radius:12px; box-shadow:0 8px 20px rgba(255,60,60,.14); }
+.party-room-side .vc-launch-btn:hover{ transform:translateY(-1px); box-shadow:0 12px 26px rgba(255,60,60,.24); }
+.party-media-card{ margin-top:0; }
+.party-room-guide{ margin-top:28px; }
+.vc-call-wrap{ filter:drop-shadow(0 18px 40px rgba(0,0,0,.35)); }
+.vc-status-bar, .vc-controls, .vc-minimized, .vc-call-card{ border-color:rgba(255,255,255,.13); box-shadow:0 12px 30px rgba(0,0,0,.45); }
+.vc-controls{ padding:9px 14px; }
+.vc-ctrl-btn:focus-visible, .vc-incoming-btn:focus-visible, .vc-cancel-btn:focus-visible{ outline:2px solid #fca5a5; outline-offset:3px; }
+
+@media (max-width:980px){
+    .party-room-page{ padding-left:18px; padding-right:18px; }
+    .party-room-layout{ gap:18px; }
+}
+@media (max-width:640px){
+    .party-room-page{ padding:20px 12px 56px; }
+    .party-room-heading{ letter-spacing:-.8px; }
+    .party-room-code-line{ font-size:13px; gap:6px; }
+    .party-room-side .vc-launch-btn{ width:100%; }
+    .party-room-guide{ margin-top:20px; padding:17px; }
+}
+
+/* ---------- WATCH PARTY LAYOUT REDESIGN ---------- */
+
+.party-room-page{
+    max-width:1760px;
+    padding-top:clamp(14px,2.2vw,28px);
+}
+body:has(.party-room-page){ overflow-x:hidden; }
+.party-room-header{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:24px;
+    padding:10px 2px 14px;
+    margin-bottom:26px;
+    background:transparent;
+    border:0;
+    border-bottom:1px solid rgba(255,255,255,.10);
+    box-shadow:none;
+    position:relative;
+}
+.party-room-header::after{
+    content:"";
+    position:absolute;
+    left:0;
+    bottom:-1px;
+    width:84px;
+    height:2px;
+    background:#e50914;
+    box-shadow:0 0 16px rgba(229,9,20,.55);
+}
+.party-room-header .party-room-heading{ margin:0; }
+.party-room-header .party-room-heading{ order:1; }
+.party-room-header .party-room-code-line{ order:3; justify-content:flex-end; margin:0; }
+.party-room-header .vc-launch-btn{
+    order:2;
+    flex:0 0 auto;
+    min-height:42px;
+    padding:10px 16px;
+    border-radius:10px;
+    white-space:nowrap;
+    font-size:0;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+}
+.party-room-header .vc-launch-btn::before{
+    content:"";
+    width:18px;
+    height:18px;
+    display:block;
+    background:currentColor;
+    -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='3' y='6' width='13' height='12' rx='2' fill='black'/%3E%3Cpath d='m16 10 5-3v10l-5-3z' fill='black'/%3E%3C/svg%3E") center/contain no-repeat;
+    mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='3' y='6' width='13' height='12' rx='2' fill='black'/%3E%3Cpath d='m16 10 5-3v10l-5-3z' fill='black'/%3E%3C/svg%3E") center/contain no-repeat;
+}
+.party-room-header .vc-launch-btn::after{ content:"Video Call"; font-size:14px; font-weight:700; }
+.vc-launch-btn-legacy{ display:none !important; }
+.party-room-header .party-room-heading::first-letter{ color:#fff; }
+.party-room-code-line{ font-size:14px; }
+.party-room-code-line strong{ color:#e50914; background:transparent; border:0; padding:0; }
+.party-room-capacity-chip{ background:rgba(229,9,20,.08); border-color:rgba(229,9,20,.32); color:#f87171; }
+.party-room-capacity-chip{ box-shadow:0 0 0 1px rgba(255,60,60,.08); }
+.party-room-layout{ grid-template-columns:minmax(0,1fr) minmax(300px,380px); gap:24px; }
+.party-room-main{ gap:18px; }
+.party-room-side{ gap:14px; }
+.party-room-side .party-ha{ padding:20px; position:relative; overflow:hidden; }
+.party-room-side .party-ha::before{
+    content:"";
+    position:absolute;
+    left:0;
+    top:16px;
+    bottom:16px;
+    width:2px;
+    background:rgba(229,9,20,.72);
+    border-radius:0 3px 3px 0;
+}
+.party-room-side .party-ha-title{ color:#e2e8f0; font-size:12px; letter-spacing:1.6px; text-transform:uppercase; }
+.party-room-side .party-ha-head{ margin-bottom:18px; }
+.party-room-side .party-diff-section{ display:flex; flex-direction:column; gap:12px; }
+.party-room-side .party-diff-section .party-ha{ margin:0; }
+.party-room-side .party-member-row{ padding:13px 0; border-color:rgba(255,255,255,.08); }
+.party-room-side .party-member-row:last-child{ border-bottom:0; }
+.party-room-side .party-member-name{ color:#f8fafc; font-weight:650; }
+.party-room-side .party-live-badge{ color:#4ade80; }
+.party-room-side .party-ha-status{ color:#cbd5e1; }
+.party-room-side .party-ha-time{ color:#f8fafc; }
+.party-room-side .vc-launch-btn{ order:-1; }
+.party-media-card{
+    padding:18px 22px;
+    border-radius:16px;
+    align-items:center;
+}
+.party-media-poster{ width:70px; height:98px; border-radius:10px; }
+.party-media-body{ min-width:180px; }
+.party-media-title{ font-size:18px; }
+.party-media-card .party-room-btn{ min-height:42px; }
+.party-room-guide{ padding:22px 24px; }
+.party-room-guide-title{ font-size:18px; letter-spacing:-.2px; }
+.party-room-guide-grid{ gap:24px; }
+.party-room-guide-item{ padding:4px 0; }
+.party-room-guide-item strong{ color:#fca5a5; letter-spacing:.1px; }
+.vc-call-wrap{ z-index:1100; }
+.vc-call-card{ border-radius:20px; }
+.vc-status-bar{ border-radius:12px; }
+.party-room-side > .vc-launch-btn{
+    position:relative;
+    isolation:isolate;
+    overflow:hidden;
+    letter-spacing:.01em;
+    background:linear-gradient(135deg,#e50914,#b20710);
+    border-color:#f0444d;
+    color:#fff;
+}
+.party-room-side > .vc-launch-btn::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:linear-gradient(100deg,transparent 18%,rgba(255,255,255,.12),transparent 82%);
+    transform:translateX(-120%);
+    transition:transform .45s ease;
+    pointer-events:none;
+}
+.party-room-side > .vc-launch-btn:hover::after{ transform:translateX(120%); }
+.party-room-side .party-ha,
+.party-room-guide,
+.party-media-card{ transition:border-color .2s ease, transform .2s ease, box-shadow .2s ease; }
+.party-room-side .party-ha:hover,
+.party-media-card:hover{ border-color:rgba(255,255,255,.17); box-shadow:0 16px 38px rgba(0,0,0,.28); }
+.party-room-guide:hover{ border-color:rgba(255,255,255,.14); }
+.vc-call-card,
+.vc-incoming-card,
+.vc-outgoing-card{ backdrop-filter:blur(18px); }
+
+@media (max-width:980px){
+    .party-room-header{ align-items:flex-start; flex-direction:column; padding:14px 0 16px; }
+    .party-room-header .party-room-code-line{ justify-content:flex-start; }
+    .party-room-header .vc-launch-btn{ width:100%; }
+    .party-room-layout{ grid-template-columns:1fr; }
+    .party-room-side{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); align-items:start; }
+    .party-room-side .vc-launch-btn{ grid-column:1 / -1; }
+    .party-room-side .party-diff-section{ grid-column:1 / -1; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .party-room-side .party-diff-section .party-ha:last-child{ grid-column:1 / -1; }
+}
+@media (max-width:640px){
+    .party-room-header{ padding:12px 0 14px; border-radius:0; gap:14px; }
+    .party-room-side{ display:flex; }
+    .party-room-side .party-diff-section{ display:flex; }
+    .party-media-card{ align-items:flex-start; padding:16px; }
+    .party-media-poster{ width:58px; height:82px; }
+    .party-media-card .party-room-btn{ width:100%; text-align:center; }
+    .party-room-guide-grid{ gap:14px; }
+    .party-room-layout{ gap:16px; }
+    .party-room-main{ gap:14px; }
+    .party-room-side .party-ha{ padding:16px; }
+    .party-room-header .vc-launch-btn{ min-height:44px; }
+}
+
 </style>
 {% endblock %}
 
@@ -1479,6 +1698,14 @@
             <span class="party-room-code-sep">•</span>
             <span class="party-room-capacity-chip" id="party-capacity-chip">👥 -- / 2</span>
         </p>
+
+        <button
+            class="party-room-btn party-room-btn-outline vc-launch-btn d-none"
+            id="vc-launch-btn"
+            onclick="handleVcLaunchClick()"
+        >
+            <span id="vc-launch-dot" class="vc-launch-dot" style="display:none"></span>📹 Video Call
+        </button>
 
     </header>
 
@@ -1570,13 +1797,15 @@
 
             <aside class="party-room-side">
 
+                <template>
                 <button
                     class="party-room-btn party-room-btn-outline vc-launch-btn"
-                    id="vc-launch-btn"
+                    id="vc-launch-btn-legacy"
                     onclick="handleVcLaunchClick()"
                 >
-                    <span id="vc-launch-dot" class="vc-launch-dot" style="display:none"></span>📹 Video Call
+                    <span id="vc-launch-dot-legacy" class="vc-launch-dot" style="display:none"></span>📹 Video Call
                 </button>
+                </template>
 
                 <!-- MEMBERS -->
 
@@ -4823,6 +5052,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     roomData = room;
 
     isHost = currentUser.id === room.host_user_id;
+    updateLaunchBtn();
 
     /* The room host initiates invitations; guests receive the floating prompt. */
     if (!isHost) document.getElementById("vc-launch-btn").classList.add("d-none");
