@@ -702,28 +702,38 @@
     pointer-events: auto;
 }
 .vc-call-wrap.vc-expanded{
-    inset:16px;
-    right:16px;
-    bottom:16px;
+    inset:0;
+    right:0;
+    bottom:0;
     align-items:stretch;
     justify-content:center;
-    padding:clamp(16px,3vw,42px);
-    background:rgba(8,8,10,.94);
-    border:1px solid rgba(255,255,255,.14);
-    border-radius:20px;
+    padding:clamp(18px,3vw,42px);
+    background:#08080a;
+    border:0;
+    border-radius:0;
+    z-index:2200;
     box-shadow:0 24px 80px rgba(0,0,0,.7);
     backdrop-filter:blur(16px);
 }
-.vc-call-wrap.vc-expanded .vc-status-bar{ align-self:center; }
-.vc-call-wrap.vc-expanded .vc-tiles{ width:min(100%,1100px); align-items:stretch; margin:0 auto; gap:16px; }
-.vc-call-wrap.vc-expanded .vc-remote-tile{ flex:1 1 auto; width:auto; max-height:calc(100vh - 210px); aspect-ratio:16/10; }
-.vc-call-wrap.vc-expanded .vc-local-tile{ width:clamp(150px,20vw,260px); align-self:flex-end; }
-.vc-call-wrap.vc-expanded .vc-controls{ align-self:center; }
+body.vc-expanded-active{ overflow:hidden; }
+.vc-call-wrap.vc-expanded .vc-status-bar{ position:absolute; top:22px; left:50%; transform:translateX(-50%); z-index:7; }
+.vc-call-wrap.vc-expanded .vc-tiles{ position:absolute; inset:0; width:auto; height:auto; max-width:none; align-items:stretch; margin:0; gap:0; }
+.vc-call-wrap.vc-expanded .vc-drag-handle{ position:absolute; top:18px; left:18px; right:18px; z-index:6; width:auto; flex-basis:auto; background:rgba(8,8,10,.58); border-color:rgba(255,255,255,.14); }
+.vc-call-wrap.vc-expanded .vc-drag-handle{ display:none; }
+.vc-call-wrap.vc-expanded .vc-remote-tile{ width:100%; height:100%; aspect-ratio:auto; }
+.vc-call-wrap.vc-expanded .vc-local-tile{ position:absolute; right:28px; bottom:92px; width:clamp(140px,14vw,210px); aspect-ratio:4/3; z-index:8; border:2px solid rgba(255,255,255,.24); }
+.vc-call-wrap.vc-expanded .vc-controls{ position:absolute; left:50%; bottom:24px; transform:translateX(-50%); z-index:9; }
 @media(max-width:640px){
-    .vc-call-wrap.vc-expanded{ inset:8px; padding:12px; border-radius:14px; }
+    .vc-call-wrap.vc-expanded{ inset:0; padding:12px; border-radius:0; }
     .vc-call-wrap.vc-expanded .vc-tiles{ flex-direction:column; max-height:calc(100vh - 150px); }
     .vc-call-wrap.vc-expanded .vc-remote-tile{ width:100%; max-height:none; aspect-ratio:4/3; }
     .vc-call-wrap.vc-expanded .vc-local-tile{ width:120px; margin-top:-62px; margin-right:8px; z-index:3; }
+}
+@media(max-width:900px){ .vc-expand-btn{ display:none !important; } }
+@media(max-width:640px){
+    .vc-call-wrap.vc-expanded .vc-tiles{ max-height:none; }
+    .vc-call-wrap.vc-expanded .vc-local-tile{ right:14px; bottom:76px; width:120px; margin:0; }
+    .vc-call-wrap.vc-expanded .vc-controls{ bottom:14px; }
 }
 
 /* -- Status bar (above the tiles) -- */
@@ -4741,7 +4751,7 @@ function openConnectedPanel() {
 
 function closeVcUi() {
     ["vc-call-wrap", "vc-outgoing-card", "vc-incoming-card", "vc-minimized", "vc-remote-tile", "vc-local-tile"].forEach(function (id) { var el = document.getElementById(id); if (el) el.classList.add("d-none"); });
-    var callWrap = document.getElementById("vc-call-wrap"); if (callWrap) callWrap.classList.remove("vc-expanded"); vcExpanded = false;
+    var callWrap = document.getElementById("vc-call-wrap"); if (callWrap) callWrap.classList.remove("vc-expanded"); document.body.classList.remove("vc-expanded-active"); vcExpanded = false;
     ["vc-controls", "vc-status-bar"].forEach(function (id) { var el = document.getElementById(id); if (el) el.classList.add("vc-hidden"); });
     var tiles = document.getElementById("vc-tiles"); if (tiles) tiles.classList.remove("d-none");
     var launch = document.getElementById("vc-launch-btn"); if (launch) launch.classList.toggle("d-none", !isHost);
@@ -4976,6 +4986,7 @@ function toggleVcExpand() {
     if (!wrap) return;
     vcExpanded = !vcExpanded;
     wrap.classList.toggle("vc-expanded", vcExpanded);
+    document.body.classList.toggle("vc-expanded-active", vcExpanded);
     if (button) {
         button.title = vcExpanded ? "Restore video call size" : "Expand video call";
         button.setAttribute("aria-label", vcExpanded ? "Restore video call size" : "Expand video call");
