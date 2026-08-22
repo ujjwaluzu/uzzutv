@@ -65,7 +65,7 @@
     display: grid;
     grid-template-columns: minmax(0, 1fr) 360px;
     gap: 24px;
-    align-items: stretch;
+    align-items: start;
 }
 
 .party-room-main{
@@ -346,6 +346,12 @@
     border: 1px solid rgba(255,255,255,.05);
     border-radius: 14px;
 }
+.party-room-side .vc-launch-btn{ width:100%; text-align:center; }
+.party-fullscreen-tip{ display:flex; align-items:flex-start; gap:12px; padding:16px 18px; }
+.party-room-main .party-fullscreen-tip{ flex:0 0 auto; min-height:0; }
+.party-fullscreen-tip-icon{ flex:0 0 30px; width:30px; height:30px; display:flex; align-items:center; justify-content:center; color:#fca5a5; background:rgba(255,60,60,.12); border:1px solid rgba(255,60,60,.28); border-radius:9px; font-size:17px; }
+.party-fullscreen-tip-title{ color:#f3f4f6; font-size:12px; font-weight:800; line-height:1.35; }
+.party-fullscreen-tip-text{ margin-top:5px; color:#9ca3af; font-size:11px; line-height:1.5; }
 
 /* ---------- MEDIA INFORMATION ---------- */
 
@@ -1551,9 +1557,26 @@
                     <iframe id="party-player" allowfullscreen allow="autoplay; encrypted-media"></iframe>
                 </div>
 
+                <!-- FULLSCREEN TIP -->
+                <div class="party-reserved party-fullscreen-tip">
+                    <div class="party-fullscreen-tip-icon" aria-hidden="true">⛶</div>
+                    <div>
+                        <div class="party-fullscreen-tip-title">Watching while on a video call?</div>
+                        <div class="party-fullscreen-tip-text">For fullscreen movie mode, use the fullscreen button in the video-call controls. This keeps the VidFast movie and both call videos visible together. Avoid VidFast's own fullscreen button because it fullscreenes only the iframe.</div>
+                    </div>
+                </div>
+
             </div>
 
             <aside class="party-room-side">
+
+                <button
+                    class="party-room-btn party-room-btn-outline vc-launch-btn"
+                    id="vc-launch-btn"
+                    onclick="handleVcLaunchClick()"
+                >
+                    <span id="vc-launch-dot" class="vc-launch-dot" style="display:none"></span>📹 Video Call
+                </button>
 
                 <!-- MEMBERS -->
 
@@ -1644,10 +1667,6 @@
 
                 </div>
 
-                <!-- RESERVED SPACE -->
-
-                <div class="party-reserved"></div>
-
             </aside>
 
             <!-- MEDIA INFORMATION -->
@@ -1687,14 +1706,6 @@
                     </div>
 
                 </div>
-
-                <button
-                    class="party-room-btn party-room-btn-outline vc-launch-btn"
-                    id="vc-launch-btn"
-                    onclick="handleVcLaunchClick()"
-                >
-                    <span id="vc-launch-dot" class="vc-launch-dot" style="display:none"></span>📹 Video Call
-                </button>
 
                 <a
                     href="{% url 'party' %}"
@@ -4475,7 +4486,7 @@ function closeVcUi() {
     ["vc-call-wrap", "vc-outgoing-card", "vc-incoming-card", "vc-minimized", "vc-remote-tile", "vc-local-tile"].forEach(function (id) { var el = document.getElementById(id); if (el) el.classList.add("d-none"); });
     ["vc-controls", "vc-status-bar"].forEach(function (id) { var el = document.getElementById(id); if (el) el.classList.add("vc-hidden"); });
     var tiles = document.getElementById("vc-tiles"); if (tiles) tiles.classList.remove("d-none");
-    var launch = document.getElementById("vc-launch-btn"); if (launch) launch.classList.remove("d-none");
+    var launch = document.getElementById("vc-launch-btn"); if (launch) launch.classList.toggle("d-none", !isHost);
 }
 
 function stopLocalMedia() {
@@ -4715,7 +4726,7 @@ function syncMinimizedVideo() {
 }
 
 function handleVcLaunchClick() { if (vcCallState === "idle") startVideoCall(); else if (vcActive) toggleMinimize(); }
-function updateLaunchBtn() { var btn = document.getElementById("vc-launch-btn"), dot = document.getElementById("vc-launch-dot"); if (!btn) return; btn.classList.toggle("vc-launch-active", vcCallState !== "idle"); if (dot) dot.style.display = vcCallState !== "idle" ? "inline-block" : "none"; }
+function updateLaunchBtn() { var btn = document.getElementById("vc-launch-btn"), dot = document.getElementById("vc-launch-dot"); if (!btn) return; if (!isHost) { btn.classList.add("d-none"); return; } btn.classList.remove("d-none"); btn.classList.toggle("vc-launch-active", vcCallState !== "idle"); if (dot) dot.style.display = vcCallState !== "idle" ? "inline-block" : "none"; }
 
 function mountVcInPlayer() {
     var player = document.getElementById("party-player-wrap");
