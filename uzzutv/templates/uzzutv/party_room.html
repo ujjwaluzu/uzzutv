@@ -1293,6 +1293,37 @@
 
 /* -- Responsive: mobile -- */
 
+.vc-call-card{
+    width: 286px;
+    box-sizing: border-box;
+    padding: 22px;
+    text-align: center;
+    color: #fff;
+    background: rgba(21,21,21,.96);
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 18px;
+    box-shadow: 0 14px 38px rgba(0,0,0,.55);
+    backdrop-filter: blur(16px);
+    animation: vc-card-in .2s ease-out;
+}
+.vc-call-card-kicker{ color:#c084fc; font-size:11px; font-weight:800; letter-spacing:.8px; text-transform:uppercase; }
+.vc-call-card-title{ margin-top:12px; font-size:18px; font-weight:800; }
+.vc-call-avatar{ width:64px; height:64px; margin:14px auto 0; display:flex; align-items:center; justify-content:center; border-radius:50%; color:#fff; background:linear-gradient(135deg,#7c3aed,#dc2626); border:3px solid rgba(255,255,255,.15); font-size:25px; font-weight:800; }
+.vc-call-card-name{ margin-top:10px; font-size:15px; font-weight:800; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.vc-call-card-role{ margin-top:3px; color:#9ca3af; font-size:10px; font-weight:800; letter-spacing:.8px; }
+.vc-call-card .vc-dots{ justify-content:center; margin:16px 0; }
+.vc-ringing-avatar{ animation:vc-ring 1.6s ease-in-out infinite; }
+.vc-call-card .vc-incoming-actions{ justify-content:center; gap:10px; margin-top:18px; }
+.vc-call-card .vc-incoming-btn{ padding:10px 16px; }
+.vc-drag-handle{ width:100%; box-sizing:border-box; display:flex; align-items:center; gap:8px; padding:9px 12px; color:#fff; background:rgba(21,21,21,.94); border:1px solid rgba(255,255,255,.1); border-radius:14px; cursor:grab; touch-action:none; user-select:none; font-size:12px; font-weight:800; }
+.vc-drag-handle:active{ cursor:grabbing; }
+.vc-drag-handle span:first-child{ color:#9ca3af; letter-spacing:-3px; }
+#vc-drag-status{ margin-left:auto; color:#22c55e; font-size:10px; }
+.vc-tiles{ flex-wrap:wrap; max-width:430px; }
+.vc-tiles .vc-drag-handle{ flex-basis:100%; }
+@keyframes vc-card-in{ from{opacity:0;transform:translateY(10px) scale(.96)} to{opacity:1;transform:none} }
+@keyframes vc-ring{ 0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.42)} 50%{box-shadow:0 0 0 12px rgba(239,68,68,0)} }
+
 @media (max-width: 640px){
 
     .vc-call-wrap{
@@ -1302,6 +1333,9 @@
         align-items: stretch;
         padding: 0;
     }
+
+    .vc-call-card{ width:calc(100% - 24px); margin:0 12px 12px; }
+    .vc-drag-handle{ border-radius:12px 12px 0 0; }
 
     .vc-tiles{
         flex-direction: row;
@@ -1594,6 +1628,28 @@
         <!-- VIDEO CALL (Phase 4 UI) -->
         <div class="vc-call-wrap d-none" id="vc-call-wrap">
 
+            <!-- Invitation cards intentionally keep the player visible until acceptance. -->
+            <section class="vc-call-card d-none" id="vc-outgoing-card" aria-live="polite">
+                <div class="vc-call-card-kicker">Video Call</div>
+                <div class="vc-call-avatar" id="vc-outgoing-avatar">G</div>
+                <div class="vc-call-card-title">Calling...</div>
+                <div class="vc-call-card-name" id="vc-outgoing-name">Guest</div>
+                <div class="vc-call-card-role">Guest</div>
+                <div class="vc-dots"><span></span><span></span><span></span></div>
+                <button class="vc-cancel-btn" onclick="cancelOutgoingCall()" title="Cancel call" aria-label="Cancel call">Cancel Call</button>
+            </section>
+
+            <section class="vc-call-card vc-incoming-card d-none" id="vc-incoming-card" aria-live="assertive">
+                <div class="vc-call-card-kicker">Incoming Video Call</div>
+                <div class="vc-call-avatar vc-ringing-avatar" id="vc-incoming-card-avatar">H</div>
+                <div class="vc-call-card-name" id="vc-incoming-card-name">Host</div>
+                <div class="vc-call-card-role">HOST</div>
+                <div class="vc-incoming-actions">
+                    <button class="vc-incoming-btn vc-incoming-reject" id="vc-card-reject-btn" onclick="rejectIncomingCall()" title="Decline call" aria-label="Decline call">Decline</button>
+                    <button class="vc-incoming-btn vc-incoming-accept" id="vc-card-accept-btn" onclick="acceptIncomingCall()" title="Accept call" aria-label="Accept call">Accept</button>
+                </div>
+            </section>
+
             <!-- Status bar -->
             <div class="vc-status-bar vc-hidden" id="vc-status-bar">
                 <span class="vc-status-dot neutral" id="vc-status-dot"></span>
@@ -1603,6 +1659,10 @@
 
             <!-- Video tiles -->
             <div class="vc-tiles" id="vc-tiles">
+
+                <div class="vc-drag-handle" id="vc-drag-handle" title="Drag video call" aria-label="Drag video call">
+                    <span aria-hidden="true">⠿</span><span>Video Call</span><span id="vc-drag-status">Connecting</span>
+                </div>
 
                 <!-- Remote tile -->
                 <div class="vc-remote-tile d-none" id="vc-remote-tile">
@@ -1686,7 +1746,7 @@
             <!-- Minimized widget (hidden by default) -->
             <div class="vc-minimized d-none" id="vc-minimized" onclick="toggleMinimize()" title="Expand video call">
                 <div class="vc-minimized-video">
-                    <video id="vc-minimized-video" autoplay muted playsinline></video>
+                    <video id="vc-minimized-video" autoplay playsinline></video>
                 </div>
                 <div class="vc-minimized-info">
                     <div class="vc-minimized-status">
@@ -1768,9 +1828,6 @@ let vcStream = null;
 let vcActive = false;
 let vcCameraOn = true;
 let vcMicOn = true;
-let vcIncomingFrom = null;           // userId of incoming call caller
-let vcPendingCallerId = null;        // who initiated the current call request
-let vcCallRequestTs = 0;             // timestamp for conflict resolution
 
 /* =========================================================
    VIDEO CALL STATE (Phase 2 - WebRTC)
@@ -1790,7 +1847,7 @@ const RTC_CONFIG = {
 const CALL_TIMEOUT_MS = 30000;
 
 let pc = null;                        // one RTCPeerConnection per participant
-let vcCallState = "idle";             // idle|waiting|calling|incoming|connecting|connected|disconnected|failed|ended
+let vcCallState = "idle";             // The single source of truth for the call lifecycle.
 let vcRemoteUserId = null;            // authenticated id of the other participant
 let pendingIceCandidates = [];        // candidates received before remoteDescription
 let offerResendTimer = null;          // re-sends the offer until answered
@@ -1798,6 +1855,12 @@ let vcStarting = false;               // guards double-click on the launch butto
 let callSessionId = null;             // unique per call, prevents stale signaling
 let callTimeoutTimer = null;          // setTimeout handle for call timeout
 let wasConnected = false;             // tracks if we reached "connected" at least once
+let reconnectTimer = null;
+let vcMinimized = false;
+let vcDrag = null;
+let vcAccepting = false;
+let vcPresenceDisconnectTimer = null;
+const vcClosedSessionIds = new Set();
 
 
 /* =========================================================
@@ -2098,6 +2161,8 @@ function renderMembersFromPresence(state) {
         guestRow.classList.remove("waiting");
 
         guestNameEl.textContent = guestEntry.username || "Guest";
+
+        if (guestEntry.username) guestUsername = guestEntry.username;
 
     } else {
 
@@ -2587,7 +2652,11 @@ function setupRealtime() {
 
     channel.on("presence", { event: "sync" }, function () {
 
-        if (!leaving) renderMembersFromPresence(channel.presenceState());
+        if (!leaving) {
+            var presence = channel.presenceState();
+            renderMembersFromPresence(presence);
+            handleVcPresence(presence);
+        }
 
     });
 
@@ -2623,16 +2692,28 @@ function setupRealtime() {
         handleVcEnd(payload);
     });
 
-    channel.on("broadcast", { event: "video_call_request" }, ({ payload }) => {
-        handleCallRequest(payload);
+    channel.on("broadcast", { event: "video_call_invite" }, ({ payload }) => {
+        handleVcInvite(payload);
     });
 
     channel.on("broadcast", { event: "video_call_accept" }, ({ payload }) => {
-        handleCallAccept(payload);
+        handleVcAccept(payload);
     });
 
-    channel.on("broadcast", { event: "video_call_reject" }, ({ payload }) => {
-        handleCallReject(payload);
+    channel.on("broadcast", { event: "video_call_decline" }, ({ payload }) => {
+        handleVcDecline(payload);
+    });
+
+    channel.on("broadcast", { event: "video_call_cancel" }, ({ payload }) => {
+        handleVcCancel(payload);
+    });
+
+    channel.on("broadcast", { event: "video_call_busy" }, ({ payload }) => {
+        handleVcBusy(payload);
+    });
+
+    channel.on("broadcast", { event: "video_call_timeout" }, ({ payload }) => {
+        handleVcTimeout(payload);
     });
 
     channel.subscribe(async (status) => {
@@ -3425,7 +3506,7 @@ function handleCallRequest(payload) {
     /* If we already have an active call in progress, auto-reject */
     if (vcActive && (vcCallState === "connected" || vcCallState === "connecting" || vcCallState === "calling")) {
         console.log("[WatchParty WebRTC] Already in call, auto-rejecting");
-        sendVcSignal("video_call_reject", { targetUserId: payload.senderUserId });
+        sendVcSignal("legacy_video_call_reject", { targetUserId: payload.senderUserId });
         return;
     }
 
@@ -3511,7 +3592,7 @@ function rejectIncomingCall() {
     console.log("[WatchParty WebRTC] Rejecting call from", vcPendingCallerId);
 
     if (vcPendingCallerId) {
-        sendVcSignal("video_call_reject", { targetUserId: vcPendingCallerId });
+        sendVcSignal("legacy_video_call_reject", { targetUserId: vcPendingCallerId });
     }
 
     /* Close the call panel */
@@ -3698,9 +3779,9 @@ async function startVideoCall() {
 
         channel.send({
             type: "broadcast",
-            event: "video_call_request",
+            event: "legacy_video_call_request",
             payload: {
-                type: "video_call_request",
+                type: "legacy_video_call_request",
                 roomCode: PARTY_ROOM_CODE,
                 senderUserId: currentUser.id,
                 senderUsername: myUsername || (isHost ? hostUsername : "Guest"),
@@ -3914,12 +3995,6 @@ function cleanupVcStream() {
 
     console.log("[WatchParty WebRTC] Page unload cleanup");
 
-    if (vcActive && channelReady && channel) {
-
-        sendVcSignal("video_call_end");
-
-    }
-
     cleanupPeerConnection();
 
     if (vcStream) {
@@ -4025,8 +4100,6 @@ function handleNetworkOnline() {
 /* =========================================================
    PHASE 4 UI HELPERS
 ========================================================= */
-
-let vcMinimized = false;
 
 function handleVcLaunchClick() {
 
@@ -4171,6 +4244,408 @@ function updateRemoteCameraOff() {
    INITIALIZE
 ========================================================= */
 
+/* =========================================================
+   VIDEO CALL UX UPGRADE
+   Invite/accept is deliberately separate from WebRTC negotiation.  The
+   transition table below is the call's only lifecycle authority.
+========================================================= */
+
+const VC_TRANSITIONS = {
+    idle: ["outgoing", "incoming"],
+    outgoing: ["accepted", "declined", "busy", "cancelled", "no_answer", "failed", "ended"],
+    incoming: ["accepted", "declining", "cancelled", "no_answer", "ended"],
+    accepted: ["connecting", "failed", "ended"],
+    connecting: ["connected", "reconnecting", "failed", "ended"],
+    connected: ["disconnected", "reconnecting", "failed", "ended"],
+    disconnected: ["reconnecting", "connected", "failed", "ended"],
+    reconnecting: ["connected", "failed", "ended"],
+    declining: ["declined", "idle"],
+    declined: ["idle"], busy: ["idle"], cancelled: ["idle"], no_answer: ["idle"], failed: ["idle"], ended: ["idle"]
+};
+
+const VC_STATUS = {
+    idle: "Ready to call", outgoing: "Calling...", incoming: "Incoming call", accepted: "Accepted",
+    connecting: "Connecting...", connected: "Connected", disconnected: "Connection lost",
+    reconnecting: "Reconnecting...", declining: "Declining...", declined: "Call declined", busy: "User is busy",
+    cancelled: "Call cancelled", no_answer: "No answer", failed: "Unable to connect", ended: "Call ended"
+};
+
+function setVcState(next) {
+    if (next === vcCallState) return true;
+    if (!VC_TRANSITIONS[vcCallState] || VC_TRANSITIONS[vcCallState].indexOf(next) === -1) {
+        console.warn("[WatchParty WebRTC] Ignoring invalid call transition", vcCallState, "->", next);
+        return false;
+    }
+    vcCallState = next;
+    renderVcState();
+    return true;
+}
+
+function participantIdFor(role) {
+    return role === "host" ? roomData && roomData.host_user_id : roomData && roomData.guest_user_id;
+}
+
+function resolvedOtherParticipantId() {
+    var known = otherParticipantUserId();
+    if (known) return known;
+    if (!channel || !channel.presenceState) return null;
+    var state = channel.presenceState();
+    for (var key in state) {
+        if (key !== currentUser.id && state[key] && state[key][0] && state[key][0].user_id) return state[key][0].user_id;
+    }
+    return null;
+}
+
+function validVcPayload(payload, options) {
+    options = options || {};
+    if (!payload || !currentUser || !roomData || payload.roomCode !== PARTY_ROOM_CODE) return false;
+    if (!payload.senderUserId || payload.senderUserId === currentUser.id) return false;
+    if (payload.targetUserId && payload.targetUserId !== currentUser.id) return false;
+    if (payload.senderUserId !== resolvedOtherParticipantId()) return false;
+    if (options.hostOnly && payload.senderUserId !== participantIdFor("host")) return false;
+    if (options.session && (!callSessionId || payload.callSessionId !== callSessionId)) return false;
+    return true;
+}
+
+function sendVcSignal(eventName, extra, sessionId) {
+    if (!channelReady || !channel || !currentUser) { console.warn("[WatchParty Call] Signal not sent; channel not ready", eventName); return; }
+    console.debug("[WatchParty Call] send", eventName, sessionId || callSessionId);
+    channel.send({ type: "broadcast", event: eventName, payload: Object.assign({
+        type: eventName, roomCode: PARTY_ROOM_CODE, senderUserId: currentUser.id,
+        targetUserId: resolvedOtherParticipantId(), callSessionId: sessionId || callSessionId, sentAt: Date.now()
+    }, extra || {}) });
+}
+
+function callPeerName() {
+    return isHost ? (guestUsername || "Guest") : (hostUsername || "Host");
+}
+
+function renderVcState() {
+    var wrap = document.getElementById("vc-call-wrap");
+    var outgoing = document.getElementById("vc-outgoing-card");
+    var incoming = document.getElementById("vc-incoming-card");
+    var status = document.getElementById("vc-status-bar");
+    var dot = document.getElementById("vc-status-dot");
+    var text = document.getElementById("vc-status-text");
+    var remote = document.getElementById("vc-status-remote");
+    var reconnect = document.getElementById("vc-reconnect-overlay");
+    var dragStatus = document.getElementById("vc-drag-status");
+    var connectedUi = ["accepted", "connecting", "connected", "disconnected", "reconnecting", "failed"].indexOf(vcCallState) !== -1;
+    if (wrap) wrap.classList.toggle("d-none", vcCallState === "idle");
+    if (outgoing) outgoing.classList.toggle("d-none", vcCallState !== "outgoing");
+    if (incoming) incoming.classList.toggle("d-none", vcCallState !== "incoming");
+    if (status) status.classList.toggle("vc-hidden", !connectedUi || vcMinimized);
+    if (text) text.textContent = VC_STATUS[vcCallState] || "";
+    if (remote) remote.textContent = (vcCallState === "connected" || vcCallState === "reconnecting") ? "· " + callPeerName() : "";
+    if (dot) dot.className = "vc-status-dot " + (vcCallState === "connected" ? "ok" : vcCallState === "reconnecting" || vcCallState === "disconnected" ? "warn" : vcCallState === "failed" ? "err" : "connecting");
+    if (reconnect) reconnect.classList.toggle("vc-visible", vcCallState === "reconnecting" || vcCallState === "disconnected");
+    if (dragStatus) { dragStatus.textContent = VC_STATUS[vcCallState] || ""; dragStatus.style.color = vcCallState === "connected" ? "#22c55e" : vcCallState === "reconnecting" ? "#f59e0b" : "#9ca3af"; }
+    updateLaunchBtn();
+}
+
+function showInviteIdentity() {
+    var name = callPeerName(), initial = name.charAt(0).toUpperCase();
+    var outgoing = document.getElementById("vc-outgoing-card");
+    if (outgoing) {
+        outgoing.querySelector(".vc-call-card-title").textContent = "Calling...";
+        outgoing.querySelector(".vc-call-card-role").textContent = "Guest";
+        outgoing.querySelector(".vc-dots").classList.remove("d-none");
+        outgoing.querySelector(".vc-cancel-btn").classList.remove("d-none");
+    }
+    ["vc-outgoing-name", "vc-incoming-card-name", "vc-incoming-name"].forEach(function (id) { var el = document.getElementById(id); if (el) el.textContent = name; });
+    ["vc-outgoing-avatar", "vc-incoming-card-avatar", "vc-incoming-avatar"].forEach(function (id) { var el = document.getElementById(id); if (el) el.textContent = initial; });
+}
+
+function openConnectedPanel() {
+    vcActive = true;
+    document.getElementById("vc-call-wrap").classList.remove("d-none");
+    document.getElementById("vc-tiles").classList.remove("d-none");
+    document.getElementById("vc-remote-tile").classList.remove("d-none");
+    document.getElementById("vc-local-tile").classList.remove("d-none");
+    document.getElementById("vc-controls").classList.remove("vc-hidden");
+    document.getElementById("vc-launch-btn").classList.add("d-none");
+    var local = document.getElementById("vc-local-video"); if (local && vcStream) local.srcObject = vcStream;
+    updateRemoteLabel(); updateLocalBadge(); updateVcCameraBtn(); updateVcMicBtn(); renderVcState();
+}
+
+function closeVcUi() {
+    ["vc-call-wrap", "vc-outgoing-card", "vc-incoming-card", "vc-minimized", "vc-remote-tile", "vc-local-tile"].forEach(function (id) { var el = document.getElementById(id); if (el) el.classList.add("d-none"); });
+    ["vc-controls", "vc-status-bar"].forEach(function (id) { var el = document.getElementById(id); if (el) el.classList.add("vc-hidden"); });
+    var tiles = document.getElementById("vc-tiles"); if (tiles) tiles.classList.remove("d-none");
+    var launch = document.getElementById("vc-launch-btn"); if (launch) launch.classList.remove("d-none");
+}
+
+function stopLocalMedia() {
+    if (vcStream) vcStream.getTracks().forEach(function (track) { track.stop(); });
+    vcStream = null;
+    ["vc-local-video", "vc-minimized-video", "vc-remote-video"].forEach(function (id) { var video = document.getElementById(id); if (video) video.srcObject = null; });
+}
+
+function clearVcTimers() {
+    [callTimeoutTimer, offerResendTimer, reconnectTimer, vcPresenceDisconnectTimer].forEach(function (timer) { if (timer) clearTimeout(timer) || clearInterval(timer); });
+    callTimeoutTimer = offerResendTimer = vcPresenceDisconnectTimer = reconnectTimer = null;
+}
+
+function cleanupPeerConnection() {
+    stopOfferResend();
+    if (pc) { pc.onicecandidate = pc.ontrack = pc.onconnectionstatechange = pc.oniceconnectionstatechange = null; try { pc.close(); } catch (e) {} }
+    pc = null; pendingIceCandidates = []; vcRemoteUserId = null;
+}
+
+function finishVcCall(finalState, message) {
+    clearVcTimers(); cleanupPeerConnection(); stopLocalMedia(); vcActive = false; vcStarting = false; vcAccepting = false; vcMinimized = false;
+    if (vcCallState !== finalState) setVcState(finalState);
+    closeVcUi();
+    if (callSessionId) {
+        var closedSession = callSessionId;
+        vcClosedSessionIds.add(closedSession);
+        setTimeout(function () { vcClosedSessionIds.delete(closedSession); }, CALL_TIMEOUT_MS + 5000);
+    }
+    callSessionId = null;
+    if (message) showVcResult(message);
+    setTimeout(function () { if (["declined", "busy", "cancelled", "no_answer", "failed", "ended"].indexOf(vcCallState) !== -1) setVcState("idle"); }, message ? 1600 : 0);
+}
+
+function showVcResult(message) {
+    var wrap = document.getElementById("vc-call-wrap"), card = document.getElementById("vc-outgoing-card");
+    if (!wrap || !card) return;
+    wrap.classList.remove("d-none"); card.classList.remove("d-none");
+    card.querySelector(".vc-call-card-title").textContent = message;
+    card.querySelector(".vc-call-card-name").textContent = callPeerName();
+    card.querySelector(".vc-call-card-role").textContent = "";
+    card.querySelector(".vc-dots").classList.add("d-none");
+    card.querySelector(".vc-cancel-btn").classList.add("d-none");
+    setTimeout(function () { if (vcCallState !== "outgoing") closeVcUi(); }, 1550);
+}
+
+function mediaErrorMessage(err) {
+    if (!err) return "Could not access camera or microphone.";
+    if (err.message === "guest-offline") return "Your guest is not currently connected.";
+    if (err.message === "signaling") return "Calling is temporarily unavailable. Please try again.";
+    if (err.name === "NotAllowedError") return "Camera or microphone access was denied.";
+    if (err.name === "NotFoundError") return "Camera or microphone not available.";
+    if (err.name === "NotReadableError") return "Camera or microphone is currently in use.";
+    if (err.name === "OverconstrainedError") return "Your camera does not support the required settings.";
+    return "Could not access camera or microphone.";
+}
+
+async function ensureLocalStream() {
+    if (vcStream) return vcStream;
+    vcStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    return vcStream;
+}
+
+async function startVideoCall() {
+    if (!isHost || vcStarting || vcCallState !== "idle") return;
+    if (!navigator.mediaDevices || !window.RTCPeerConnection) { showVcResult("Video calling is not supported by this browser."); return; }
+    vcStarting = true;
+    try {
+        if (!channelReady) await new Promise(function (resolve, reject) { var started = Date.now(); (function wait() { if (channelReady) return resolve(); if (Date.now() - started > 5000) return reject(new Error("signaling")); setTimeout(wait, 100); })(); });
+        var remoteId = resolvedOtherParticipantId();
+        if (!remoteId) throw new Error("guest-offline");
+        await ensureLocalStream(); // permission is requested from the host's intentional click.
+        callSessionId = crypto.randomUUID(); vcRemoteUserId = remoteId;
+        if (!setVcState("outgoing")) return;
+        showInviteIdentity();
+        sendVcSignal("video_call_invite", { expiresAt: Date.now() + CALL_TIMEOUT_MS });
+        startCallTimeout();
+    } catch (err) { callSessionId = null; showVcResult(mediaErrorMessage(err)); }
+    finally { vcStarting = false; }
+}
+
+function startCallTimeout() {
+    if (callTimeoutTimer) clearTimeout(callTimeoutTimer);
+    var session = callSessionId;
+    callTimeoutTimer = setTimeout(function () {
+        if (callSessionId !== session || ["outgoing", "incoming"].indexOf(vcCallState) === -1) return;
+        if (vcCallState === "outgoing") sendVcSignal("video_call_timeout", {}, session);
+        setVcState("no_answer"); finishVcCall("no_answer", "No answer");
+    }, CALL_TIMEOUT_MS);
+}
+
+function handleVcInvite(payload) {
+    console.debug("[WatchParty Call] invite received", payload && payload.callSessionId, payload && payload.senderUserId);
+    if (!validVcPayload(payload, { hostOnly: true }) || myRole !== "guest" || !payload.callSessionId || !payload.expiresAt || payload.expiresAt <= Date.now()) { console.warn("[WatchParty Call] invite rejected by validation"); return; }
+    if (vcClosedSessionIds.has(payload.callSessionId)) return;
+    if (vcCallState !== "idle") { sendVcSignal("video_call_busy", {}, payload.callSessionId); return; }
+    callSessionId = payload.callSessionId; vcRemoteUserId = payload.senderUserId;
+    if (!setVcState("incoming")) return;
+    showInviteIdentity();
+    var remaining = Math.min(CALL_TIMEOUT_MS, Math.max(0, payload.expiresAt - Date.now()));
+    callTimeoutTimer = setTimeout(function () { if (vcCallState === "incoming") finishVcCall("no_answer"); }, remaining);
+}
+
+async function acceptIncomingCall() {
+    if (vcAccepting || vcCallState !== "incoming" || !callSessionId) return;
+    vcAccepting = true;
+    var button = document.getElementById("vc-card-accept-btn"); if (button) button.disabled = true;
+    try {
+        await ensureLocalStream();
+        if (vcCallState !== "incoming") return;
+        clearVcTimers(); setVcState("accepted"); sendVcSignal("video_call_accept"); openConnectedPanel(); setVcState("connecting");
+    } catch (err) {
+        sendVcSignal("video_call_decline", { reason: "media_unavailable" });
+        setVcState("declining"); finishVcCall("declined", mediaErrorMessage(err));
+    } finally { vcAccepting = false; if (button) button.disabled = false; }
+}
+
+function rejectIncomingCall() {
+    if (vcCallState !== "incoming") return;
+    setVcState("declining"); sendVcSignal("video_call_decline"); finishVcCall("declined");
+}
+
+function cancelOutgoingCall() {
+    if (vcCallState !== "outgoing") return;
+    sendVcSignal("video_call_cancel"); setVcState("cancelled"); finishVcCall("cancelled");
+}
+
+async function handleVcAccept(payload) {
+    if (!validVcPayload(payload, { session: true }) || vcCallState !== "outgoing" || pc) return;
+    clearVcTimers(); setVcState("accepted"); openConnectedPanel(); setVcState("connecting");
+    await createOfferAsCaller();
+}
+
+function handleVcDecline(payload) {
+    if (!validVcPayload(payload, { session: true }) || vcCallState !== "outgoing") return;
+    setVcState("declined"); finishVcCall("declined", "Call declined");
+}
+function handleVcCancel(payload) {
+    if (!validVcPayload(payload, { session: true }) || vcCallState !== "incoming") return;
+    setVcState("cancelled"); finishVcCall("cancelled");
+}
+function handleVcBusy(payload) {
+    if (!validVcPayload(payload, { session: true }) || vcCallState !== "outgoing") return;
+    setVcState("busy"); finishVcCall("busy", "User is already on another call.");
+}
+function handleVcTimeout(payload) {
+    if (!validVcPayload(payload, { session: true }) || ["outgoing", "incoming"].indexOf(vcCallState) === -1) return;
+    setVcState("no_answer"); finishVcCall("no_answer", "No answer");
+}
+
+async function createPeerConnection() {
+    if (pc || !callSessionId || vcCallState !== "connecting") return pc;
+    pc = new RTCPeerConnection(RTC_CONFIG);
+    pc.onicecandidate = function (event) { if (event.candidate && pc) sendVcSignal("video_call_ice", { candidate: event.candidate }); };
+    pc.ontrack = function (event) {
+        var video = document.getElementById("vc-remote-video"), stream = event.streams && event.streams[0];
+        if (video && stream) { video.srcObject = stream; video.play().catch(function () { showAudioUnmutePrompt(); }); updateRemoteCameraOff(); syncMinimizedVideo(); }
+    };
+    pc.onconnectionstatechange = function () { if (pc) handlePeerConnectionState(pc.connectionState); };
+    pc.oniceconnectionstatechange = function () { if (pc) handleIceConnectionState(pc.iceConnectionState); };
+    vcStream.getTracks().forEach(function (track) { pc.addTrack(track, vcStream); });
+    return pc;
+}
+
+async function createOfferAsCaller() {
+    var myPc = await createPeerConnection(); if (!myPc || myPc.localDescription) return;
+    try { var offer = await myPc.createOffer(); await myPc.setLocalDescription(offer); sendVcSignal("video_call_offer", { offer: myPc.localDescription }); startOfferResend(); }
+    catch (err) { finishVcCall("failed", "Could not start the video call."); }
+}
+function startOfferResend() {
+    stopOfferResend(); offerResendTimer = setInterval(function () {
+        if (!pc || pc.remoteDescription || vcCallState !== "connecting") return stopOfferResend();
+        if (pc.localDescription) sendVcSignal("video_call_offer", { offer: pc.localDescription });
+    }, 3000);
+}
+function stopOfferResend() { if (offerResendTimer) clearInterval(offerResendTimer); offerResendTimer = null; }
+
+async function handleVcOffer(payload) {
+    if (!validVcPayload(payload, { hostOnly: true, session: true }) || vcCallState !== "connecting" || !payload.offer || !payload.offer.sdp) return;
+    if (pc && pc.remoteDescription) { if (pc.localDescription && pc.localDescription.type === "answer") sendVcSignal("video_call_answer", { answer: pc.localDescription }); return; }
+    try { var myPc = await createPeerConnection(); if (!myPc) return; await myPc.setRemoteDescription(payload.offer); await flushPendingIceCandidates(); var answer = await myPc.createAnswer(); await myPc.setLocalDescription(answer); sendVcSignal("video_call_answer", { answer: myPc.localDescription }); }
+    catch (err) { finishVcCall("failed", "Could not connect the video call."); }
+}
+async function handleVcAnswer(payload) {
+    if (!validVcPayload(payload, { session: true }) || vcCallState !== "connecting" || !pc || pc.remoteDescription || !payload.answer || !payload.answer.sdp) return;
+    try { await pc.setRemoteDescription(payload.answer); await flushPendingIceCandidates(); }
+    catch (err) { finishVcCall("failed", "Could not connect the video call."); }
+}
+async function handleVcIce(payload) {
+    if (!validVcPayload(payload, { session: true }) || !payload.candidate || !payload.candidate.candidate || ["connecting", "connected", "reconnecting"].indexOf(vcCallState) === -1) return;
+    if (!pc || !pc.remoteDescription) { pendingIceCandidates.push(payload.candidate); return; }
+    try { await pc.addIceCandidate(payload.candidate); } catch (err) { console.warn("[WatchParty WebRTC] Invalid ICE ignored", err); }
+}
+async function flushPendingIceCandidates() { var queued = pendingIceCandidates.splice(0); for (var i = 0; pc && pc.remoteDescription && i < queued.length; i++) try { await pc.addIceCandidate(queued[i]); } catch (err) {} }
+
+function handlePeerConnectionState(state) {
+    if (state === "connected") { clearReconnectTimer(); setVcState("connected"); }
+    else if (state === "connecting" && vcCallState === "accepted") setVcState("connecting");
+    else if (state === "disconnected") startReconnectTimer();
+    else if (state === "failed") finishVcCall("failed", "Connection failed. Try again.");
+}
+function handleIceConnectionState(state) { if (state === "connected" || state === "completed") { clearReconnectTimer(); if (vcCallState !== "connected") setVcState("connected"); } else if (state === "disconnected") startReconnectTimer(); else if (state === "failed") finishVcCall("failed", "Connection failed. Try again."); }
+function clearReconnectTimer() { if (reconnectTimer) clearTimeout(reconnectTimer); reconnectTimer = null; }
+function startReconnectTimer() { if (["connected", "disconnected", "reconnecting"].indexOf(vcCallState) === -1) return; setVcState("reconnecting"); if (reconnectTimer) return; reconnectTimer = setTimeout(function () { if (vcCallState === "reconnecting") finishVcCall("failed", "Guest disconnected. Try again."); }, 15000); }
+
+function handleVcEnd(payload) {
+    if (!validVcPayload(payload, { session: true })) return;
+    finishVcCall("ended", "Call ended");
+}
+function endVideoCall() {
+    if (["outgoing"].indexOf(vcCallState) !== -1) return cancelOutgoingCall();
+    if (vcCallState === "incoming") return rejectIncomingCall();
+    if (["accepted", "connecting", "connected", "disconnected", "reconnecting"].indexOf(vcCallState) === -1) return;
+    sendVcSignal("video_call_end"); finishVcCall("ended");
+}
+
+function toggleMinimize() {
+    if (["accepted", "connecting", "connected", "disconnected", "reconnecting"].indexOf(vcCallState) === -1) return;
+    vcMinimized = !vcMinimized;
+    document.getElementById("vc-tiles").classList.toggle("d-none", vcMinimized);
+    document.getElementById("vc-controls").classList.toggle("vc-hidden", vcMinimized);
+    document.getElementById("vc-minimized").classList.toggle("d-none", !vcMinimized);
+    if (vcMinimized) syncMinimizedVideo(); renderVcState();
+}
+
+/* The compact widget represents the other participant, not the local preview. */
+function syncMinimizedVideo() {
+    var minimized = document.getElementById("vc-minimized-video");
+    var remote = document.getElementById("vc-remote-video");
+    if (!minimized) return;
+    minimized.muted = false;
+    if (remote && remote.srcObject) {
+        minimized.srcObject = remote.srcObject;
+        minimized.play().catch(function () { /* the expanded video owns the audio prompt */ });
+    } else {
+        minimized.srcObject = null;
+    }
+}
+
+function handleVcLaunchClick() { if (vcCallState === "idle") startVideoCall(); else if (vcActive) toggleMinimize(); }
+function updateLaunchBtn() { var btn = document.getElementById("vc-launch-btn"), dot = document.getElementById("vc-launch-dot"); if (!btn) return; btn.classList.toggle("vc-launch-active", vcCallState !== "idle"); if (dot) dot.style.display = vcCallState !== "idle" ? "inline-block" : "none"; }
+
+function setupVcDragging() {
+    var wrap = document.getElementById("vc-call-wrap"), handle = document.getElementById("vc-drag-handle"), minimized = document.getElementById("vc-minimized");
+    function clamp() { if (!wrap || !wrap.style.left) return; var rect = wrap.getBoundingClientRect(), margin = 16; wrap.style.left = Math.max(margin, Math.min(window.innerWidth - rect.width - margin, rect.left)) + "px"; wrap.style.top = Math.max(margin, Math.min(window.innerHeight - rect.height - margin, rect.top)) + "px"; wrap.style.right = "auto"; wrap.style.bottom = "auto"; }
+    function start(event) { if (window.innerWidth <= 640 || !wrap || event.button && event.button !== 0) return; var rect = wrap.getBoundingClientRect(); vcDrag = { x: event.clientX, y: event.clientY, left: rect.left, top: rect.top, moved: false, minimized: event.currentTarget === minimized }; wrap.setPointerCapture && wrap.setPointerCapture(event.pointerId); event.preventDefault(); }
+    function move(event) { if (!vcDrag) return; vcDrag.moved = vcDrag.moved || Math.abs(event.clientX - vcDrag.x) > 3 || Math.abs(event.clientY - vcDrag.y) > 3; wrap.style.left = (vcDrag.left + event.clientX - vcDrag.x) + "px"; wrap.style.top = (vcDrag.top + event.clientY - vcDrag.y) + "px"; wrap.style.right = "auto"; wrap.style.bottom = "auto"; clamp(); }
+    function end() { if (!vcDrag) return; var restore = vcDrag.minimized && !vcDrag.moved; vcDrag = null; clamp(); if (restore) toggleMinimize(); }
+    if (handle) handle.addEventListener("pointerdown", start); if (minimized) minimized.addEventListener("pointerdown", function (e) { if (!e.target.closest("button")) start(e); });
+    window.addEventListener("pointermove", move); window.addEventListener("pointerup", end); window.addEventListener("resize", clamp);
+    document.addEventListener("keydown", function (event) { if (event.key === "Escape" && vcCallState === "incoming") rejectIncomingCall(); else if (event.key === "Escape" && vcActive && !vcMinimized) toggleMinimize(); });
+}
+
+function handleNetworkOffline() { if (["connecting", "connected", "disconnected", "reconnecting"].indexOf(vcCallState) !== -1) startReconnectTimer(); }
+function handleNetworkOnline() { if (vcCallState === "reconnecting" && pc && pc.connectionState === "connected") { clearReconnectTimer(); setVcState("connected"); } }
+
+function handleVcPresence(presence) {
+    if (!presence || vcCallState === "idle") return;
+    var remoteId = otherParticipantUserId();
+    if (!remoteId) return;
+    if (presence[remoteId]) { if (vcPresenceDisconnectTimer) clearTimeout(vcPresenceDisconnectTimer); vcPresenceDisconnectTimer = null; return; }
+    if (vcPresenceDisconnectTimer) return;
+    vcPresenceDisconnectTimer = setTimeout(function () {
+        vcPresenceDisconnectTimer = null;
+        if (channel && channel.presenceState && channel.presenceState()[remoteId]) return;
+        if (myRole === "guest" && ["incoming", "accepted", "connecting"].indexOf(vcCallState) !== -1) finishVcCall("ended", "Host disconnected");
+        else if (myRole === "host" && ["connected", "disconnected", "reconnecting"].indexOf(vcCallState) !== -1) startReconnectTimer();
+    }, 5000);
+}
+
+/* Refreshing a page releases camera hardware but is not an intentional call end. */
+function cleanupVcStream() { clearVcTimers(); cleanupPeerConnection(); stopLocalMedia(); vcActive = false; }
+
+
 document.addEventListener("DOMContentLoaded", async () => {
 
     currentUser = await getCurrentUser();
@@ -4192,6 +4667,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     roomData = room;
 
     isHost = currentUser.id === room.host_user_id;
+
+    /* The room host initiates invitations; guests receive the floating prompt. */
+    if (!isHost) document.getElementById("vc-launch-btn").classList.add("d-none");
 
     console.log("[WatchParty] Init:", {
         currentUserId: currentUser.id,
@@ -4240,6 +4718,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     buildPlayer(room);
 
     setupRealtime();
+
+    setupVcDragging();
 
     setInterval(tick, 1000);
 
