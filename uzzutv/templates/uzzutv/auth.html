@@ -908,11 +908,7 @@ authForm.addEventListener("submit", async (event) => {
 
         if (isSignup) {
 
-            const redirectUrl =
-                window.location.hostname === "127.0.0.1" ||
-                window.location.hostname === "localhost"
-                    ? `${window.location.origin}/home/`
-                    : "https://uzzutv.pythonanywhere.com/home/";
+            const redirectUrl = `${window.location.origin}/home/`;
 
 
             const { data, error } =
