@@ -1,0 +1,39 @@
+{% extends "aniuzu/base.html" %}
+
+{% block title %}{{ section_title }} — Aniuzu{% endblock %}
+{% block meta_description %}Browse {{ section_title|lower }} on Aniuzu, powered by AniList.{% endblock %}
+
+{% block body %}
+
+<div class="az-container">
+  <header class="az-page-head">
+    <h1>{{ section_title }}</h1>
+  </header>
+
+  {% if api_error %}
+    <div class="az-state az-state-error">
+      Couldn't load this page right now — AniList may be busy or rate-limiting us.
+      <button type="button" class="az-btn-ghost" onclick="window.location.reload()">Try again</button>
+    </div>
+  {% elif anime_list %}
+    <div class="az-grid">
+      {% for media in anime_list %}
+        {% include "aniuzu/_anime_card.html" %}
+      {% endfor %}
+    </div>
+
+    <nav class="az-pager" aria-label="Pagination">
+      {% if has_previous %}
+        <a class="az-btn-ghost" href="?page={{ previous_page }}">← Previous</a>
+      {% else %}<span></span>{% endif %}
+      <span class="az-pager-info">Page {{ current_page }}</span>
+      {% if has_next %}
+        <a class="az-btn-ghost" href="?page={{ next_page }}">Next →</a>
+      {% else %}<span></span>{% endif %}
+    </nav>
+  {% else %}
+    <div class="az-state">No anime found on this page.</div>
+  {% endif %}
+</div>
+
+{% endblock %}

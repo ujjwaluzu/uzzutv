@@ -586,6 +586,9 @@ body{
         <li class="nav-item">
           <a class="nav-link {% if request.resolver_match.url_name == 'tv' or request.resolver_match.url_name == 'watchtv' or request.resolver_match.url_name == 'detail' and request.resolver_match.kwargs.type == 'tv' %}active{% endif %}" href="{% url 'tv'%}">Series</a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ ANIUZU_URL }}">Aniuzu</a>
+        </li>
         <li class="nav-item d-none" id="party-nav-item">
           <a class="nav-link {% if request.resolver_match.url_name == 'party' or request.resolver_match.url_name == 'party_room' %}active{% endif %}" href="{% url 'party'%}">Party</a>
         </li>

@@ -1,0 +1,87 @@
+{% extends "aniuzu/base.html" %}
+{% load aniuzu_extras %}
+
+{% block title %}{% if anime %}{{ anime|display_title }}{% else %}Anime{% endif %} — Aniuzu{% endblock %}
+
+{% block body %}
+
+{% if api_error %}
+  <div class="az-container az-state az-state-error">
+    Couldn't load this anime right now — AniList may be temporarily unavailable.
+    <a class="az-btn-ghost" href="{% url 'aniuzu:detail' anime_id %}">Retry</a>
+    <a class="az-btn-ghost" href="{% url 'aniuzu:home' %}">Go home</a>
+  </div>
+{% elif anime %}
+
+<section class="az-detail-hero">
+  <div class="az-detail-banner">
+    {% if anime.bannerImage %}
+      <img src="{{ anime.bannerImage }}" alt="" onerror="this.remove()">
+    {% endif %}
+  </div>
+
+  <div class="az-container az-detail-head">
+    <div class="az-detail-cover">
+      {% if anime.coverImage.extraLarge or anime.coverImage.large %}
+        <img src="{{ anime.coverImage.extraLarge|default:anime.coverImage.large }}" alt="{{ anime|display_title }}" onerror="this.style.display='none'">
+      {% endif %}
+      <span class="az-card-fallback" aria-hidden="true">{{ anime|display_title|slice:":1" }}</span>
+    </div>
+
+    <div class="az-detail-info">
+      <h1 class="az-detail-title">{{ anime|display_title }}</h1>
+      {% with native=anime.title.native romaji=anime.title.romaji english=anime.title.english %}
+        {% if romaji and romaji != english or native and native != english %}
+          <p class="az-detail-alt">{{ romaji }}{% if romaji and native %} · {{ native }}{% endif %}</p>
+        {% endif %}
+      {% endwith %}
+
+      <div class="az-hero-meta">
+        {% if anime.averageScore %}<span class="az-pill az-pill-score">{{ anime.averageScore }}%</span>{% endif %}
+        {% detail_meta anime as meta %}
+        {% if meta %}<span class="az-pill">{{ meta }}</span>{% endif %}
+        <span class="az-pill">{{ anime.status|title }}</span>
+      </div>
+
+      {% if anime.genres %}
+        <div class="az-chip-row">
+          {% for genre in anime.genres %}<span class="az-chip">{{ genre }}</span>{% endfor %}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<div class="az-container az-detail-body">
+  {% if anime.clean_description %}
+    <section class="az-block">
+      <h2>Synopsis</h2>
+      <p class="az-desc">{{ anime.clean_description }}</p>
+    </section>
+  {% else %}
+    <section class="az-block">
+      <h2>Synopsis</h2>
+      <p class="az-desc az-muted">No description available for this title yet.</p>
+    </section>
+  {% endif %}
+
+  <section class="az-block">
+    <h2>Details</h2>
+    <dl class="az-facts">
+      <div><dt>Status</dt><dd>{{ anime.status|title }}</dd></div>
+      <div><dt>Format</dt><dd>{{ anime.format|default:"—" }}</dd></div>
+      <div><dt>Episodes</dt><dd>{{ anime.episodes|default:"—" }}</dd></div>
+      <div><dt>Duration</dt><dd>{% if anime.duration %}{{ anime.duration }} min{% else %}—{% endif %}</dd></div>
+      <div><dt>Season</dt><dd>{% if anime.season %}{{ anime.season|title }} {{ anime.seasonYear|default:'' }}{% else %}—{% endif %}</dd></div>
+      {% if anime.studios.nodes %}
+        <div><dt>Studios</dt><dd>{% for studio in anime.studios.nodes %}{{ studio.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</dd></div>
+      {% endif %}
+    </dl>
+  </section>
+
+  <a class="az-btn-ghost" href="{% url 'aniuzu:home' %}">← Back to home</a>
+</div>
+
+{% endif %}
+
+{% endblock %}

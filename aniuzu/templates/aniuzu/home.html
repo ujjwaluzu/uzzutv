@@ -1,0 +1,48 @@
+{% extends "aniuzu/base.html" %}
+{% load aniuzu_extras %}
+
+{% block title %}Aniuzu — Discover Anime{% endblock %}
+
+{% block body %}
+
+{% if hero %}
+<section class="az-hero">
+  <div class="az-hero-bg">
+    <img src="{{ hero.bannerImage }}" alt="" onerror="this.remove()">
+  </div>
+  <div class="az-hero-inner">
+    <p class="az-hero-kicker">Featured</p>
+    <h1 class="az-hero-title">{{ hero|display_title }}</h1>
+    {% if hero.short_description %}
+      <p class="az-hero-desc">{{ hero.short_description }}</p>
+    {% endif %}
+    <div class="az-hero-meta">
+      {% if hero.averageScore %}<span class="az-pill az-pill-score">{{ hero.averageScore }}%</span>{% endif %}
+      {% if hero.format or hero.seasonYear %}<span class="az-pill">{{ hero.format|default:'' }}{% if hero.format and hero.seasonYear %} ·{% endif %} {{ hero.seasonYear|default:'' }}</span>{% endif %}
+    </div>
+    <a class="az-btn-primary" href="{% url 'aniuzu:detail' hero.id %}">
+      View Anime
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+    </a>
+  </div>
+</section>
+{% else %}
+<section class="az-hero az-hero-fallback">
+  <div class="az-hero-inner">
+    <h1 class="az-hero-title">Discover anime,<br>powered by AniList.</h1>
+    <p class="az-hero-desc">Trending, popular and currently airing series — updated continuously.</p>
+  </div>
+</section>
+{% endif %}
+
+<div class="az-container">
+
+  {% include "aniuzu/_anime_row.html" with title="Trending Now" items=trending.items api_error=trending.api_error %}
+
+  {% include "aniuzu/_anime_row.html" with title="All-Time Popular" items=popular.items api_error=popular.api_error %}
+
+  {% include "aniuzu/_anime_row.html" with title="Currently Airing" items=airing.items api_error=airing.api_error %}
+
+</div>
+
+{% endblock %}

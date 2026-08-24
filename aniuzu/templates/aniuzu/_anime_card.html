@@ -1,0 +1,17 @@
+{% load aniuzu_extras %}
+<a class="az-card" href="{% url 'aniuzu:detail' media.id %}">
+  <div class="az-card-cover">
+    {% if media.coverImage.large or media.coverImage.extraLarge %}
+      <img src="{{ media.coverImage.extraLarge|default:media.coverImage.large }}" alt="{{ media|display_title }}" loading="lazy" decoding="async" onerror="this.style.display='none'">
+    {% endif %}
+    <span class="az-card-fallback" aria-hidden="true">{{ media|display_title|slice:":1" }}</span>
+    {% if media.averageScore %}
+      <span class="az-card-score">
+        <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><path d="M12 2l2.9 6.3 6.8.7-5.1 4.6 1.4 6.7L12 16.9 6 20.3l1.4-6.7L2.3 9l6.8-.7z"/></svg>
+        {{ media.averageScore }}%
+      </span>
+    {% endif %}
+  </div>
+  <h3 class="az-card-title">{{ media|display_title }}</h3>
+  <p class="az-card-meta">{% card_meta media %}</p>
+</a>
