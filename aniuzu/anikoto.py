@@ -46,7 +46,15 @@ class SeriesNotFound(AnikotoError):
 
 
 class RateLimited(AnikotoError):
-    """Anikoto answered 429; back off before retrying."""
+    """Anikoto answered 429; back off before retrying.
+
+    Carries `retry_after` (seconds) parsed from the Retry-After header
+    when Anikoto sends one — shared hosting IPs need to actually wait.
+    """
+
+    def __init__(self, retry_after=0):
+        super().__init__(f"rate limited (Retry-After={retry_after}s)")
+        self.retry_after = int(retry_after or 0)
 
 
 def _api_url():
@@ -57,6 +65,28 @@ def _timeout():
     return getattr(settings, "ANIKOTO_TIMEOUT", REQUEST_TIMEOUT)
 
 
+# Cloudflare-fronted APIs commonly reject the default python-requests
+# user agent outright — shared-hosting egress IPs get no benefit of the
+# doubt. Identifying as a normal browser keeps the door open.
+DEFAULT_USER_AGENT = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+    "(KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
+)
+
+
+def _user_agent():
+    return getattr(settings, "ANIKOTO_USER_AGENT", DEFAULT_USER_AGENT)
+
+
+def _retry_after(response):
+    """Seconds from a Retry-After header (0 when absent/unparseable)."""
+    raw = response.headers.get("Retry-After") if response is not None else None
+    try:
+        return max(0, int(float(raw)))
+    except (TypeError, ValueError):
+        return 0
+
+
 def _get(path, params=None):
     """GET {base}/{path}. Returns parsed JSON or raises."""
     try:
@@ -64,12 +94,12 @@ def _get(path, params=None):
             f"{_api_url()}/{path.lstrip('/')}",
             params=params,
             timeout=_timeout(),
-            headers={"Accept": "application/json"},
+            headers={"Accept": "application/json", "User-Agent": _user_agent()},
         )
         if response.status_code == 404:
             raise SeriesNotFound
         if response.status_code == 429:
-            raise RateLimited
+            raise RateLimited(_retry_after(response))
         response.raise_for_status()
         payload = response.json()
     except (SeriesNotFound, RateLimited):
@@ -240,20 +270,31 @@ def scan_catalog(max_pages=SCAN_PAGES_PER_MISS):
     """Advance the catalog index by up to `max_pages` pages of /recent-anime.
 
     The accumulated ani_id -> entry map plus a cursor are cached, so scans
-    resume where they stopped instead of restarting. Rate limits (429) keep
-    progress made so far. Returns True once the catalog is fully consumed.
+    resume where they stopped instead of restarting. Rate limits keep any
+    progress made so far.
+
+    Returns (exhausted, stop_reason):
+      "done"                    — pass finished without provider trouble
+                                  (exhausted says whether the whole catalog
+                                  has been consumed)
+      "rate-limited:<seconds>"  — Anikoto answered 429; value is the parsed
+                                  Retry-After hint
+      "unreachable:<detail>"    — network/API/malformed-response failure
     """
     state = _index_state()
     cursor = int(state["cursor"])
     exhausted = bool(state["exhausted"])
+    stop_reason = "done"
 
     scanned = 0
     while scanned < max_pages and not exhausted:
         try:
             page = recent_anime(page=cursor, per_page=CATALOG_PER_PAGE)
-        except RateLimited:
+        except RateLimited as exc:
+            stop_reason = f"rate-limited:{exc.retry_after}"
             break
-        except AnikotoError:
+        except AnikotoError as exc:
+            stop_reason = f"unreachable:{str(exc)[:120] or 'unknown'}"
             break
 
         rows = page.get("rows") or []
@@ -278,11 +319,16 @@ def scan_catalog(max_pages=SCAN_PAGES_PER_MISS):
     state["cursor"] = cursor
     state["exhausted"] = exhausted
     cache.set(_INDEX_KEY, state, INDEX_CACHE_TIMEOUT)
-    return exhausted
+    return exhausted, stop_reason
 
 
 def lookup_in_index(anilist_id):
-    """Catalog entry whose aniId matches, advancing the scan until found."""
+    """Catalog entry whose aniId matches, advancing the scan until found.
+
+    Scanning stops early when the provider itself is misbehaving (rate
+    limit / unreachable) — hammering a failing API from a request path
+    helps nobody; the next request resumes from the cached cursor.
+    """
     target = str(anilist_id).strip()
 
     def find():
@@ -291,11 +337,12 @@ def lookup_in_index(anilist_id):
     hit = find()
     guard = 0
     while hit is None and guard < 200:
-        state = _index_state()
-        if state["exhausted"]:
+        if _index_state()["exhausted"]:
             break
-        scan_catalog()
+        _, reason = scan_catalog()
         hit = find()
+        if hit is not None or reason != "done":
+            break
         guard += 1
     return hit
 

@@ -1,6 +1,8 @@
+from io import StringIO
 from unittest import mock
 
 from django.core.cache import cache
+from django.core.management import call_command
 from django.test import TestCase, override_settings
 
 from . import anikoto, anilist, providers
@@ -13,6 +15,24 @@ def locmem_cache():
             "LOCATION": "aniuzu-tests",
         }
     }
+
+
+class _FakeResponse:
+    """Just enough of requests.Response for anikoto._get()."""
+
+    def __init__(self, status_code=200, payload=None, headers=None):
+        self.status_code = status_code
+        self._payload = {"ok": True, "data": payload if payload is not None else []}
+        self.headers = headers or {}
+
+    def json(self):
+        return self._payload
+
+    def raise_for_status(self):
+        import requests
+
+        if self.status_code >= 400:
+            raise requests.HTTPError(f"status {self.status_code}")
 
 
 class ProviderUrlTests(TestCase):
@@ -114,6 +134,119 @@ class NormalizeSeriesTests(TestCase):
             anikoto.normalize_series({"anime": {}, "episodes": []})
         with self.assertRaises(anikoto.AnikotoError):
             anikoto.normalize_series(None)
+
+
+@override_settings(CACHES=locmem_cache())
+class TransportTests(TestCase):
+    """HTTP layer: UA header, 404/429 semantics."""
+
+    def test_get_sends_browser_user_agent(self):
+        with mock.patch.object(anikoto.requests, "get",
+                               return_value=_FakeResponse()) as getter:
+            anikoto._get("recent-anime", {"page": 1})
+        headers = getter.call_args.kwargs["headers"]
+        self.assertTrue(headers["User-Agent"].startswith("Mozilla/5.0"))
+        self.assertEqual(headers["Accept"], "application/json")
+
+    def test_404_maps_to_series_not_found(self):
+        with mock.patch.object(anikoto.requests, "get",
+                               return_value=_FakeResponse(status_code=404)):
+            with self.assertRaises(anikoto.SeriesNotFound):
+                anikoto._get("series/999999999")
+
+    def test_429_carries_retry_after(self):
+        response = _FakeResponse(status_code=429, headers={"Retry-After": "45"})
+        with mock.patch.object(anikoto.requests, "get", return_value=response):
+            with self.assertRaises(anikoto.RateLimited) as ctx:
+                anikoto._get("recent-anime")
+        self.assertEqual(ctx.exception.retry_after, 45)
+
+    def test_malformed_payload_raises(self):
+        bad = _FakeResponse()
+        bad._payload = {"nope": True}
+        with mock.patch.object(anikoto.requests, "get", return_value=bad):
+            with self.assertRaises(anikoto.AnikotoError):
+                anikoto._get("recent-anime")
+
+
+@override_settings(CACHES=locmem_cache())
+class ScanCatalogReasonTests(TestCase):
+    def setUp(self):
+        cache.clear()
+
+    def test_rate_limit_reports_retry_hint(self):
+        with mock.patch.object(anikoto, "recent_anime",
+                               side_effect=anikoto.RateLimited(45)):
+            exhausted, reason = anikoto.scan_catalog()
+        self.assertFalse(exhausted)
+        self.assertEqual(reason, "rate-limited:45")
+
+    def test_unreachable_reports_detail(self):
+        with mock.patch.object(anikoto, "recent_anime",
+                               side_effect=anikoto.AnikotoError("connection refused")):
+            exhausted, reason = anikoto.scan_catalog()
+        self.assertFalse(exhausted)
+        self.assertEqual(reason, "unreachable:connection refused")
+
+    def test_successful_pass_reports_done(self):
+        page = {
+            "rows": [{"id": 1642, "title": "One Piece", "ani_id": "21"}],
+            "pagination": {"total_pages": 1},
+        }
+        with mock.patch.object(anikoto, "recent_anime", return_value=page):
+            exhausted, reason = anikoto.scan_catalog()
+        self.assertTrue(exhausted)
+        self.assertEqual(reason, "done")
+
+    def test_lookup_stops_hammering_when_provider_fails(self):
+        # Seed a non-exhausted index, then make every scan fail.
+        cache.set(anikoto._INDEX_KEY,
+                  {"by_ani": {}, "cursor": 1, "exhausted": False}, 60)
+        with mock.patch.object(anikoto, "scan_catalog",
+                               return_value=(False, "unreachable:x")) as scanner:
+            result = anikoto.lookup_in_index(123456789)
+        self.assertIsNone(result)
+        self.assertEqual(scanner.call_count, 1)  # no repeated hammering
+
+
+@override_settings(CACHES=locmem_cache())
+class AnikotoIndexCommandTests(TestCase):
+    def setUp(self):
+        cache.clear()
+
+    def test_gives_up_after_repeated_no_progress(self):
+        with mock.patch.object(anikoto, "scan_catalog",
+                               return_value=(False, "unreachable:x")):
+            out = StringIO()
+            call_command("anikoto_index", stdout=out)
+        text = out.getvalue()
+        self.assertIn("stopped: unreachable:x", text)
+        self.assertIn("No progress twice in a row", text)
+
+    def test_completes_when_catalog_exhausted(self):
+        def fake_scan():
+            # Real scans persist their progress; the command reads it back.
+            cache.set(anikoto._INDEX_KEY, {
+                "by_ani": {"21": {"seriesId": 1642, "aniId": "21"}},
+                "cursor": 9,
+                "exhausted": True,
+            }, 60)
+            return True, "done"
+
+        with mock.patch.object(anikoto, "scan_catalog", side_effect=fake_scan):
+            out = StringIO()
+            call_command("anikoto_index", stdout=out)
+        self.assertIn("indexed 1 titles", out.getvalue())
+        self.assertIn("Catalog fully indexed.", out.getvalue())
+
+    def test_waits_on_rate_limit_then_gives_up_cleanly(self):
+        with mock.patch.object(anikoto, "scan_catalog",
+                               return_value=(False, "rate-limited:5")), \
+             mock.patch("aniuzu.management.commands.anikoto_index.time.sleep") as sleeper:
+            out = StringIO()
+            call_command("anikoto_index", "--delay", "0", stdout=out)
+        self.assertIn("waiting 5s", out.getvalue())
+        self.assertTrue(sleeper.called)
 
 
 @override_settings(CACHES=locmem_cache())
