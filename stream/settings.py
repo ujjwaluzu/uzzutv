@@ -49,7 +49,6 @@ CACHES = {
 
 INSTALLED_APPS = [
     'uzzutv',
-    'aniuzu',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -82,7 +81,6 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'aniuzu.context_processors.aniuzu_url',
             ],
         },
     },
@@ -138,17 +136,6 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATIC_ROOT = '/home/uzzutv/uzzutv/staticfiles'
-
-# Aniuzu (anime site: AniList metadata + Anikoto episodes + MegaPlay playback)
-
-ANILIST_API_URL = os.getenv("ANILIST_API_URL", "https://graphql.anilist.co")
-
-# Anikoto is called SERVER-SIDE only (per their docs) and cached in the
-# default Django cache (database-backed — no Redis).
-ANIKOTO_API_URL = os.getenv("ANIKOTO_API_URL", "https://anikotoapi.site")
-ANIKOTO_TIMEOUT = int(os.getenv("ANIKOTO_TIMEOUT", "15"))
-
-ANIUZU_URL = os.getenv("ANIUZU_URL", "/aniuzu/")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
