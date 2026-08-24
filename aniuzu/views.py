@@ -2,7 +2,7 @@ from django.conf import settings
 from django.http import Http404
 from django.shortcuts import render
 
-from . import anilist, providers
+from . import anilist, anikoto, providers
 
 
 SECTIONS = {
@@ -24,24 +24,6 @@ def _safe_page_number(request):
     except (TypeError, ValueError):
         return 1
     return page if page >= 1 else 1
-
-
-def episode_total(anime):
-    """Best-known episode count, without inventing metadata.
-
-    Prefers AniList's `episodes`; for ongoing shows falls back to the
-    number of episodes already aired. Returns None when unknown.
-    """
-    if not anime:
-        return None
-    count = anime.get("episodes")
-    if count:
-        return int(count)
-    next_airing = anime.get("nextAiringEpisode") or {}
-    airing = next_airing.get("episode")
-    if airing and airing > 1:
-        return int(airing) - 1
-    return None
 
 
 def _section(data):
@@ -112,6 +94,92 @@ def search(request):
     })
 
 
+# ----------------------------------------------------------------------
+# Anikoto episode plumbing (server-side only)
+# ----------------------------------------------------------------------
+
+def _episode_browser_payload(series):
+    """Slim per-episode records embedded into pages for the JS browser.
+
+    Numbers keep Anikoto's values (specials/gaps preserved); sub/dub flags
+    reflect actual embed availability. URLs stay server-side here — the
+    detail page never needs them.
+    """
+    episodes = []
+    for episode in series["episodes"]:
+        episodes.append({
+            "n": episode["number"],
+            "s": 1 if episode["subUrl"] else 0,
+            "d": 1 if episode["dubUrl"] else 0,
+        })
+    return {
+        "count": len(episodes),
+        "subAvailable": any(e["s"] for e in episodes),
+        "dubAvailable": any(e["d"] for e in episodes),
+        "episodes": episodes,
+    }
+
+
+def _resolve_episode(series, wanted_number):
+    """Exact Anikoto episode by number, else the next one above it.
+
+    Returns (index, episode_record) or (None, None). Never invents an
+    episode: what plays always comes from Anikoto's own list.
+    """
+    episodes = series["episodes"]
+    for index, episode in enumerate(episodes):
+        if episode["number"] == wanted_number:
+            return index, episode
+    # Exact misses fall forward (fractional specials like 5.5 sit between
+    # integers); anything past the end simply doesn't exist yet.
+    for index, episode in enumerate(episodes):
+        if episode["number"] is not None and episode["number"] > wanted_number:
+            return index, episode
+    return None, None
+
+
+def _watch_context_payload(anilist_id, series_id, series, index, language):
+    """JSON snapshot the watch page JS needs — everything pre-decided
+    server-side so the client never constructs playback URLs."""
+    episodes = series["episodes"]
+    current = episodes[index]
+    previous = episodes[index - 1] if index > 0 else None
+    following = episodes[index + 1] if index < len(episodes) - 1 else None
+
+    available = []
+    if current["subUrl"]:
+        available.append("sub")
+    if current["dubUrl"]:
+        available.append("dub")
+
+    return {
+        "debug": bool(getattr(settings, "DEBUG", False)),
+        "anilistId": anilist_id,
+        "anikotoSeriesId": series_id,
+        "anikotoEpisodeId": current["id"],
+        "embedId": current["embedId"],
+        "episodeNumber": str(current["number"]),
+        "language": providers.closest_language(language, available),
+        "availableLanguages": available,
+        "playerUrls": {"sub": current["subUrl"], "dub": current["dubUrl"]},
+        "prevNumber": str(previous["number"]) if previous else None,
+        "nextNumber": str(following["number"]) if following else None,
+        "totalEpisodes": len(episodes),
+        # Origins the watch page may receive player postMessages from.
+        "allowedOrigins": providers.ALLOWED_ORIGINS,
+        "episodes": [
+            {
+                "n": item["number"],
+                "id": item["id"],          # Anikoto episode record id
+                "embed": item["embedId"],  # MegaPlay embed id
+                "sub": item["subUrl"],
+                "dub": item["dubUrl"],
+            }
+            for item in episodes
+        ],
+    }
+
+
 def detail(request, anime_id):
     try:
         anime = anilist.get_anime(anime_id)
@@ -120,56 +188,68 @@ def detail(request, anime_id):
     except anilist.AniListError:
         anime = None  # transient AniList failure -> render fallback state
 
-    api_error = anime is None
-    if anime:
-        anime["clean_description"] = anilist.clean_description(anime.get("description"))
+    anime_id = int(anime_id)
+
+    # Episodes come from Anikoto; AniList metadata failure must not block it.
+    series_id, series = anikoto.get_series_for_anilist(anime_id)
+    anikoto_error = series_id is not None and series is None  # mapped but fetch failed
 
     return render(request, "aniuzu/detail.html", {
         "anime": anime,
-        "api_error": api_error,
-        "anime_id": int(anime_id),
-        "episode_total": episode_total(anime),
-        "episode_range": episode_range(anime),
+        "api_error": anime is None,
+        "anime_id": anime_id,
+        "series_id": series_id,
+        "series": series,
+        "anikoto_error": anikoto_error,
+        "browser_data": _episode_browser_payload(series) if series else None,
     })
-
-
-def episode_range(anime):
-    """1..N for the detail page's quick-pick strip (empty when unknown)."""
-    total = episode_total(anime)
-    return range(1, total + 1) if total else []
 
 
 def watch(request, anime_id, episode):
     try:
-        episode = max(1, int(episode))
+        wanted = max(1, int(episode))
     except (TypeError, ValueError):
         raise Http404("Invalid episode")
 
+    anime_id = int(anime_id)
+
     try:
         anime = anilist.get_anime(anime_id)
+    except anilist.AniListError:
+        anime = None  # degrade gracefully; Anikoto still drives playback
     except anilist.AnimeNotFound:
         raise Http404("Anime not found")
-    except anilist.AniListError:
-        anime = None  # transient AniList failure -> render fallback state
 
-    anime_id = int(anime_id)
-    total = episode_total(anime)
+    series_id, series = anikoto.get_series_for_anilist(anime_id)
 
-    watch_data = {
-        "anilistId": anime_id,
-        "episode": episode,
-        "totalEpisodes": total,
-        "debug": bool(getattr(settings, "DEBUG", False)),
-        "defaultProvider": providers.DEFAULT_PROVIDER,
-        "defaultLanguage": providers.DEFAULT_LANGUAGE,
-        "providers": providers.client_config(),
-    }
+    index, current = (None, None)
+    if series:
+        index, current = _resolve_episode(series, wanted)
+
+    language = request.GET.get("lang")
+    payload = None
+    if series and current:
+        payload = _watch_context_payload(anime_id, series_id, series, index, language)
+
+    # AniList metadata first; Anikoto title covers transient AniList
+    # failures so the page stays usable when one provider is down.
+    display_title = ""
+    if anime:
+        display_title = (anime.get("title") or {}).get("english") \
+            or (anime.get("title") or {}).get("romaji") \
+            or (anime.get("title") or {}).get("native") or ""
+    if not display_title and series:
+        display_title = series.get("title") or ""
 
     return render(request, "aniuzu/watch.html", {
         "anime": anime,
         "anime_id": anime_id,
-        "episode": episode,
-        "episode_total": total,
-        "api_error": anime is None,
-        "watch_data": watch_data,
+        "api_error": anime is None and series is None,
+        "series": series,
+        "series_id": series_id,
+        "current_episode": current,
+        "wanted_episode": wanted,
+        "display_title": display_title,
+        "anikoto_error": series_id is not None and series is None,
+        "watch_data": payload,
     })

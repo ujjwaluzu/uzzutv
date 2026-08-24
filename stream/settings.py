@@ -139,9 +139,14 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATIC_ROOT = '/home/uzzutv/uzzutv/staticfiles'
 
-# Aniuzu (anime site, powered by the public AniList GraphQL API)
+# Aniuzu (anime site: AniList metadata + Anikoto episodes + MegaPlay playback)
 
 ANILIST_API_URL = os.getenv("ANILIST_API_URL", "https://graphql.anilist.co")
+
+# Anikoto is called SERVER-SIDE only (per their docs) and cached in the
+# default Django cache (database-backed — no Redis).
+ANIKOTO_API_URL = os.getenv("ANIKOTO_API_URL", "https://anikotoapi.site")
+ANIKOTO_TIMEOUT = int(os.getenv("ANIKOTO_TIMEOUT", "15"))
 
 ANIUZU_URL = os.getenv("ANIUZU_URL", "/aniuzu/")
 

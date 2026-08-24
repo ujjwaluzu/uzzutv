@@ -1,9 +1,15 @@
 /* ============================================================
    ANIUZU — watch page
-   Player state, provider switching, postMessage events,
-   localStorage progress, resume + auto-next scaffolding.
-   Provider metadata is injected from the server (single source
-   of truth: aniuzu/providers.py) via #az-watch-data.
+   AniList supplies the header metadata; Anikoto supplies every
+   episode (numbers, embed ids, SUB/DUB URLs) via the server, and
+   MegaPlay plays them. The client NEVER builds playback URLs and
+   never treats the AniList ID as an Anikoto/episode identifier.
+
+   Everything is decided server-side in #az-watch-data:
+     playerUrls.sub/.dub  — verbatim Anikoto embed URLs (MegaPlay)
+     availableLanguages   — languages this exact episode really has
+     prevNumber/nextNumber— neighbours from Anikoto's ordered list
+     episodes[]           — full catalog for search + navigation
    ============================================================ */
 
 (function () {
@@ -19,30 +25,39 @@
     return;
   }
 
-  var AUTO_NEXT_ENABLED = false; // flip later to enable automatic switching
-  var LOAD_TIMEOUT_MS = 25000;   // give slow providers a fair chance
+  var AUTO_NEXT_ENABLED = false; // scaffolding; manual click stays primary
+  var LOAD_TIMEOUT_MS = 25000;
   var SAVE_INTERVAL_MS = 10000;
-  var RESUME_MIN_PERCENT = 1.5;  // ignore trivial progress
-  var RESUME_MAX_PERCENT = 93;   // near-finished counts as "done", not resume
+  var RESUME_MIN_PERCENT = 1.5;
+  var RESUME_MAX_PERCENT = 93;
   var RESUME_MIN_SECONDS = 20;
   var WATCHED_PERCENT = 85;
 
   var PREFS_KEY = 'aniuzu:watch-prefs';
-  var progressKey = function (animeId, episode) {
-    return 'aniuzu:anime:' + animeId + ':episode:' + episode;
-  };
+  var PROGRESS_PREFIX = 'aniuzu:progress:' + CFG.anilistId + ':';
 
   // ------------------------------------------------------------
-  // Progress storage abstraction (localStorage today, swappable
-  // for an API/database later — the rest of the code only calls
-  // these four functions).
+  // Provider-independent progress layer.
+  // Keyed by the Anikoto episode identity (embed id), NOT just the
+  // episode number, so progress survives renumbering/specials.
+  // localStorage today; swappable later without touching callers.
   // ------------------------------------------------------------
 
-  function saveWatchProgress(animeId, episode, currentTime, duration) {
+  function progressKey(embedId) {
+    return PROGRESS_PREFIX + embedId;
+  }
+
+  function saveWatchProgress(snapshot, currentTime, duration) {
+    if (!snapshot || !snapshot.embedId) return;
     if (!duration || duration <= 0 || currentTime <= 0) return;
     var percent = Math.min(100, (currentTime / duration) * 100);
     try {
-      localStorage.setItem(progressKey(animeId, episode), JSON.stringify({
+      localStorage.setItem(progressKey(snapshot.embedId), JSON.stringify({
+        anilistId: CFG.anilistId,
+        anikotoSeriesId: CFG.anikotoSeriesId,
+        anikotoEpisodeId: snapshot.anikotoEpisodeId,
+        embedId: snapshot.embedId,
+        episodeNumber: snapshot.episodeNumber,
         currentTime: currentTime,
         duration: duration,
         percent: percent,
@@ -51,9 +66,10 @@
     } catch (err) { /* storage full/unavailable — non-fatal */ }
   }
 
-  function getWatchProgress(animeId, episode) {
+  function getWatchProgress(embedId) {
+    if (!embedId) return null;
     try {
-      var raw = localStorage.getItem(progressKey(animeId, episode));
+      var raw = localStorage.getItem(progressKey(embedId));
       if (!raw) return null;
       var data = JSON.parse(raw);
       if (!data || typeof data.currentTime !== 'number' || typeof data.duration !== 'number') {
@@ -65,8 +81,8 @@
     }
   }
 
-  function getResumeTime(animeId, episode) {
-    var saved = getWatchProgress(animeId, episode);
+  function getResumeTime(embedId) {
+    var saved = getWatchProgress(embedId);
     if (!saved) return null;
     if (saved.currentTime < RESUME_MIN_SECONDS) return null;
     if (!saved.duration) return null;
@@ -75,19 +91,25 @@
     return saved.currentTime;
   }
 
-  function clearWatchProgress(animeId, episode) {
+  function clearWatchProgress(embedId) {
     try {
-      localStorage.removeItem(progressKey(animeId, episode));
+      localStorage.removeItem(progressKey(embedId));
     } catch (err) { /* ignore */ }
   }
 
-  function watchedEpisodes(animeId, total) {
+  // Watched map by episode number (percent watched >= threshold),
+  // gathered from stored records instead of guessing numbers.
+  function watchedEpisodes() {
     var watched = {};
     try {
-      for (var ep = 1; ep <= total; ep++) {
-        var saved = getWatchProgress(animeId, ep);
-        if (saved && saved.duration && (saved.currentTime / saved.duration) * 100 >= WATCHED_PERCENT) {
-          watched[ep] = true;
+      for (var i = 0; i < localStorage.length; i++) {
+        var key = localStorage.key(i);
+        if (!key || key.indexOf(PROGRESS_PREFIX) !== 0) continue;
+        var data = null;
+        try { data = JSON.parse(localStorage.getItem(key)); } catch (err) { continue; }
+        if (data && typeof data.percent === 'number' && data.percent >= WATCHED_PERCENT &&
+            data.episodeNumber !== undefined && data.episodeNumber !== null) {
+          watched[String(data.episodeNumber)] = true;
         }
       }
     } catch (err) { /* ignore */ }
@@ -95,56 +117,24 @@
   }
 
   // ------------------------------------------------------------
-  // Providers / URL building
-  // ------------------------------------------------------------
-
-  var providerList = Array.isArray(CFG.providers) ? CFG.providers : [];
-  var providersByKey = {};
-  providerList.forEach(function (p) { providersByKey[p.key] = p; });
-
-  function findProvider(key) {
-    return providersByKey[key] || null;
-  }
-
-  function supportsLanguage(provider, language) {
-    return !!(provider && provider.supportedLanguages.indexOf(language) !== -1);
-  }
-
-  // The only place player URLs are built on the client.
-  function buildProviderUrl(providerKey, anilistId, episode, language) {
-    var provider = findProvider(providerKey);
-    if (!provider) return null;
-    if (!supportsLanguage(provider, language)) return null;
-    return provider.urlTemplate
-      .replace('{anilist_id}', encodeURIComponent(anilistId))
-      .replace('{episode}', encodeURIComponent(episode))
-      .replace('{language}', encodeURIComponent(language));
-  }
-
-  function closestLanguage(providerKey, wanted) {
-    var provider = findProvider(providerKey);
-    if (provider && provider.supportedLanguages.indexOf(wanted) !== -1) return wanted;
-    if (provider && provider.supportedLanguages.length) return provider.supportedLanguages[0];
-    return 'sub';
-  }
-
-  // ------------------------------------------------------------
   // State
   // ------------------------------------------------------------
 
   var prefs = loadPrefs();
-  var initialProvider = pickInitialProvider();
   var state = {
-    provider: initialProvider,
-    language: closestLanguage(initialProvider, prefs.language || CFG.defaultLanguage || 'sub'),
-    episode: CFG.episode,
-    totalEpisodes: CFG.totalEpisodes,
+    language: pickInitialLanguage(),
+    episodeNumber: CFG.episodeNumber,
+    anikotoEpisodeId: CFG.anikotoEpisodeId,
+    embedId: CFG.embedId,
+    playerUrls: CFG.playerUrls,
+    prevNumber: CFG.prevNumber,
+    nextNumber: CFG.nextNumber,
     loading: false,
     error: false,
     resumePrompted: false,
     completeShown: false,
     lastSavedAt: 0,
-    lastEvent: null // most recent raw event values, used for throttled saves
+    lastEvent: null
   };
 
   function loadPrefs() {
@@ -157,17 +147,15 @@
 
   function savePrefs() {
     try {
-      localStorage.setItem(PREFS_KEY, JSON.stringify({
-        provider: state.provider,
-        language: state.language
-      }));
+      localStorage.setItem(PREFS_KEY, JSON.stringify({ language: state.language }));
     } catch (err) { /* ignore */ }
   }
 
-  function pickInitialProvider() {
-    var wanted = prefs.provider;
-    if (findProvider(wanted)) return wanted;
-    return findProvider(CFG.defaultProvider) ? CFG.defaultProvider : (providerList[0] || {}).key;
+  function pickInitialLanguage() {
+    var available = CFG.availableLanguages || [];
+    if (prefs.language && available.indexOf(prefs.language) !== -1) return prefs.language;
+    if (CFG.language && available.indexOf(CFG.language) !== -1) return CFG.language;
+    return available[0] || null;
   }
 
   // ------------------------------------------------------------
@@ -179,7 +167,7 @@
     loading: document.getElementById('az-loading'),
     loadingLabel: document.getElementById('az-loading-label'),
     error: document.getElementById('az-error'),
-    errorServers: document.getElementById('az-error-servers'),
+    errorActions: document.getElementById('az-error-actions'),
     resume: document.getElementById('az-resume'),
     resumeTime: document.getElementById('az-resume-time'),
     resumeYes: document.getElementById('az-resume-yes'),
@@ -187,16 +175,15 @@
     complete: document.getElementById('az-complete'),
     nextFromComplete: document.getElementById('az-next-from-complete'),
     completeDismiss: document.getElementById('az-complete-dismiss'),
-    servers: document.getElementById('az-servers'),
     languages: document.getElementById('az-languages'),
     prev: document.getElementById('az-prev'),
     next: document.getElementById('az-next'),
     navEpisode: document.getElementById('az-nav-episode'),
     currentEpisodeLabel: document.getElementById('az-current-episode'),
-    episodes: document.getElementById('az-episodes'),
+    episodesHost: document.getElementById('az-episodes-host'),
     epSearch: document.getElementById('az-ep-search')
   };
-  if (!el.frame) return;
+  if (!el.frame || !CFG.playerUrls) return;
 
   var iframe = null;
   var loadTimer = null;
@@ -212,25 +199,11 @@
     var h = Math.floor(seconds / 3600);
     var m = Math.floor((seconds % 3600) / 60);
     var s = seconds % 60;
-    var mm = (h > 0 ? String(m).padStart(2, '0') : String(m));
-    return (h > 0 ? h + ':' : '') + mm + ':' + String(s).padStart(2, '0');
-  }
-
-  function maxEpisode() {
-    return state.totalEpisodes || null;
-  }
-
-  function hasNext() {
-    return maxEpisode() === null || state.episode < maxEpisode();
-  }
-  function hasPrev() {
-    return state.episode > 1;
+    return (h > 0 ? h + ':' : '') + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
   }
 
   // ------------------------------------------------------------
   // Overlays
-  // loading/error = full stage states (mutually exclusive);
-  // resume/complete = small cards that don't block the player.
   // ------------------------------------------------------------
 
   function setStage(name) {
@@ -245,22 +218,19 @@
     });
   }
 
-  function hideOverlays() {
-    setStage(null);
-    setCard(null);
-  }
-
   // ------------------------------------------------------------
-  // Iframe lifecycle
+  // Iframe lifecycle — src always comes from server-provided URLs.
   // ------------------------------------------------------------
 
   function mountIframe(url) {
+    if (!url) { failPlayback('no-url'); return; }
+
     if (loadTimer) { clearTimeout(loadTimer); loadTimer = null; }
     if (iframe && iframe.parentNode) iframe.parentNode.removeChild(iframe);
 
     iframe = document.createElement('iframe');
     iframe.className = 'az-player-iframe';
-    iframe.title = 'Episode player';
+    iframe.title = 'MegaPlay player';
     iframe.setAttribute('allow', 'autoplay; fullscreen; encrypted-media; picture-in-picture');
     iframe.setAttribute('referrerpolicy', 'origin');
     iframe.src = url;
@@ -272,11 +242,7 @@
     state.lastEvent = null;
     setStage('loading');
 
-    iframe.addEventListener('load', function () {
-      // Fires when the provider page itself finishes loading (success or
-      // its own error page — we can't inspect cross-origin content).
-      if (iframe && iframe.src === url) markLoaded();
-    });
+    iframe.addEventListener('load', markLoaded);
 
     loadTimer = setTimeout(function () {
       if (state.loading) failPlayback('timeout');
@@ -293,136 +259,73 @@
     devLog('playback failed:', reason);
     state.loading = false;
     state.error = true;
-    renderErrorServers();
+    renderErrorActions();
     setCard(null);
     setStage('error');
   }
 
   function maybeOfferResume() {
-    // Offered once per page load (when an episode opens), regardless of
-    // whether the provider has reported progress yet — providers may be
-    // slow or silent, and the card must not depend on them.
     if (state.resumePrompted) return;
     state.resumePrompted = true;
-    var resumeAt = getResumeTime(CFG.anilistId, state.episode);
+    var resumeAt = getResumeTime(state.embedId);
     if (resumeAt === null) return;
     if (el.resumeTime) el.resumeTime.textContent = formatTime(resumeAt);
     setCard('resume');
   }
 
   // ------------------------------------------------------------
-  // Rendering: selectors, navigation, episodes
+  // Rendering: language selector, navigation, episodes
   // ------------------------------------------------------------
-
-  function renderServers() {
-    if (!el.servers) return;
-    el.servers.innerHTML = '';
-    providerList.forEach(function (provider) {
-      var btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'az-seg' + (provider.key === state.provider ? ' active' : '');
-      btn.setAttribute('role', 'tab');
-      btn.setAttribute('aria-selected', provider.key === state.provider ? 'true' : 'false');
-      btn.textContent = provider.displayName;
-      btn.addEventListener('click', function () { selectServer(provider.key); });
-      el.servers.appendChild(btn);
-    });
-  }
 
   function renderLanguages() {
     if (!el.languages) return;
-    var current = findProvider(state.provider);
-    // Union of every language any provider can serve.
-    var union = [];
-    providerList.forEach(function (p) {
-      p.supportedLanguages.forEach(function (lang) {
-        if (union.indexOf(lang) === -1) union.push(lang);
-      });
-    });
-
     el.languages.innerHTML = '';
-    union.forEach(function (lang) {
+    [['sub', 'SUB'], ['dub', 'DUB']].forEach(function (pair) {
+      var lang = pair[0];
+      var label = pair[1];
+      var supported = (CFG.availableLanguages || []).indexOf(lang) !== -1 &&
+                      !!state.playerUrls[lang];
       var btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'az-seg az-seg-lang' + (lang === state.language ? ' active' : '');
       btn.setAttribute('role', 'tab');
       btn.setAttribute('aria-selected', lang === state.language ? 'true' : 'false');
-      btn.textContent = lang.toUpperCase();
-
-      var supportedHere = supportsLanguage(current, lang);
-      btn.disabled = !supportedHere;
-      if (!supportedHere) {
-        btn.title = current ? current.displayName + " doesn't support " + lang.toUpperCase() : '';
-      }
+      btn.textContent = label;
+      btn.disabled = !supported;
+      if (!supported) btn.title = label + ' not available for this episode';
       btn.addEventListener('click', function () { selectLanguage(lang); });
       el.languages.appendChild(btn);
     });
   }
 
   function renderNavigation() {
-    if (el.prev) {
-      el.prev.disabled = !hasPrev();
-    }
-    if (el.next) {
-      el.next.disabled = !hasNext();
-    }
-    if (el.navEpisode) el.navEpisode.textContent = String(state.episode);
-    if (el.currentEpisodeLabel) el.currentEpisodeLabel.textContent = String(state.episode);
+    if (el.prev) el.prev.disabled = !state.prevNumber;
+    if (el.next) el.next.disabled = !state.nextNumber;
+    updateEpisodeLabels();
   }
+
+  function updateEpisodeLabels() {
+    if (el.navEpisode) el.navEpisode.textContent = String(state.episodeNumber);
+    if (el.currentEpisodeLabel) el.currentEpisodeLabel.textContent = String(state.episodeNumber);
+  }
+
+  var browser = null;
+  var watchedMap = {};
 
   function renderEpisodes() {
-    if (!el.episodes) return;
-    el.episodes.innerHTML = '';
-
-    var total = maxEpisode();
-    if (total === null) {
-      // No reliable count from AniList: offer only what we know exists,
-      // plus a manual jump box — never fabricate episode numbers.
-      appendEpisodeButton(state.episode);
-      renderJumpBox();
-      return;
-    }
-
-    var watched = watchedEpisodes(CFG.anilistId, total);
-    var filter = (el.epSearch && !el.epSearch.hidden && el.epSearch.value || '').trim();
-    for (var ep = 1; ep <= total; ep++) {
-      if (filter && String(ep).indexOf(filter.replace(/^0+/, '')) === -1) continue;
-      appendEpisodeButton(ep, watched[ep]);
-    }
-
-    highlightCurrentEpisode();
-  }
-
-  function appendEpisodeButton(ep, watched) {
-    var btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'az-ep-btn';
-    btn.dataset.episode = String(ep);
-    btn.textContent = String(ep);
-    btn.title = 'Episode ' + ep + (watched ? ' (watched)' : '');
-    if (watched) btn.classList.add('watched');
-    if (ep === state.episode) btn.classList.add('active');
-    btn.addEventListener('click', function () { goToEpisode(ep); });
-    el.episodes.appendChild(btn);
-  }
-
-  function renderJumpBox() {
-    if (el.epSearch) {
-      el.epSearch.hidden = false;
-      el.epSearch.placeholder = 'Jump to episode…';
-    }
-  }
-
-  function highlightCurrentEpisode() {
-    if (!el.episodes) return;
-    var buttons = el.episodes.querySelectorAll('.az-ep-btn');
-    for (var i = 0; i < buttons.length; i++) {
-      var isActive = Number(buttons[i].dataset.episode) === state.episode;
-      buttons[i].classList.toggle('active', isActive);
-      if (isActive) {
-        buttons[i].scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    if (!el.episodesHost || !window.AniuzuEpisodes) return;
+    watchedMap = watchedEpisodes();
+    browser = window.AniuzuEpisodes.create({
+      container: el.episodesHost,
+      searchInput: el.epSearch,
+      episodes: CFG.episodes || [],
+      activeNumber: state.episodeNumber,
+      watched: watchedMap,
+      onSelect: function (record) {
+        if (String(record.n) === String(state.episodeNumber)) return;
+        goToEpisode(record);
       }
-    }
+    });
   }
 
   // ------------------------------------------------------------
@@ -430,132 +333,135 @@
   // ------------------------------------------------------------
 
   function loadCurrentPlayer() {
-    var url = buildProviderUrl(state.provider, CFG.anilistId, state.episode, state.language);
+    var url = state.playerUrls[state.language];
     if (!url) {
-      failPlayback('invalid-url');
+      failPlayback('invalid-language');
       return;
     }
-    var provider = findProvider(state.provider);
-    if (el.loadingLabel && provider) {
-      el.loadingLabel.textContent = 'Loading ' + provider.displayName + '…';
-    }
+    if (el.loadingLabel) el.loadingLabel.textContent = 'Loading MegaPlay…';
     mountIframe(url);
-    renderServers();
     renderLanguages();
     savePrefs();
   }
 
-  function selectServer(key) {
-    if (!findProvider(key) || key === state.provider) return;
-    state.provider = key;
-    // Keep URLs valid: fall back to the closest language this server has.
-    state.language = closestLanguage(key, state.language);
-    loadCurrentPlayer();
-  }
-
   function selectLanguage(lang) {
-    var current = findProvider(state.provider);
-    if (!supportsLanguage(current, lang) || lang === state.language) return;
+    if ((CFG.availableLanguages || []).indexOf(lang) === -1) return;
+    if (!state.playerUrls[lang] || lang === state.language) return;
     state.language = lang;
     loadCurrentPlayer();
   }
 
-  function watchPath(episode) {
-    // Same route pattern as urls.py: aniuzu/watch/<id>/<ep>/
+  function watchPath(episodeNumber) {
     return window.location.pathname.replace(
-      /\/watch\/\d+\/\d+\/?/,
-      '/watch/' + CFG.anilistId + '/' + episode + '/'
+      /\/watch\/\d+\/[^\/]+\/?/,
+      '/watch/' + CFG.anilistId + '/' + episodeNumber + '/'
     );
   }
 
-  function goToEpisode(episode) {
-    episode = Number(episode);
-    if (!episode || episode < 1) return;
-    if (maxEpisode() !== null && episode > maxEpisode()) return;
-    if (episode === state.episode) return;
+  function goToEpisode(record) {
+    if (!record || (!record.sub && !record.dub)) return;
 
-    state.episode = episode;
+    var urls = { sub: record.sub || null, dub: record.dub || null };
+    var available = [];
+    if (urls.sub) available.push('sub');
+    if (urls.dub) available.push('dub');
+    if (!available.length) return;
 
-    // Keep refresh/back behaviour sane without reloading the page.
+    var wanted = prefs.language;
+    var nextLanguage = available.indexOf(wanted) !== -1 ? wanted : available[0];
+
+    // Neighbours come from Anikoto's ordered list, recomputed for the
+    // episode we are switching to (never number ± 1 arithmetic).
+    var list = CFG.episodes || [];
+    var index = -1;
+    for (var i = 0; i < list.length; i++) {
+      if (String(list[i].n) === String(record.n)) { index = i; break; }
+    }
+    if (index === -1) return;
+    var previous = index > 0 ? list[index - 1] : null;
+    var following = index < list.length - 1 ? list[index + 1] : null;
+
+    state.playerUrls = urls;
+    state.episodeNumber = record.n;
+    state.anikotoEpisodeId = record.id;      // Anikoto episode record id
+    state.embedId = record.embed;            // MegaPlay embed id
+    state.language = nextLanguage;
+    state.prevNumber = previous ? String(previous.n) : null;
+    state.nextNumber = following ? String(following.n) : null;
+    state.resumePrompted = false;
+    state.completeShown = false;
+
     try {
-      window.history.replaceState({}, '', watchPath(episode));
+      window.history.replaceState({}, '', watchPath(record.n));
     } catch (err) { /* ignore */ }
 
-    document.title = document.title.replace(/Episode \d+/, 'Episode ' + episode);
+    document.title = document.title.replace(/Episode\s+\S+/, 'Episode ' + record.n);
     renderNavigation();
-    renderEpisodes();
+    if (browser) browser.setActive(record.n);
     loadCurrentPlayer();
+    maybeOfferResume();
     el.frame.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  function goNext() { if (hasNext()) goToEpisode(state.episode + 1); }
-  function goPrev() { if (hasPrev()) goToEpisode(state.episode - 1); }
+  function goNext() {
+    if (!state.nextNumber) return;
+    jumpToNumber(state.nextNumber);
+  }
 
-  function renderErrorServers() {
-    if (!el.errorServers) return;
-    el.errorServers.innerHTML = '';
-    providerList.forEach(function (provider) {
-      if (provider.key === state.provider) return;
+  function goPrev() {
+    if (!state.prevNumber) return;
+    jumpToNumber(state.prevNumber);
+  }
+
+  function jumpToNumber(number) {
+    var record = (CFG.episodes || []).filter(function (item) {
+      return String(item.n) === String(number);
+    })[0];
+    if (record) goToEpisode(record);
+  }
+
+  function renderErrorActions() {
+    if (!el.errorActions) return;
+    el.errorActions.innerHTML = '';
+    // Retry the same stream…
+    var retry = document.createElement('button');
+    retry.type = 'button';
+    retry.className = 'az-mini-btn az-mini-primary';
+    retry.textContent = 'Retry';
+    retry.addEventListener('click', loadCurrentPlayer);
+    el.errorActions.appendChild(retry);
+    // …or switch to the other track when one exists.
+    (CFG.availableLanguages || []).forEach(function (lang) {
+      if (lang === state.language || !state.playerUrls[lang]) return;
       var btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = 'az-mini-btn az-mini-primary';
-      btn.textContent = 'Try ' + provider.displayName;
-      btn.addEventListener('click', function () {
-        selectServer(provider.key);
-      });
-      el.errorServers.appendChild(btn);
+      btn.className = 'az-mini-btn';
+      btn.textContent = 'Try ' + lang.toUpperCase();
+      btn.addEventListener('click', function () { selectLanguage(lang); });
+      el.errorActions.appendChild(btn);
     });
+    var reload = document.createElement('button');
+    reload.type = 'button';
+    reload.className = 'az-mini-btn';
+    reload.textContent = 'Reload page';
+    reload.addEventListener('click', function () { window.location.reload(); });
+    el.errorActions.appendChild(reload);
   }
 
   // ------------------------------------------------------------
-  // Player events (postMessage)
+  // MegaPlay postMessage events
   // ------------------------------------------------------------
 
-  // Each parser returns {kind, currentTime, duration} or null.
-  var eventParsers = {
-    megaplay: parseMegaplayEvent,
-    vidnest: parseVidnestEvent
-  };
-
   function parseMegaplayEvent(data) {
-    // {event:"time", time, duration, percent} | {event:"complete"} |
-    // {event:"error"} | {type:"watching-log", currentTime, duration}
     switch (data.event || data.type) {
       case 'time':
-        return {
-          kind: 'progress',
-          currentTime: num(data.time),
-          duration: num(data.duration)
-        };
+        return { kind: 'progress', currentTime: num(data.time), duration: num(data.duration) };
       case 'watching-log':
-        return {
-          kind: 'progress',
-          currentTime: num(data.currentTime),
-          duration: num(data.duration)
-        };
+        return { kind: 'progress', currentTime: num(data.currentTime), duration: num(data.duration) };
       case 'complete':
         return { kind: 'complete' };
       case 'error':
         return { kind: 'error' };
-      default:
-        return null;
-    }
-  }
-
-  function parseVidnestEvent(data) {
-    // play/pause/ended/seeked/timeupdate — shape may vary between embeds.
-    var name = data.event || data.type;
-    switch (name) {
-      case 'play': return { kind: 'play' };
-      case 'pause': return { kind: 'pause' };
-      case 'ended': return { kind: 'complete' };
-      case 'seeked': return { kind: 'seeked' };
-      case 'timeupdate':
-        return {
-          kind: 'progress',
-          currentTime: num(data.currentTime != null ? data.currentTime : data.time),
-          duration: num(data.duration)
-        };
       default:
         return null;
     }
@@ -578,21 +484,18 @@
   }
 
   function onMessage(event) {
-    var provider = findProvider(state.provider);
-    if (!provider) return;
-
     // Never trust messages from unknown origins.
-    if (provider.allowedOrigins.indexOf(event.origin) === -1) return;
+    var allowed = Array.isArray(CFG.allowedOrigins) ? CFG.allowedOrigins : [];
+    if (allowed.indexOf(event.origin) === -1) return;
 
     var data = safeParseData(event.data);
     if (!data) return;
 
-    var parsed = (eventParsers[provider.eventStyle] || function () { return null; })(data);
+    var parsed = parseMegaplayEvent(data);
     if (!parsed) {
       devLog('ignored message from', event.origin, data);
       return;
     }
-
     handlePlayerEvent(parsed);
   }
 
@@ -606,7 +509,7 @@
       if (now - state.lastSavedAt >= SAVE_INTERVAL_MS &&
           evt.currentTime !== null && evt.duration) {
         state.lastSavedAt = now;
-        saveWatchProgress(CFG.anilistId, state.episode, evt.currentTime, evt.duration);
+        saveCurrentProgress(evt.currentTime, evt.duration);
       }
       return;
     }
@@ -616,11 +519,10 @@
       state.completeShown = true;
       var lastKnown = state.lastEvent || {};
       if (lastKnown.currentTime && lastKnown.duration) {
-        saveWatchProgress(CFG.anilistId, state.episode, lastKnown.currentTime, lastKnown.duration);
+        saveCurrentProgress(lastKnown.currentTime, lastKnown.duration);
       }
       setCard('complete');
-      if (AUTO_NEXT_ENABLED && hasNext()) {
-        // Scaffolding for future auto-next; manual click stays primary.
+      if (AUTO_NEXT_ENABLED && state.nextNumber) {
         setTimeout(goNext, 5000);
       }
       return;
@@ -630,13 +532,18 @@
       failPlayback('provider-error');
       return;
     }
+  }
 
-    // play/pause/seeked etc.: acknowledged, nothing to do yet.
+  function saveCurrentProgress(currentTime, duration) {
+    saveWatchProgress({
+      embedId: state.embedId,
+      anikotoEpisodeId: state.anikotoEpisodeId,
+      episodeNumber: state.episodeNumber
+    }, currentTime, duration);
   }
 
   window.addEventListener('message', onMessage);
 
-  // Persist the latest position when leaving or hiding the tab.
   window.addEventListener('beforeunload', flushProgress);
   document.addEventListener('visibilitychange', function () {
     if (document.visibilityState === 'hidden') flushProgress();
@@ -645,7 +552,7 @@
   function flushProgress() {
     var evt = state.lastEvent;
     if (evt && evt.currentTime !== null && evt.duration) {
-      saveWatchProgress(CFG.anilistId, state.episode, evt.currentTime, evt.duration);
+      saveCurrentProgress(evt.currentTime, evt.duration);
     }
   }
 
@@ -659,31 +566,29 @@
   if (el.completeDismiss) el.completeDismiss.addEventListener('click', function () { setCard(null); });
 
   if (el.resumeYes) el.resumeYes.addEventListener('click', function () {
-    // The provider player handles its own playback position; we simply
-    // acknowledge and get out of the way.
+    // MegaPlay resumes on its own once it receives watching-log state;
+    // we simply acknowledge and get out of the way.
     setCard(null);
   });
 
   if (el.resumeNo) el.resumeNo.addEventListener('click', function () {
-    clearWatchProgress(CFG.anilistId, state.episode);
+    clearWatchProgress(state.embedId);
     setCard(null);
-    mountIframe(buildProviderUrl(state.provider, CFG.anilistId, state.episode, state.language));
+    loadCurrentPlayer();
   });
 
   if (el.epSearch) {
-    el.epSearch.addEventListener('input', renderEpisodes);
     el.epSearch.addEventListener('keydown', function (ev) {
       if (ev.key !== 'Enter') return;
       ev.preventDefault();
       var wanted = parseInt(el.epSearch.value, 10);
-      if (wanted && (maxEpisode() === null || wanted <= maxEpisode())) {
-        goToEpisode(wanted);
+      if (wanted) {
+        jumpToNumber(wanted);
         el.epSearch.blur();
       }
     });
   }
 
-  renderServers();
   renderLanguages();
   renderNavigation();
   renderEpisodes();

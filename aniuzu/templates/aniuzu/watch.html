@@ -1,7 +1,7 @@
 {% extends "aniuzu/base.html" %}
 {% load static aniuzu_extras %}
 
-{% block title %}{% if anime %}Watch {{ anime|display_title }}{% else %}Watch{% endif %} — Episode {{ episode }} — Aniuzu{% endblock %}
+{% block title %}{% if display_title %}Watch {{ display_title }}{% else %}Watch{% endif %} — Episode {{ wanted_episode }} — Aniuzu{% endblock %}
 
 {% block extra_head %}
 <link rel="stylesheet" href="{% static 'aniuzu/css/watch.css' %}">
@@ -9,42 +9,63 @@
 
 {% block body %}
 
-{{ watch_data|json_script:"az-watch-data" }}
+{% if watch_data %}{{ watch_data|json_script:"az-watch-data" }}{% endif %}
 
 {% if api_error %}
   <div class="az-container az-watch">
     <div class="az-state az-state-error">
-      Couldn't start this episode right now — AniList may be temporarily unavailable.
-      <a class="az-btn-ghost" href="{% url 'aniuzu:watch' anime_id episode %}">Retry</a>
+      Couldn't start this episode right now — AniList and Anikoto are both unreachable.
+      <a class="az-btn-ghost" href="{% url 'aniuzu:watch' anime_id wanted_episode %}">Retry</a>
       <a class="az-btn-ghost" href="{% url 'aniuzu:home' %}">Go home</a>
     </div>
   </div>
-{% elif anime %}
+{% elif not series %}
+  <div class="az-container az-watch">
+    <header class="az-watch-head">
+      <a class="az-back" href="{% url 'aniuzu:detail' anime_id %}" aria-label="Back">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        <span>Back</span>
+      </a>
+      <div class="az-watch-heading">
+        <h1 class="az-watch-title">{{ display_title }}</h1>
+      </div>
+    </header>
+    <div class="az-state az-state-error">
+      {% if anikoto_error %}
+        The episode catalog (Anikoto) is temporarily unavailable — metadata is shown, playback will return shortly.
+      {% else %}
+        Episodes for this title aren't available on Anikoto yet.
+      {% endif %}
+      <a class="az-btn-ghost" href="{% url 'aniuzu:detail' anime_id %}">Back to details</a>
+    </div>
+  </div>
+{% else %}
 
 <div class="az-container az-watch">
 
   <header class="az-watch-head">
-    <a class="az-back" href="{% url 'aniuzu:detail' anime_id %}" aria-label="Back to {{ anime|display_title }}">
+    <a class="az-back" href="{% url 'aniuzu:detail' anime_id %}" aria-label="Back to {{ display_title }}">
       <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
       <span>Back</span>
     </a>
     <div class="az-watch-heading">
-      <h1 class="az-watch-title">{{ anime|display_title }}</h1>
-      <p class="az-watch-sub">Episode <span id="az-current-episode">{{ episode }}</span></p>
+      <h1 class="az-watch-title">{{ display_title }}</h1>
+      <p class="az-watch-sub">Episode <span id="az-current-episode">{% if current_episode %}{{ current_episode.number }}{% else %}{{ wanted_episode }}{% endif %}</span></p>
     </div>
   </header>
 
+  {% if current_episode %}
   <div class="az-player-frame" id="az-player-frame">
     <!-- iframe injected by watch.js; keeps a fixed 16:9 stage with zero layout shift -->
     <div class="az-overlay az-overlay-loading" id="az-loading" hidden>
       <span class="az-spinner" aria-hidden="true"></span>
-      <p id="az-loading-label">Loading player…</p>
+      <p id="az-loading-label">Loading MegaPlay…</p>
     </div>
 
     <div class="az-overlay az-overlay-error" id="az-error" hidden>
       <h2>Playback unavailable</h2>
-      <p>This server couldn't play the episode. Try another one:</p>
-      <div class="az-overlay-actions" id="az-error-servers"></div>
+      <p>MegaPlay couldn't play this track.</p>
+      <div class="az-overlay-actions" id="az-error-actions"></div>
     </div>
 
     <div class="az-overlay az-overlay-resume" id="az-resume" hidden>
@@ -67,42 +88,52 @@
   <section class="az-controls-card">
 
     <div class="az-control-row">
-      <span class="az-control-label">Server</span>
-      <div class="az-seg-group" id="az-servers" role="tablist" aria-label="Video server"></div>
-    </div>
-
-    <div class="az-control-row">
       <span class="az-control-label">Language</span>
       <div class="az-seg-group" id="az-languages" role="tablist" aria-label="Audio language"></div>
     </div>
 
     <div class="az-nav-row">
       <button type="button" class="az-nav-btn" id="az-prev">← Previous Episode</button>
-      <span class="az-nav-pos">Episode <span id="az-nav-episode">{{ episode }}</span></span>
+      <span class="az-nav-pos">Episode <span id="az-nav-episode">{% if current_episode %}{{ current_episode.number }}{% else %}{{ wanted_episode }}{% endif %}</span></span>
       <button type="button" class="az-nav-btn" id="az-next">Next Episode →</button>
     </div>
 
     <div class="az-episodes-block">
       <div class="az-episodes-head">
-        <span class="az-control-label">Episodes</span>
-        {% if episode_total %}
-          <input type="search" id="az-ep-search" placeholder="Find episode…" aria-label="Find episode"
-                 {% if episode_total <= 20 %}hidden{% endif %}>
-        {% endif %}
+        <span class="az-control-label">Episodes <span class="az-ep-count">{{ series.episodes|length }}</span></span>
+        <input type="search" id="az-ep-search" placeholder="Search episode…" aria-label="Find episode">
       </div>
-      <div class="az-episodes-scroll" id="az-episodes" tabindex="0" aria-label="Episode list"></div>
+      <div id="az-episodes-host"></div>
     </div>
 
   </section>
+  {% elif series %}
+  <div class="az-state az-state-error">
+    Episode {{ wanted_episode }} isn't in the Anikoto catalog for this title
+    ({{ series.episodes|length }} episodes available).
+    <a class="az-btn-ghost" href="{% url 'aniuzu:watch' anime_id 1 %}">Start from episode 1</a>
+    <a class="az-btn-ghost" href="{% url 'aniuzu:detail' anime_id %}">Back to details</a>
+  </div>
+
+  <section class="az-controls-card">
+    <div class="az-episodes-block">
+      <div class="az-episodes-head">
+        <span class="az-control-label">Episodes <span class="az-ep-count">{{ series.episodes|length }}</span></span>
+        <input type="search" id="az-ep-search" placeholder="Search episode…" aria-label="Find episode">
+      </div>
+      <div id="az-episodes-host"></div>
+    </div>
+  </section>
+  {% endif %}
 
   <section class="az-watch-info">
     <a class="az-watch-info-poster" href="{% url 'aniuzu:detail' anime_id %}">
       {% if anime.coverImage.large or anime.coverImage.extraLarge %}
-        <img src="{{ anime.coverImage.large|default:anime.coverImage.extraLarge }}" alt="{{ anime|display_title }}" loading="lazy">
+        <img src="{{ anime.coverImage.large|default:anime.coverImage.extraLarge }}" alt="{{ display_title }}" loading="lazy">
       {% endif %}
     </a>
     <div class="az-watch-info-body">
-      <h2><a href="{% url 'aniuzu:detail' anime_id %}">{{ anime|display_title }}</a></h2>
+      <h2><a href="{% url 'aniuzu:detail' anime_id %}">{{ display_title }}</a></h2>
       {% if anime.clean_description %}
         <p>{{ anime.clean_description|truncatechars:280 }}</p>
       {% endif %}
@@ -117,5 +148,8 @@
 {% endblock %}
 
 {% block extra_scripts %}
-{% if anime %}<script src="{% static 'aniuzu/js/watch.js' %}" defer></script>{% endif %}
+{% if series %}
+<script src="{% static 'aniuzu/js/episodes.js' %}" defer></script>
+<script src="{% static 'aniuzu/js/watch.js' %}" defer></script>
+{% endif %}
 {% endblock %}

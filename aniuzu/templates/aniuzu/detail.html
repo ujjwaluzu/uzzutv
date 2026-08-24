@@ -1,5 +1,5 @@
 {% extends "aniuzu/base.html" %}
-{% load aniuzu_extras %}
+{% load static aniuzu_extras %}
 
 {% block title %}{% if anime %}{{ anime|display_title }}{% else %}Anime{% endif %} — Aniuzu{% endblock %}
 
@@ -44,15 +44,17 @@
       </div>
 
       <div class="az-detail-actions">
-        {% if episode_total or anime.status != "NOT_YET_RELEASED" %}
+        {% if series %}
           <a class="az-btn-watch" href="{% url 'aniuzu:watch' anime.id 1 %}">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M8 5.14v13.72c0 .8.87 1.3 1.56.88l10.54-6.86a1.05 1.05 0 0 0 0-1.76L9.56 4.26A1.04 1.04 0 0 0 8 5.14z"/></svg>
             Watch Now
           </a>
-          {% if not episode_total %}<span class="az-detail-note">Episode count unknown — starting from episode 1.</span>{% endif %}
+          <span class="az-detail-note">{{ browser_data.count }} episode{{ browser_data.count|pluralize }} on Anikoto{% if browser_data.dubAvailable %} · DUB available{% endif %}</span>
         {% else %}
           <span class="az-btn-watch" aria-disabled="true">Watch Now</span>
-          <span class="az-detail-note">Episodes are not available yet.</span>
+          <span class="az-detail-note">
+            {% if anikoto_error %}Episode catalog temporarily unavailable.{% else %}Episodes are not available yet.{% endif %}
+          </span>
         {% endif %}
       </div>
 
@@ -66,14 +68,16 @@
 </section>
 
 <div class="az-container az-detail-body">
-  {% if episode_total %}
+  {% if browser_data %}
+    <section class="az-block az-episodes-preview">
+      <h2>Episodes <span class="az-ep-count">{{ browser_data.count }}</span></h2>
+      {{ browser_data|json_script:"az-detail-episodes" }}
+      <div class="az-ep-browser-detail" id="az-episodes-host"></div>
+    </section>
+  {% elif anikoto_error %}
     <section class="az-block az-episodes-preview">
       <h2>Episodes</h2>
-      <div class="az-ep-strip">
-        {% for n in episode_range %}
-          <a class="az-ep-chip" href="{% url 'aniuzu:watch' anime.id n %}">{{ n }}</a>
-        {% endfor %}
-      </div>
+      <p class="az-desc az-muted">The episode catalog is temporarily unavailable — please check back soon.</p>
     </section>
   {% endif %}
 
@@ -108,4 +112,31 @@
 
 {% endif %}
 
+{% endblock %}
+
+{% block extra_scripts %}
+{% if browser_data %}
+<script src="{% static 'aniuzu/js/episodes.js' %}" defer></script>
+<script defer>
+document.addEventListener('DOMContentLoaded', function () {
+  var dataEl = document.getElementById('az-detail-episodes');
+  var host = document.getElementById('az-episodes-host');
+  if (!dataEl || !host || !window.AniuzuEpisodes) return;
+  var data;
+  try { data = JSON.parse(dataEl.textContent); } catch (err) { return; }
+  // Route template for this anime; the trailing /1/ is swapped per pick.
+  var watchTemplate = '{% url "aniuzu:watch" anime.id 1 %}';
+  window.AniuzuEpisodes.create({
+    container: host,
+    episodes: (data.episodes || []).map(function (item) {
+      return { n: item.n, s: item.s, d: item.d };
+    }),
+    onSelect: function (record) {
+      var target = Number.isInteger(record.n) ? record.n : Math.ceil(record.n);
+      window.location.href = watchTemplate.replace(/\/1\/$/, '/' + target + '/');
+    }
+  });
+});
+</script>
+{% endif %}
 {% endblock %}
