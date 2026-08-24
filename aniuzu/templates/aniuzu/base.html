@@ -11,6 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'aniuzu/css/aniuzu.css' %}">
   <link rel="icon" type="image/x-icon" href="https://img.icons8.com/?size=100&id=dpUQB4dX6yQC&format=png&color=000000">
+  {% block extra_head %}{% endblock %}
 </head>
 <body>
 
@@ -59,6 +60,7 @@
   });
 })();
 </script>
-
+{% block extra_scripts %}{% endblock %}
 </body>
+
 </html>

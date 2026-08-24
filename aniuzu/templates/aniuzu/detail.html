@@ -43,6 +43,19 @@
         <span class="az-pill">{{ anime.status|title }}</span>
       </div>
 
+      <div class="az-detail-actions">
+        {% if episode_total or anime.status != "NOT_YET_RELEASED" %}
+          <a class="az-btn-watch" href="{% url 'aniuzu:watch' anime.id 1 %}">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M8 5.14v13.72c0 .8.87 1.3 1.56.88l10.54-6.86a1.05 1.05 0 0 0 0-1.76L9.56 4.26A1.04 1.04 0 0 0 8 5.14z"/></svg>
+            Watch Now
+          </a>
+          {% if not episode_total %}<span class="az-detail-note">Episode count unknown — starting from episode 1.</span>{% endif %}
+        {% else %}
+          <span class="az-btn-watch" aria-disabled="true">Watch Now</span>
+          <span class="az-detail-note">Episodes are not available yet.</span>
+        {% endif %}
+      </div>
+
       {% if anime.genres %}
         <div class="az-chip-row">
           {% for genre in anime.genres %}<span class="az-chip">{{ genre }}</span>{% endfor %}
@@ -53,6 +66,17 @@
 </section>
 
 <div class="az-container az-detail-body">
+  {% if episode_total %}
+    <section class="az-block az-episodes-preview">
+      <h2>Episodes</h2>
+      <div class="az-ep-strip">
+        {% for n in episode_range %}
+          <a class="az-ep-chip" href="{% url 'aniuzu:watch' anime.id n %}">{{ n }}</a>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+
   {% if anime.clean_description %}
     <section class="az-block">
       <h2>Synopsis</h2>

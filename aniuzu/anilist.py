@@ -56,6 +56,7 @@ DETAIL_FIELDS = CARD_FIELDS + """
   description(asHtml: false)
   duration
   studios(isMain: true) { nodes { name } }
+  nextAiringEpisode { episode }
 """
 
 

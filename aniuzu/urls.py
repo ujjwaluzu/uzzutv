@@ -11,4 +11,5 @@ urlpatterns = [
     path("airing/", views.browse, kwargs={"section": "airing"}, name="airing"),
     path("search/", views.search, name="search"),
     path("anime/<int:anime_id>/", views.detail, name="detail"),
+    path("watch/<int:anime_id>/<int:episode>/", views.watch, name="watch"),
 ]

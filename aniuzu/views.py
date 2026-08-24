@@ -1,7 +1,8 @@
+from django.conf import settings
 from django.http import Http404
 from django.shortcuts import render
 
-from . import anilist
+from . import anilist, providers
 
 
 SECTIONS = {
@@ -23,6 +24,24 @@ def _safe_page_number(request):
     except (TypeError, ValueError):
         return 1
     return page if page >= 1 else 1
+
+
+def episode_total(anime):
+    """Best-known episode count, without inventing metadata.
+
+    Prefers AniList's `episodes`; for ongoing shows falls back to the
+    number of episodes already aired. Returns None when unknown.
+    """
+    if not anime:
+        return None
+    count = anime.get("episodes")
+    if count:
+        return int(count)
+    next_airing = anime.get("nextAiringEpisode") or {}
+    airing = next_airing.get("episode")
+    if airing and airing > 1:
+        return int(airing) - 1
+    return None
 
 
 def _section(data):
@@ -109,4 +128,48 @@ def detail(request, anime_id):
         "anime": anime,
         "api_error": api_error,
         "anime_id": int(anime_id),
+        "episode_total": episode_total(anime),
+        "episode_range": episode_range(anime),
+    })
+
+
+def episode_range(anime):
+    """1..N for the detail page's quick-pick strip (empty when unknown)."""
+    total = episode_total(anime)
+    return range(1, total + 1) if total else []
+
+
+def watch(request, anime_id, episode):
+    try:
+        episode = max(1, int(episode))
+    except (TypeError, ValueError):
+        raise Http404("Invalid episode")
+
+    try:
+        anime = anilist.get_anime(anime_id)
+    except anilist.AnimeNotFound:
+        raise Http404("Anime not found")
+    except anilist.AniListError:
+        anime = None  # transient AniList failure -> render fallback state
+
+    anime_id = int(anime_id)
+    total = episode_total(anime)
+
+    watch_data = {
+        "anilistId": anime_id,
+        "episode": episode,
+        "totalEpisodes": total,
+        "debug": bool(getattr(settings, "DEBUG", False)),
+        "defaultProvider": providers.DEFAULT_PROVIDER,
+        "defaultLanguage": providers.DEFAULT_LANGUAGE,
+        "providers": providers.client_config(),
+    }
+
+    return render(request, "aniuzu/watch.html", {
+        "anime": anime,
+        "anime_id": anime_id,
+        "episode": episode,
+        "episode_total": total,
+        "api_error": anime is None,
+        "watch_data": watch_data,
     })
