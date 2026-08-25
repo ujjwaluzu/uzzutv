@@ -20,9 +20,9 @@
 
 <div class="az-breadcrumb"><a href="{% url 'aniuzu' %}">Home</a><span class="az-bc-sep">/</span><span>Top</span></div>
 
-<h2 class="az-page-title" style="margin-bottom:20px;">Top Anime</h2>
+<h2 class="az-page-title">Top Anime</h2>
 
-<div class="az-genre-pills" style="justify-content:center;margin-bottom:32px;">
+<div class="az-chip-row">
 <a href="{% url 'aniuzu_top' %}?sort=score" class="az-pill{% if sort == 'score' %} active{% endif %}">Score</a>
 <a href="{% url 'aniuzu_top' %}?sort=popular" class="az-pill{% if sort == 'popular' %} active{% endif %}">Popular</a>
 <a href="{% url 'aniuzu_top' %}?sort=trending" class="az-pill{% if sort == 'trending' %} active{% endif %}">Trending</a>

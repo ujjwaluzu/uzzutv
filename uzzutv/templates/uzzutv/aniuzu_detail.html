@@ -174,27 +174,9 @@
 {% endif %}
 
 <script>
-function azSlideLeft(id){var s=document.getElementById(id);if(s)s.scrollBy({left:-600,behavior:"smooth"})}
-function azSlideRight(id){var s=document.getElementById(id);if(s)s.scrollBy({left:600,behavior:"smooth"})}
-function azToggleDesc(){
-var t=document.getElementById("az-desc-text");
-var b=document.getElementById("az-desc-toggle");
-if(!t||!b)return;
-if(t.classList.contains("collapsed")){t.classList.remove("collapsed");b.innerHTML='Show Less <span class="material-icons" style="font-size:18px;">expand_less</span>';}
-else{t.classList.add("collapsed");b.innerHTML='Show More <span class="material-icons" style="font-size:18px;">expand_more</span>';}
-}
-var wlBtn=document.querySelector(".az-watchlist-btn");
-if(wlBtn){
-wlBtn.addEventListener("click",function(){
-toggleWatchlist(wlBtn.dataset.id,wlBtn.dataset.type,wlBtn.dataset.title,wlBtn.dataset.poster,wlBtn);
-});
-document.addEventListener("DOMContentLoaded",function(){
-updateWatchlistButton(wlBtn.dataset.id,wlBtn.dataset.type,wlBtn);
-});
-}
 document.addEventListener("DOMContentLoaded",function(){
 if(typeof saveContinue==="function"){saveContinue('{{ anilist_id }}','anime','{{ anime.coverImage.large }}');}
-document.querySelectorAll(".az-hero-rating[data-score]").forEach(function(el){var s=parseInt(el.getAttribute("data-score"));if(s>=80)el.classList.add("score-high");else if(s>=60)el.classList.add("score-mid");else el.classList.add("score-low")});
 });
 </script>
 {% endblock %}
+{% block extra_js %}<script src="{% static 'uzzutv/aniuzu.js' %}"></script>{% endblock %}

@@ -18,9 +18,9 @@
 
 <h1 class="visually-hidden">Search Anime - Aniuzu</h1>
 
-<div class="az-breadcrumb" style="margin-bottom:8px;"><a href="{% url 'aniuzu' %}">Home</a><span class="az-bc-sep">/</span><span>Search</span></div>
+<div class="az-breadcrumb"><a href="{% url 'aniuzu' %}">Home</a><span class="az-bc-sep">/</span><span>Search</span></div>
 
-<h2 class="az-page-title" style="margin-bottom:24px;">Search Anime</h2>
+<h2 class="az-page-title">Search Anime</h2>
 
 <form class="az-search-form" method="get" action="{% url 'aniuzu_search' %}">
 <input type="text" name="q" placeholder="Search anime..." value="{{ query|default:'' }}" autocomplete="off">
@@ -28,7 +28,7 @@
 </form>
 
 {% if query %}
-<p style="text-align:center;color:#9ca3af;margin-bottom:28px;font-size:14px;">Results for "<strong style="color:#e5e7eb;">{{ query }}</strong>"</p>
+<p class="az-results-desc">Results for "<strong>{{ query }}</strong>"</p>
 {% endif %}
 
 {% if items %}

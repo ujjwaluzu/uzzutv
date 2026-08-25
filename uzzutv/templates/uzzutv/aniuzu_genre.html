@@ -23,7 +23,7 @@
 <h2 class="az-page-title">{{ genre }} Anime</h2>
 
 {% if genres %}
-<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-bottom:32px;">
+<div class="az-chip-row">
 {% for g in genres %}
 <a href="{% url 'aniuzu_genre' g %}" class="az-chip{% if g == genre %} active{% endif %}">{{ g }}</a>
 {% endfor %}

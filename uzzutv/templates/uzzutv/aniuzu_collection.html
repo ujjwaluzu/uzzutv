@@ -20,9 +20,9 @@
 
 <div class="az-breadcrumb"><a href="{% url 'aniuzu' %}">Home</a><span class="az-bc-sep">/</span><a href="{% url 'aniuzu_collections' %}">Collections</a><span class="az-bc-sep">/</span><span>{{ collection.title }}</span></div>
 
-<div style="text-align:center;margin-bottom:32px;">
-<a href="{% url 'aniuzu_collections' %}" style="display:inline-flex;align-items:center;gap:6px;color:#9ca3af;font-size:13px;text-decoration:none;margin-bottom:12px;transition:color .2s;"><span class="material-icons" style="font-size:16px;">arrow_back</span> All Collections</a>
-<h2 style="font-family:'Anton',sans-serif;font-size:1.8rem;color:#fff;margin-bottom:8px;letter-spacing:.5px;text-transform:uppercase;">{{ collection.title }}</h2>
+<div class="az-collection-header">
+<a href="{% url 'aniuzu_collections' %}" class="az-back-link"><span class="material-icons" style="font-size:16px;">arrow_back</span> All Collections</a>
+<h2 class="az-page-title" style="margin-bottom:8px;">{{ collection.title }}</h2>
 <p style="color:#9ca3af;font-size:14px;margin:0;">{{ collection.description }}</p>
 </div>
 

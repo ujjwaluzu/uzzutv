@@ -1,0 +1,163 @@
+/* =========================================================
+   HERO SLIDER
+========================================================= */
+
+window.addEventListener("DOMContentLoaded",function(){
+azBuildHeroDots();
+renderContinueAnime("continue-anime");
+var l=document.getElementById("az-loader");
+if(l){l.classList.add("fade-out");setTimeout(function(){l.style.display="none"},1000);}
+});
+document.addEventListener("keydown",function(e){
+if(e.key==="ArrowLeft"){azHeroMove(-1)}
+else if(e.key==="ArrowRight"){azHeroMove(1)}
+});
+function azBuildHeroDots(){
+var c=document.getElementById("az-hero-dots");
+var s=document.querySelectorAll(".az-hero-slide");
+if(!c||s.length===0)return;
+c.innerHTML="";
+s.forEach(function(_,i){
+var d=document.createElement("button");
+d.type="button";d.className="hero-dot";
+d.setAttribute("aria-label","Go to slide "+(i+1));
+if(i===0)d.classList.add("active");
+d.addEventListener("click",function(){azGoToSlide(i)});
+c.appendChild(d);
+});
+}
+var azIdx=0;
+var azSlides=document.querySelectorAll(".az-hero-slide");
+function azActivateSlide(i){
+azSlides.forEach(function(s){s.classList.remove("active")});
+azSlides[i].classList.add("active");
+var dots=document.querySelectorAll(".hero-dot");
+dots.forEach(function(d,di){d.classList.toggle("active",di===i)});
+}
+function azGoToSlide(i){azIdx=i;azActivateSlide(i)}
+function azHeroMove(dir){
+if(azSlides.length===0)return;
+azIdx=(azIdx+dir+azSlides.length)%azSlides.length;
+azActivateSlide(azIdx);
+}
+function azShowSlide(){
+if(azSlides.length===0)return;
+azIdx=(azIdx+1)%azSlides.length;
+azActivateSlide(azIdx);
+}
+var azTimer;
+if(azSlides.length>0){azSlides[0].classList.add("active");azTimer=setInterval(azShowSlide,6000)}
+var azWrapper=document.querySelector(".az-hero-wrapper");
+if(azWrapper){
+azWrapper.addEventListener("mouseenter",function(){clearInterval(azTimer)});
+azWrapper.addEventListener("mouseleave",function(){azTimer=setInterval(azShowSlide,6000)});
+}
+
+/* =========================================================
+   SLIDER SCROLL UTILS
+========================================================= */
+
+function azSlideLeft(id){var s=document.getElementById(id);if(s)s.scrollBy({left:-600,behavior:"smooth"})}
+function azSlideRight(id){var s=document.getElementById(id);if(s)s.scrollBy({left:600,behavior:"smooth"})}
+
+/* =========================================================
+   ANIME CONTINUE WATCHING
+========================================================= */
+
+async function removeContinueAnime(id){
+var user=await getCurrentUser();
+if(!user)return;
+var{error}=await supabaseClient.from("continue_watching").delete().eq("user_id",user.id).eq("media_id",Number(id)).eq("media_type","anime");
+if(error){console.error("Error removing anime:",error);return;}
+renderContinueAnime("continue-anime");
+}
+
+async function renderContinueAnime(containerId){
+var container=document.getElementById(containerId);
+if(!container)return;
+var skel=document.getElementById("continue-skeleton");
+var list=await getAllContinue();
+var animeList=list.filter(function(item){return item.media_type==="anime"});
+if(animeList.length===0){if(skel)skel.style.display="none";container.innerHTML="";return;}
+if(skel)skel.style.display="none";
+var cardsHtml=animeList.map(function(item){
+return '<div class="az-card" style="position:relative;">' +
+'<button onclick="removeContinueAnime('+item.media_id+')" style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.7);border:none;color:white;width:28px;height:28px;border-radius:50%;cursor:pointer;z-index:10;font-size:14px;line-height:28px;text-align:center;">&#10005;</button>' +
+'<a class="card-link" href="/aniuzu/anime/'+item.media_id+'/">' +
+'<div class="card-poster">' +
+'<img loading="lazy" decoding="async" src="'+item.poster+'">' +
+'<span class="card-gradient"></span>' +
+'</div></a>' +
+'<div class="card-info"><div class="card-title" style="font-size:12px;">Recently Viewed</div></div>' +
+'</div>';
+}).join("");
+container.innerHTML='<div class="az-content-section"><div class="az-slider-header"><h2 class="section-title">Continue Watching</h2><div class="az-slider-controls"><button onclick="azSlideLeft(\'az-continue-slider\')"><span class="material-icons">chevron_left</span></button><button onclick="azSlideRight(\'az-continue-slider\')"><span class="material-icons">chevron_right</span></button></div></div><div class="az-row" id="az-continue-slider">'+cardsHtml+'</div></div>';
+}
+
+/* =========================================================
+   TOGGLE DESCRIPTION
+========================================================= */
+
+function azToggleDesc(){
+var t=document.getElementById("az-desc-text");
+var b=document.getElementById("az-desc-toggle");
+if(!t||!b)return;
+if(t.classList.contains("collapsed")){t.classList.remove("collapsed");b.innerHTML='Show Less <span class="material-icons" style="font-size:18px;">expand_less</span>';}
+else{t.classList.add("collapsed");b.innerHTML='Show More <span class="material-icons" style="font-size:18px;">expand_more</span>';}
+}
+
+/* =========================================================
+   DETAIL PAGE WATCHLIST BUTTON
+========================================================= */
+
+var wlBtn=document.querySelector(".az-watchlist-btn");
+if(wlBtn){
+wlBtn.addEventListener("click",function(){
+toggleWatchlist(wlBtn.dataset.id,wlBtn.dataset.type,wlBtn.dataset.title,wlBtn.dataset.poster,wlBtn);
+});
+document.addEventListener("DOMContentLoaded",function(){
+updateWatchlistButton(wlBtn.dataset.id,wlBtn.dataset.type,wlBtn);
+});
+}
+
+/* =========================================================
+   SCORE COLORING
+========================================================= */
+
+document.addEventListener("DOMContentLoaded",function(){
+document.querySelectorAll(".card-rating").forEach(function(el){
+var m=el.textContent.match(/(\d+)/);
+if(m){var n=parseInt(m[1]);if(n>=80)el.classList.add("score-high");else if(n>=60)el.classList.add("score-mid");else el.classList.add("score-low")}
+});
+document.querySelectorAll(".az-hero-rating").forEach(function(el){
+var raw=el.getAttribute("data-score");
+var n=raw?parseInt(raw):null;
+if(n===null){var m=el.textContent.match(/(\d+)/);if(m)n=parseInt(m[1]);}
+if(n!==null){if(n>=80)el.classList.add("score-high");else if(n>=60)el.classList.add("score-mid");else el.classList.add("score-low")}
+});
+document.querySelectorAll(".az-card").forEach(function(card){
+var link=card.querySelector(".card-link");
+if(!link)return;
+var href=link.getAttribute("href")||"";
+var m=href.match(/\/anime\/(\d+)\//);
+if(!m)return;
+var id=m[1];
+var img=card.querySelector(".card-poster img");
+var title=card.querySelector(".card-title");
+var poster=img?img.src:"";
+var t=title?title.textContent.trim():"";
+var btn=document.createElement("button");
+btn.className="az-card-watchlist";
+btn.innerHTML="&#65291;";
+btn.setAttribute("data-id",id);
+btn.setAttribute("data-type","anime");
+btn.setAttribute("data-title",t);
+btn.setAttribute("data-poster",poster);
+btn.setAttribute("aria-label","Add to Watchlist");
+btn.addEventListener("click",function(e){e.preventDefault();e.stopPropagation();toggleWatchlist(id,"anime",t,poster,btn)});
+card.appendChild(btn);
+if(typeof isInWatchlist==="function"){isInWatchlist(id,"anime").then(function(exists){if(exists){btn.innerHTML="&#10003;";btn.classList.add("in-watchlist")}})}
+});
+var btt=document.getElementById("az-back-to-top");
+if(btt){window.addEventListener("scroll",function(){btt.classList.toggle("visible",window.scrollY>400)});btt.addEventListener("click",function(){window.scrollTo({top:0,behavior:"smooth"})})}
+});

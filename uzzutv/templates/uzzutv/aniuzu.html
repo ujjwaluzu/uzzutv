@@ -23,10 +23,6 @@
   </div>
 </div>
 
-<style>
-.loader-content{text-align:center}.loader-content .logo{font-family:'Anton','Passero One',sans-serif;font-size:40px;color:white;margin-bottom:20px;letter-spacing:2px;text-transform:uppercase}.loader-content .brand-red{color:#ff3c3c}.spinner{width:50px;height:50px;border:4px solid rgba(255,255,255,0.2);border-top:4px solid #ff3c3c;border-radius:50%;animation:az-spin 1s linear infinite}@keyframes az-spin{to{transform:rotate(360deg)}}
-</style>
-
 {% if hero %}
 <div class="az-hero-wrapper">
 <div class="az-hero-slider">
@@ -184,89 +180,5 @@
 </div>
 {% endif %}
 
-<script>
-window.addEventListener("DOMContentLoaded",function(){
-azBuildHeroDots();
-renderContinueAnime("continue-anime");
-var l=document.getElementById("az-loader");
-if(l){l.classList.add("fade-out");setTimeout(function(){l.style.display="none"},1000);}
-});
-document.addEventListener("keydown",function(e){
-if(e.key==="ArrowLeft"){azHeroMove(-1)}
-else if(e.key==="ArrowRight"){azHeroMove(1)}
-});
-function azBuildHeroDots(){
-var c=document.getElementById("az-hero-dots");
-var s=document.querySelectorAll(".az-hero-slide");
-if(!c||s.length===0)return;
-c.innerHTML="";
-s.forEach(function(_,i){
-var d=document.createElement("button");
-d.type="button";d.className="hero-dot";
-d.setAttribute("aria-label","Go to slide "+(i+1));
-if(i===0)d.classList.add("active");
-d.addEventListener("click",function(){azGoToSlide(i)});
-c.appendChild(d);
-});
-}
-var azIdx=0;
-var azSlides=document.querySelectorAll(".az-hero-slide");
-function azActivateSlide(i){
-azSlides.forEach(function(s){s.classList.remove("active")});
-azSlides[i].classList.add("active");
-var dots=document.querySelectorAll(".hero-dot");
-dots.forEach(function(d,di){d.classList.toggle("active",di===i)});
-}
-function azGoToSlide(i){azIdx=i;azActivateSlide(i)}
-function azHeroMove(dir){
-if(azSlides.length===0)return;
-azIdx=(azIdx+dir+azSlides.length)%azSlides.length;
-azActivateSlide(azIdx);
-}
-function azShowSlide(){
-if(azSlides.length===0)return;
-azIdx=(azIdx+1)%azSlides.length;
-azActivateSlide(azIdx);
-}
-var azTimer;
-if(azSlides.length>0){azSlides[0].classList.add("active");azTimer=setInterval(azShowSlide,6000)}
-var azWrapper=document.querySelector(".az-hero-wrapper");
-if(azWrapper){
-azWrapper.addEventListener("mouseenter",function(){clearInterval(azTimer)});
-azWrapper.addEventListener("mouseleave",function(){azTimer=setInterval(azShowSlide,6000)});
-}
-function azSlideLeft(id){var s=document.getElementById(id);if(s)s.scrollBy({left:-600,behavior:"smooth"})}
-function azSlideRight(id){var s=document.getElementById(id);if(s)s.scrollBy({left:600,behavior:"smooth"})}
-</script>
-<script>
-async function removeContinueAnime(id){
-var user=await getCurrentUser();
-if(!user)return;
-var{error}=await supabaseClient.from("continue_watching").delete().eq("user_id",user.id).eq("media_id",Number(id)).eq("media_type","anime");
-if(error){console.error("Error removing anime:",error);return;}
-renderContinueAnime("continue-anime");
-}
-
-async function renderContinueAnime(containerId){
-var container=document.getElementById(containerId);
-if(!container)return;
-var skel=document.getElementById("continue-skeleton");
-var list=await getAllContinue();
-var animeList=list.filter(function(item){return item.media_type==="anime"});
-if(animeList.length===0){if(skel)skel.style.display="none";container.innerHTML="";return;}
-if(skel)skel.style.display="none";
-var cardsHtml=animeList.map(function(item){
-return '<div class="az-card" style="position:relative;">' +
-'<button onclick="removeContinueAnime('+item.media_id+')" style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.7);border:none;color:white;width:28px;height:28px;border-radius:50%;cursor:pointer;z-index:10;font-size:14px;line-height:28px;text-align:center;">&#10005;</button>' +
-'<a class="card-link" href="/aniuzu/anime/'+item.media_id+'/">' +
-'<div class="card-poster">' +
-'<img loading="lazy" decoding="async" src="'+item.poster+'">' +
-'<span class="card-gradient"></span>' +
-'</div></a>' +
-'<div class="card-info"><div class="card-title" style="font-size:12px;">Recently Viewed</div></div>' +
-'</div>';
-}).join("");
-container.innerHTML='<div class="az-content-section"><div class="az-slider-header"><h2 class="section-title">Continue Watching</h2><div class="az-slider-controls"><button onclick="azSlideLeft(\'az-continue-slider\')"><span class="material-icons">chevron_left</span></button><button onclick="azSlideRight(\'az-continue-slider\')"><span class="material-icons">chevron_right</span></button></div></div><div class="az-row" id="az-continue-slider">'+cardsHtml+'</div></div>';
-}
-</script>
 {% endblock %}
+{% block extra_js %}<script src="{% static 'uzzutv/aniuzu.js' %}"></script>{% endblock %}

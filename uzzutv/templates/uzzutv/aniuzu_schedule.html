@@ -16,28 +16,28 @@
 {% block body %}
 <h1 class="visually-hidden">Airing Schedule - Aniuzu</h1>
 
-<div class="az-content-section" style="max-width:1200px;margin:0 auto;padding:32px 16px;">
+<div class="az-page-container">
 
 <div class="az-breadcrumb"><a href="{% url 'aniuzu' %}">Home</a><span class="az-bc-sep">/</span><span>Schedule</span></div>
 
-<h2 style="font-family:'Anton',sans-serif;font-size:1.8rem;color:#fff;text-align:center;margin-bottom:20px;letter-spacing:.5px;text-transform:uppercase;">Airing Schedule</h2>
+<h2 class="az-page-title">Airing Schedule</h2>
 
-<div style="display:flex;justify-content:center;gap:8px;margin-bottom:32px;">
-<a href="{% url 'aniuzu_schedule' %}?view=week" style="display:inline-block;padding:8px 20px;border-radius:20px;font-size:13px;font-weight:600;text-decoration:none;letter-spacing:.3px;transition:all .2s;{% if view == 'week' %}background:#ff3c3c;color:#fff;{% else %}background:#1a1a1a;color:#9ca3af;border:1px solid #333;{% endif %}">This Week</a>
-<a href="{% url 'aniuzu_schedule' %}?view=today" style="display:inline-block;padding:8px 20px;border-radius:20px;font-size:13px;font-weight:600;text-decoration:none;letter-spacing:.3px;transition:all .2s;{% if view == 'today' %}background:#ff3c3c;color:#fff;{% else %}background:#1a1a1a;color:#9ca3af;border:1px solid #333;{% endif %}">Today</a>
+<div class="az-chip-row">
+<a href="{% url 'aniuzu_schedule' %}?view=week" class="az-pill{% if view == 'week' %} active{% endif %}">This Week</a>
+<a href="{% url 'aniuzu_schedule' %}?view=today" class="az-pill{% if view == 'today' %} active{% endif %}">Today</a>
 </div>
 
 {% if days %}
 
 {% for day_label, day_items in days.items %}
 {% if day_items %}
-<div style="margin-bottom:28px;">
-<div class="az-slider-header" style="margin-bottom:14px;">
-<h2 class="section-title" style="font-size:1.1rem;color:#ccc;text-transform:uppercase;letter-spacing:.4px;">{{ day_label }}</h2>
+<div class="az-schedule-section">
+<div class="az-slider-header">
+<h2 class="az-schedule-day-title">{{ day_label }}</h2>
 </div>
-<div class="az-row" style="overflow-x:auto;padding-bottom:8px;">
+<div class="az-schedule-row">
 {% for entry in day_items %}
-<div class="az-card" style="min-width:140px;max-width:160px;flex:0 0 auto;">
+<div class="az-card az-schedule-card">
 <a class="card-link" href="{% url 'aniuzu_detail' entry.id %}">
 <div class="card-poster">
 <img loading="lazy" decoding="async" alt="{{ entry.title }} poster" {% if entry.cover %}src="{{ entry.cover }}"{% else %}src="{% static 'uzzutv/images/logo.png' %}"{% endif %}>
@@ -58,9 +58,9 @@
 
 {% elif items %}
 
-<div class="az-row" style="overflow-x:auto;padding-bottom:8px;">
+<div class="az-schedule-row">
 {% for entry in items %}
-<div class="az-card" style="min-width:140px;max-width:160px;flex:0 0 auto;">
+<div class="az-card az-schedule-card">
 <a class="card-link" href="{% url 'aniuzu_detail' entry.id %}">
 <div class="card-poster">
 <img loading="lazy" decoding="async" alt="{{ entry.title }} poster" {% if entry.cover %}src="{{ entry.cover }}"{% else %}src="{% static 'uzzutv/images/logo.png' %}"{% endif %}>
@@ -78,8 +78,8 @@
 
 {% else %}
 
-<div style="text-align:center;padding:60px 20px;">
-<p style="color:#6b7280;font-size:15px;">No anime scheduled for this period.</p>
+<div class="az-empty">
+<p>No anime scheduled for this period.</p>
 </div>
 
 {% endif %}

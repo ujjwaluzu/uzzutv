@@ -20,18 +20,18 @@
 
 <div class="az-breadcrumb"><a href="{% url 'aniuzu' %}">Home</a><span class="az-bc-sep">/</span><span>Seasons</span></div>
 
-<h2 class="az-page-title" style="margin-bottom:20px;">Season Browser</h2>
+<h2 class="az-page-title">Season Browser</h2>
 
-<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-bottom:12px;">
+<div class="az-chip-row" style="margin-bottom:12px;">
 {% for s in seasons_list %}
 <a href="{% url 'aniuzu_seasons' %}?season={{ s }}&year={{ year }}" class="az-pill{% if s == season %} active{% endif %}">{{ s|title }}</a>
 {% endfor %}
 </div>
 
-<div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:32px;">
-<a href="{% url 'aniuzu_seasons' %}?season={{ season }}&year={{ year|add:'-1' }}" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:#1a1a1a;color:#9ca3af;border:1px solid #333;text-decoration:none;font-size:18px;transition:all .2s;">&#8249;</a>
-<span style="font-family:'Anton',sans-serif;font-size:1.4rem;color:#fff;min-width:60px;text-align:center;">{{ year }}</span>
-<a href="{% url 'aniuzu_seasons' %}?season={{ season }}&year={{ year|add:'1' }}" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:#1a1a1a;color:#9ca3af;border:1px solid #333;text-decoration:none;font-size:18px;transition:all .2s;">&#8250;</a>
+<div class="az-year-nav">
+<a href="{% url 'aniuzu_seasons' %}?season={{ season }}&year={{ year|add:'-1' }}" class="az-year-arrow">&#8249;</a>
+<span class="az-year-label">{{ year }}</span>
+<a href="{% url 'aniuzu_seasons' %}?season={{ season }}&year={{ year|add:'1' }}" class="az-year-arrow">&#8250;</a>
 </div>
 
 {% if items %}

@@ -20,9 +20,9 @@
 
 <div class="az-breadcrumb"><a href="{% url 'aniuzu' %}">Home</a><span class="az-bc-sep">/</span><a href="{% url 'aniuzu_studios' %}">Studios</a><span class="az-bc-sep">/</span><span>{{ studio_name }}</span></div>
 
-<h2 class="az-page-title" style="margin-bottom:20px;">{{ studio_name }}</h2>
+<h2 class="az-page-title">{{ studio_name }}</h2>
 
-<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-bottom:32px;">
+<div class="az-chip-row">
 {% for s in studios %}
 <a href="{% url 'aniuzu_studio' s.slug %}" class="az-chip{% if s.slug == studio_slug %} active{% endif %}">{{ s.name }}</a>
 {% endfor %}
