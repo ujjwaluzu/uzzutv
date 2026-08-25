@@ -1,0 +1,40 @@
+{% extends 'uzzutv/layout.html' %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'uzzutv/home.css' %}">
+<link rel="stylesheet" href="{% static 'uzzutv/aniuzu.css' %}">
+{% endblock %}
+
+{% block title %}Browse by Genre - Aniuzu{% endblock %}
+{% block meta_description %}Browse anime by genre on Aniuzu. Find action, romance, comedy and more.{% endblock %}
+{% block canonical %}<link rel="canonical" href="https://uzzutv.pythonanywhere.com/aniuzu/genres/">{% endblock %}
+{% block og_url %}https://uzzutv.pythonanywhere.com/aniuzu/genres/{% endblock %}
+{% block og_title %}Browse by Genre - Aniuzu{% endblock %}
+{% block og_description %}Browse anime by genre on Aniuzu.{% endblock %}
+
+{% block body %}
+<h1 class="visually-hidden">Browse by Genre - Aniuzu</h1>
+
+<div class="az-content-section" style="max-width:1200px;margin:0 auto;padding:32px 16px;">
+
+<h2 style="font-family:'Anton',sans-serif;font-size:1.8rem;color:#fff;text-align:center;margin-bottom:32px;letter-spacing:.5px;text-transform:uppercase;">Browse by Genre</h2>
+
+<style>
+.az-genre-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.az-genre-card{display:flex;align-items:center;justify-content:center;padding:20px 12px;background:#141414;border:1px solid #222;border-radius:10px;text-decoration:none;color:#d1d5db;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;text-align:center;letter-spacing:.3px;transition:all .2s;min-height:64px}.az-genre-card:hover{background:#1c1c1c;border-color:#ff3c3c;color:#fff;transform:translateY(-2px)}@media(max-width:900px){.az-genre-grid{grid-template-columns:repeat(3,1fr)}}@media(max-width:600px){.az-genre-grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+
+{% if genres %}
+<div class="az-genre-grid">
+{% for genre in genres %}
+<a class="az-genre-card" href="{% url 'aniuzu_genre' genre %}">{{ genre }}</a>
+{% endfor %}
+</div>
+{% else %}
+<div style="text-align:center;padding:60px 20px;">
+<p style="color:#6b7280;font-size:15px;">No genres available.</p>
+</div>
+{% endif %}
+
+</div>
+{% endblock %}

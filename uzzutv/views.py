@@ -1142,7 +1142,7 @@ def robots_txt(request):
 
 def sitemap_xml(request):
 
-    cache_key = "sitemap_urls"
+    cache_key = "sitemap_urls_v2"
     urls = cache.get(cache_key)
 
     if urls is None:
@@ -1200,3 +1200,641 @@ def sitemap_xml(request):
     )
 
     return HttpResponse(xml, content_type="application/xml")
+
+
+# ================================================================
+# ANILOST API
+# ================================================================
+
+ANILIST_URL = "https://graphql.anilist.co"
+
+
+def anilist_query(query, variables=None):
+    """Execute a GraphQL query against the AniList API with caching."""
+    try:
+        resp = requests.post(
+            ANILIST_URL,
+            json={"query": query, "variables": variables or {}},
+            timeout=15,
+        )
+        if resp.status_code != 200:
+            return None
+        return resp.json().get("data")
+    except Exception:
+        return None
+
+
+# ----------------------------------------------------------------
+# QUERIES
+# ----------------------------------------------------------------
+
+ANIME_PAGE_QUERY = """
+query ($page: Int, $perPage: Int, $sort: [MediaSort], $status: MediaStatus, $season: MediaSeason, $seasonYear: Int, $type: MediaType) {
+  Page(page: $page, perPage: $perPage) {
+    media(sort: $sort, status: $status, season: $season, seasonYear: $seasonYear, type: $type, countryOfOrigin: JP) {
+      id
+      title { romaji english native }
+      coverImage { large extraLarge }
+      bannerImage
+      averageScore
+      popularity
+      format
+      episodes
+      duration
+      status
+      season
+      seasonYear
+      genres
+    }
+  }
+}
+
+"""
+
+ANIME_DETAIL_QUERY = """
+query ($id: Int) {
+  Media(id: $id, type: ANIME) {
+    id
+    title { romaji english native }
+    coverImage { large extraLarge }
+    bannerImage
+    description(asHtml: false)
+    averageScore
+    popularity
+    favourites
+    format
+    episodes
+    duration
+    status
+    season
+    seasonYear
+    countryOfOrigin
+    genres
+    tags { name }
+    startDate { year month day }
+    endDate { year month day }
+    studios(isMain: true) { nodes { name } }
+    source
+    rankings { rank type context year season }
+    trailer { id site thumbnail }
+    relations {
+      edges {
+        relationType
+        node {
+          ... on Media {
+            id
+            title { romaji english }
+            coverImage { large }
+            format
+            episodes
+            status
+            averageScore
+          }
+        }
+      }
+    }
+    recommendations(perPage: 12, sort: RATING_DESC) {
+      nodes {
+        mediaRecommendation {
+          id
+          title { romaji english }
+          coverImage { large }
+          bannerImage
+          format
+          episodes
+          averageScore
+          status
+        }
+      }
+    }
+    characters(perPage: 12, role: MAIN, sort: FAVOURITES_DESC) {
+      edges {
+        node {
+          id
+          name { full }
+          image { large }
+        }
+        role
+      }
+    }
+    staff(perPage: 6, sort: FAVOURITES_DESC) {
+      edges {
+        node {
+          id
+          name { full }
+          image { large }
+        }
+        role
+      }
+    }
+  }
+}
+
+"""
+
+
+AIRING_SCHEDULE_QUERY = """
+query ($start: Int, $end: Int, $page: Int, $perPage: Int) {
+  Page(page: $page, perPage: $perPage) {
+    airingSchedules(airingAt_greater: $start, airingAt_lesser: $end, sort: TIME) {
+      id
+      airingAt
+      episode
+      media {
+        id
+        title { romaji english }
+        coverImage { large }
+        format
+        episodes
+        averageScore
+        season
+        seasonYear
+      }
+    }
+    pageInfo { total lastPage hasNextPage }
+  }
+}
+
+"""
+
+GENRE_MEDIA_QUERY = """
+query ($genre: String, $page: Int, $perPage: Int) {
+  Page(page: $page, perPage: $perPage) {
+    media(genre: $genre, type: ANIME, countryOfOrigin: JP, sort: POPULARITY_DESC) {
+      id
+      title { romaji english native }
+      coverImage { large extraLarge }
+      bannerImage
+      averageScore
+      popularity
+      format
+      episodes
+      duration
+      status
+      season
+      seasonYear
+      genres
+    }
+    pageInfo { total lastPage hasNextPage }
+  }
+}
+
+"""
+
+ANILIST_GENRES = [
+    "Action", "Adventure", "Comedy", "Drama", "Ecchi", "Fantasy",
+    "Horror", "Mahou Shoujo", "Mecha", "Music", "Mystery",
+    "Psychological", "Romance", "Sci-Fi", "Slice of Life", "Sports",
+    "Supernatural", "Thriller",
+]
+
+SEARCH_ANIME_QUERY = """
+query ($search: String, $page: Int, $perPage: Int) {
+  Page(page: $page, perPage: $perPage) {
+    media(search: $search, type: ANIME, countryOfOrigin: JP, sort: POPULARITY_DESC) {
+      id
+      title { romaji english native }
+      coverImage { large extraLarge }
+      bannerImage
+      averageScore
+      popularity
+      format
+      episodes
+      duration
+      status
+      season
+      seasonYear
+      genres
+    }
+    pageInfo { total lastPage hasNextPage }
+  }
+}
+
+"""
+
+
+# ----------------------------------------------------------------
+# DATA FETCHERS
+# ----------------------------------------------------------------
+
+def anilist_trending():
+    cache_key = "anilist_trending"
+    data = cache.get(cache_key)
+    if data:
+        return data
+
+    data = anilist_query(ANIME_PAGE_QUERY, {
+        "page": 1, "perPage": 15,
+        "sort": ["TRENDING_DESC", "POPULARITY_DESC"],
+        "type": "ANIME",
+    })
+    items = (data or {}).get("Page", {}).get("media", [])
+    cache.set(cache_key, items, 21600)
+    return items
+
+
+def anilist_popular():
+    cache_key = "anilist_popular"
+    data = cache.get(cache_key)
+    if data:
+        return data
+
+    data = anilist_query(ANIME_PAGE_QUERY, {
+        "page": 1, "perPage": 15,
+        "sort": ["POPULARITY_DESC"],
+        "type": "ANIME",
+    })
+    items = (data or {}).get("Page", {}).get("media", [])
+    cache.set(cache_key, items, 21600)
+    return items
+
+
+def anilist_current_season():
+    import datetime
+    now = datetime.date.today()
+    month = now.month
+    if month <= 3:
+        season = "WINTER"
+    elif month <= 6:
+        season = "SPRING"
+    elif month <= 9:
+        season = "SUMMER"
+    else:
+        season = "FALL"
+
+    year = now.year
+
+    cache_key = f"anilist_season_{season}_{year}"
+    data = cache.get(cache_key)
+    if data:
+        return data
+
+    data = anilist_query(ANIME_PAGE_QUERY, {
+        "page": 1, "perPage": 15,
+        "sort": ["POPULARITY_DESC"],
+        "season": season,
+        "seasonYear": year,
+        "type": "ANIME",
+    })
+    items = (data or {}).get("Page", {}).get("media", [])
+    cache.set(cache_key, items, 21600)
+    return items
+
+
+def anilist_airing():
+    cache_key = "anilist_airing"
+    data = cache.get(cache_key)
+    if data:
+        return data
+
+    data = anilist_query(ANIME_PAGE_QUERY, {
+        "page": 1, "perPage": 15,
+        "sort": ["POPULARITY_DESC"],
+        "status": "RELEASING",
+        "type": "ANIME",
+    })
+    items = (data or {}).get("Page", {}).get("media", [])
+    cache.set(cache_key, items, 21600)
+    return items
+
+
+def anilist_top_rated():
+    cache_key = "anilist_top_rated"
+    data = cache.get(cache_key)
+    if data:
+        return data
+
+    data = anilist_query(ANIME_PAGE_QUERY, {
+        "page": 1, "perPage": 15,
+        "sort": ["SCORE_DESC"],
+        "type": "ANIME",
+    })
+    items = (data or {}).get("Page", {}).get("media", [])
+    cache.set(cache_key, items, 21600)
+    return items
+
+
+def anilist_anime_detail(anilist_id):
+    cache_key = f"anilist_detail_{anilist_id}"
+    context = cache.get(cache_key)
+    if context:
+        return context
+
+    data = anilist_query(ANIME_DETAIL_QUERY, {"id": anilist_id})
+    media = (data or {}).get("Media")
+    if not media:
+        return None
+
+    title = media.get("title", {}).get("english") or media.get("title", {}).get("romaji") or ""
+    romaji = media.get("title", {}).get("romaji", "")
+    native = media.get("title", {}).get("native", "")
+
+    description = (media.get("description") or "").strip()
+
+    raw_score = media.get("averageScore")
+    score_str = f"{raw_score}%" if raw_score else None
+
+    genres = media.get("genres") or []
+
+    studios = [s.get("name", "") for s in (media.get("studios", {}).get("nodes", []))]
+    tags = [t.get("name", "") for t in (media.get("tags") or []) if t.get("name")]
+
+    related_edges = media.get("relations", {}).get("edges", [])
+    related_anime = []
+    wanted_rel = {"SEQUEL", "PREQUEL", "SIDE_STORY", "SPIN_OFF", "ALTERNATIVE", "ADAPTATION", "CHARACTER", "SUMMARY", "OTHER"}
+    for edge in related_edges:
+        rel_type = edge.get("relationType", "")
+        if rel_type in wanted_rel:
+            node = edge.get("node", {})
+            if node.get("id"):
+                related_anime.append({
+                    "id": node["id"],
+                    "title": node.get("title", {}).get("english") or node.get("title", {}).get("romaji", ""),
+                    "cover": (node.get("coverImage") or {}).get("large", ""),
+                    "format": node.get("format", ""),
+                    "episodes": node.get("episodes"),
+                    "status": node.get("status", ""),
+                    "score": node.get("averageScore"),
+                    "relation": rel_type.replace("_", " ").title(),
+                })
+
+    rec_nodes = media.get("recommendations", {}).get("nodes", [])
+    recommendations = []
+    for rec in rec_nodes:
+        rm = rec.get("mediaRecommendation", {})
+        if rm.get("id"):
+            recommendations.append({
+                "id": rm["id"],
+                "title": rm.get("title", {}).get("english") or rm.get("title", {}).get("romaji", ""),
+                "cover": (rm.get("coverImage") or {}).get("large", ""),
+                "banner": rm.get("bannerImage", ""),
+                "format": rm.get("format", ""),
+                "episodes": rm.get("episodes"),
+                "score": rm.get("averageScore"),
+                "status": rm.get("status", ""),
+            })
+
+    characters = []
+    for edge in (media.get("characters", {}).get("edges", [])):
+        node = edge.get("node", {})
+        if node.get("id"):
+            characters.append({
+                "id": node["id"],
+                "name": node.get("name", {}).get("full", ""),
+                "image": (node.get("image") or {}).get("large", ""),
+            })
+
+    staff_list = []
+    for edge in (media.get("staff", {}).get("edges", [])):
+        node = edge.get("node", {})
+        if node.get("id"):
+            staff_list.append({
+                "id": node["id"],
+                "name": node.get("name", {}).get("full", ""),
+                "image": (node.get("image") or {}).get("large", ""),
+            })
+
+    context = {
+        "anime": media,
+        "title": title,
+        "romaji": romaji,
+        "native": native,
+        "description": description,
+        "score_str": score_str,
+        "score_raw": raw_score,
+        "genres": genres,
+        "studios": studios,
+        "tags": [t.get("name", "") for t in (media.get("tags") or [])],
+        "related": related_anime,
+        "recommendations": recommendations,
+        "characters": characters,
+        "staff": staff_list,
+        "meta_desc": f"Watch {title} on UzzUTV Aniuzu. Explore details, genres and related anime.",
+    }
+
+    cache.set(cache_key, context, 43200)
+    return context
+
+
+def anilist_search(query, page=1):
+    cache_key = f"anilist_search_{query.strip().lower()}_p{page}"
+    cached = cache.get(cache_key)
+    if cached:
+        return cached
+
+    data = anilist_query(SEARCH_ANIME_QUERY, {
+        "search": query.strip(),
+        "page": page,
+        "perPage": 24,
+    })
+    page_data = (data or {}).get("Page", {})
+    items = page_data.get("media", [])
+    total_pages = (page_data.get("pageInfo") or {}).get("lastPage", 1)
+
+    result = {"items": items, "total_pages": total_pages}
+    cache.set(cache_key, result, 3600)
+    return result
+
+
+def anilist_schedule(start_ts, end_ts, page=1):
+    import datetime
+    date_label = datetime.date.fromtimestamp(start_ts).isoformat()
+    cache_key = f"anilist_schedule_{date_label}_p{page}"
+    cached = cache.get(cache_key)
+    if cached:
+        return cached
+
+    data = anilist_query(AIRING_SCHEDULE_QUERY, {
+        "start": start_ts,
+        "end": end_ts,
+        "page": page,
+        "perPage": 50,
+    })
+    page_data = (data or {}).get("Page", {})
+    raw = page_data.get("airingSchedules", [])
+    total_pages = (page_data.get("pageInfo") or {}).get("lastPage", 1)
+
+    seen = set()
+    entries = []
+    for s in raw:
+        media = s.get("media", {})
+        mid = media.get("id")
+        if not mid or mid in seen:
+            continue
+        seen.add(mid)
+        entries.append({
+            "id": mid,
+            "title": media.get("title", {}).get("english") or media.get("title", {}).get("romaji", ""),
+            "cover": (media.get("coverImage") or {}).get("large", ""),
+            "format": media.get("format", ""),
+            "episodes": media.get("episodes"),
+            "score": media.get("averageScore"),
+            "episode": s.get("episode"),
+            "airing_at": s.get("airingAt"),
+        })
+
+    result = {"items": entries, "total_pages": total_pages}
+    cache.set(cache_key, result, 1800)
+    return result
+
+
+def anilist_by_genre(genre, page=1):
+    cache_key = f"anilist_genre_{genre.lower()}_p{page}"
+    cached = cache.get(cache_key)
+    if cached:
+        return cached
+
+    data = anilist_query(GENRE_MEDIA_QUERY, {
+        "genre": genre,
+        "page": page,
+        "perPage": 24,
+    })
+    page_data = (data or {}).get("Page", {})
+    items = page_data.get("media", [])
+    total_pages = (page_data.get("pageInfo") or {}).get("lastPage", 1)
+
+    result = {"items": items, "total_pages": total_pages}
+    cache.set(cache_key, result, 3600)
+    return result
+
+
+# ================================================================
+# ANILOST HELPER — sanitize HTML descriptions
+# ================================================================
+
+def sanitize_anilist_description(text):
+    """Strip HTML tags from AniList descriptions."""
+    import re
+    clean = re.sub(r'<[^>]+>', '', text or '')
+    clean = clean.replace('&amp;', '&').replace('&lt;', '<').replace('&gt;', '>').replace('&#039;', "'").replace('&quot;', '"')
+    return clean.strip()
+
+
+# ================================================================
+# ANIZU VIEWS
+# ================================================================
+
+def aniuzu(request):
+    """Main Aniuzu anime browsing page."""
+    trending = anilist_trending()
+    popular = anilist_popular()
+    airing = anilist_airing()
+    seasonal = anilist_current_season()
+    top_rated = anilist_top_rated()
+
+    hero = trending[:5] if trending else []
+
+    return render(request, "uzzutv/aniuzu.html", {
+        "hero": hero,
+        "trending": trending,
+        "popular": popular,
+        "airing": airing,
+        "seasonal": seasonal,
+        "top_rated": top_rated,
+    })
+
+
+def aniuzu_detail(request, anilist_id):
+    """Anime detail page."""
+    ctx = anilist_anime_detail(anilist_id)
+    if ctx is None:
+        raise Http404("Anime not found")
+
+    ctx["anilist_id"] = anilist_id
+    ctx["meta_desc"] = sanitize_anilist_description(ctx["meta_desc"])
+    ctx["description"] = sanitize_anilist_description(ctx["description"])
+
+    return render(request, "uzzutv/aniuzu_detail.html", ctx)
+
+
+def aniuzu_search(request):
+    """Aniuzu anime search."""
+    query = request.GET.get("q", "").strip()
+    page = max(1, int(request.GET.get("page", 1)))
+
+    items = []
+    total_pages = 1
+
+    if query:
+        result = anilist_search(query, page)
+        items = result["items"]
+        total_pages = result["total_pages"]
+
+    pages = []
+    for p in range(1, total_pages + 1):
+        if p == 1 or p == total_pages or abs(p - page) <= 2:
+            if pages and pages[-1] != "..." and p - 1 != pages[-1]:
+                pages.append("...")
+            pages.append(p)
+
+    return render(request, "uzzutv/aniuzu_search.html", {
+        "query": query,
+        "items": items,
+        "page": page,
+        "total_pages": total_pages,
+        "pages": pages,
+    })
+
+
+def aniuzu_schedule(request):
+    """Airing schedule page — shows anime airing this week."""
+    import datetime, calendar, time
+
+    today = datetime.date.today()
+    start_of_week = today - datetime.timedelta(days=today.weekday())
+    end_of_week = start_of_week + datetime.timedelta(days=6)
+
+    start_ts = int(time.mktime(start_of_week.timetuple()))
+    end_ts = int(time.mktime(end_of_week.timetuple())) + 86399
+
+    view = request.GET.get("view", "week")
+    if view == "today":
+        start_ts = int(time.mktime(today.timetuple()))
+        end_ts = start_ts + 86399
+
+    result = anilist_schedule(start_ts, end_ts)
+    items = result["items"]
+
+    days = {}
+    for entry in items:
+        ts = entry.get("airing_at", 0)
+        d = datetime.datetime.fromtimestamp(ts).strftime("%A, %b %d") if ts else "TBA"
+        days.setdefault(d, []).append(entry)
+
+    return render(request, "uzzutv/aniuzu_schedule.html", {
+        "days": days,
+        "items": items,
+        "view": view,
+        "start_date": start_of_week if view == "week" else today,
+    })
+
+
+def aniuzu_genre_list(request):
+    """Genre browse page — shows all available genres."""
+    return render(request, "uzzutv/aniuzu_genre_list.html", {
+        "genres": ANILIST_GENRES,
+    })
+
+
+def aniuzu_genre(request, genre):
+    """Anime filtered by a specific genre with pagination."""
+    page = max(1, int(request.GET.get("page", 1)))
+    result = anilist_by_genre(genre, page)
+    items = result["items"]
+    total_pages = result["total_pages"]
+
+    pages = []
+    for p in range(1, total_pages + 1):
+        if p == 1 or p == total_pages or abs(p - page) <= 2:
+            if pages and pages[-1] != "..." and p - 1 != pages[-1]:
+                pages.append("...")
+            pages.append(p)
+
+    return render(request, "uzzutv/aniuzu_genre.html", {
+        "genre": genre,
+        "items": items,
+        "page": page,
+        "total_pages": total_pages,
+        "pages": pages,
+        "genres": ANILIST_GENRES,
+    })

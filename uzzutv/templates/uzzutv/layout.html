@@ -23,6 +23,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://image.tmdb.org">
+<link rel="preconnect" href="https://graphql.anilist.co">
+<link rel="preconnect" href="https://s4.anilist.co">
 <link rel="preconnect" href="https://www.vidking.net">
 <link rel="preconnect" href="https://vidnest.fun">
 <link rel="preconnect" href="https://vidsrcme.ru">
@@ -569,6 +571,41 @@ body{
 </head>
 <body>
 
+{% if request.path|slice:":7" == "/aniuzu" %}
+<nav class="navbar navbar-expand-lg navbar-dark az-navbar">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="{% url 'aniuzu'%}">Ani<span class="brand-red">uzu</span></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#azNavCollapse" aria-controls="azNavCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="azNavCollapse">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link {% if request.resolver_match.url_name == 'aniuzu' %}active{% endif %}" href="{% url 'aniuzu'%}">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.resolver_match.url_name == 'aniuzu_schedule' %}active{% endif %}" href="{% url 'aniuzu_schedule'%}">Schedule</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.resolver_match.url_name == 'aniuzu_genre_list' or request.resolver_match.url_name == 'aniuzu_genre' %}active{% endif %}" href="{% url 'aniuzu_genre_list'%}">Genres</a>
+        </li>
+      </ul>
+      <form method="get" action="{% url 'aniuzu_search'%}" class="uzz-search az-search">
+        <input class="uzz-search-input az-search-input" type="search" placeholder="Search anime..." aria-label="Search anime" name="q" value="{{ query|default:'' }}">
+        <button class="uzz-search-btn az-search-btn" type="submit">Search</button>
+      </form>
+      <div class="uzz-auth" id="auth-nav">
+        <a href="/auth/" id="login-nav" class="btn">Login</a>
+        <div id="account-nav" class="d-none d-flex align-items-center gap-2">
+          <span class="navbar-text text-white" id="user-username">Loading...</span>
+          <button type="button" class="btn" id="logout-btn">Logout</button>
+        </div>
+      </div>
+      <a class="az-back-uzzutv" href="{% url 'home'%}"><span class="material-icons" style="font-size:16px;vertical-align:middle;">movie</span> UzzUTV</a>
+    </div>
+  </div>
+</nav>
+{% else %}
 <nav class="navbar navbar-expand-lg navbar-dark">
   <div class="container-fluid">
     <a class="navbar-brand" href="{% url 'index'%}">UzzU<span class="brand-red">TV</span></a>
@@ -585,6 +622,9 @@ body{
         </li>
         <li class="nav-item">
           <a class="nav-link {% if request.resolver_match.url_name == 'tv' or request.resolver_match.url_name == 'watchtv' or request.resolver_match.url_name == 'detail' and request.resolver_match.kwargs.type == 'tv' %}active{% endif %}" href="{% url 'tv'%}">Series</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.resolver_match.url_name == 'aniuzu' or request.resolver_match.url_name == 'aniuzu_detail' or request.resolver_match.url_name == 'aniuzu_search' %}active{% endif %}" href="{% url 'aniuzu'%}">Aniuzu</a>
         </li>
         <li class="nav-item d-none" id="party-nav-item">
           <a class="nav-link {% if request.resolver_match.url_name == 'party' or request.resolver_match.url_name == 'party_room' %}active{% endif %}" href="{% url 'party'%}">Party</a>
@@ -634,6 +674,7 @@ body{
     </div>
   </div>
 </nav>
+{% endif %}
 
 
 <div class="bg-img">
@@ -664,6 +705,7 @@ body{
       <ul class="footer-list">
         <li><a href="{% url 'movie' %}">Movies</a></li>
         <li><a href="{% url 'tv' %}">Series</a></li>
+        <li><a href="{% url 'aniuzu' %}">Aniuzu</a></li>
         <li><a href="{% url 'watchlist' %}">Watchlist</a></li>
       </ul>
     </div>

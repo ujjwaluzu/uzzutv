@@ -1,0 +1,80 @@
+{% extends 'uzzutv/layout.html' %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'uzzutv/home.css' %}">
+<link rel="stylesheet" href="{% static 'uzzutv/aniuzu.css' %}">
+{% endblock %}
+
+{% block title %}Aniuzu Search{% if query %}: {{ query }}{% endif %}{% endblock %}
+{% block meta_description %}Search anime on Aniuzu and discover titles to watch.{% endblock %}
+{% block canonical %}<link rel="canonical" href="https://uzzutv.pythonanywhere.com/aniuzu/search/">{% endblock %}
+{% block og_url %}https://uzzutv.pythonanywhere.com/aniuzu/search/{% endblock %}
+
+{% block body %}
+
+<div class="az-search-results">
+
+<h1 class="visually-hidden">Search Anime - Aniuzu</h1>
+
+<h2 style="font-family:'Anton',sans-serif;font-size:1.8rem;color:#fff;text-align:center;margin-bottom:24px;letter-spacing:.5px;text-transform:uppercase;">Search Anime</h2>
+
+<form class="az-search-form" method="get" action="{% url 'aniuzu_search' %}">
+<input type="text" name="q" placeholder="Search anime..." value="{{ query|default:'' }}" autocomplete="off">
+<button type="submit"><span class="material-icons" style="font-size:20px;vertical-align:middle;margin-right:4px;">search</span> Search</button>
+</form>
+
+{% if query %}
+<p style="text-align:center;color:#9ca3af;margin-bottom:28px;font-size:14px;">Results for "<strong style="color:#e5e7eb;">{{ query }}</strong>"</p>
+{% endif %}
+
+{% if items %}
+
+<div class="az-search-grid">
+{% for anime in items %}
+<div class="az-card">
+<a class="card-link" href="{% url 'aniuzu_detail' anime.id %}">
+<div class="card-poster">
+<img loading="lazy" decoding="async" alt="{{ anime.title.english|default:anime.title.romaji }} poster" {% if anime.coverImage.large %}src="{{ anime.coverImage.large }}"{% else %}src="{% static 'uzzutv/images/logo.png' %}"{% endif %}>
+<span class="card-gradient"></span>
+{% if anime.averageScore %}<span class="card-rating">&#9733; {{ anime.averageScore }}</span>{% endif %}
+</div>
+</a>
+<div class="card-info">
+<div class="card-title">{{ anime.title.english|default:anime.title.romaji|truncatewords:4 }}</div>
+<div class="card-meta">{% if anime.format %}{{ anime.format }}{% endif %}{% if anime.episodes %} &bull; {{ anime.episodes }} ep{% endif %}{% if anime.seasonYear %} &bull; {{ anime.seasonYear }}{% endif %}</div>
+</div>
+</div>
+{% endfor %}
+</div>
+
+{% if total_pages > 1 %}
+<div class="az-pagination">
+{% if page > 1 %}
+<a href="{% url 'aniuzu_search' %}?q={{ query }}&page={{ page|add:'-1' }}">&#8249; Prev</a>
+{% endif %}
+{% for p in pages %}
+{% if p == page %}
+<span class="az-page-current">{{ p }}</span>
+{% elif p == '...' %}
+<span class="az-page-dots">...</span>
+{% else %}
+<a href="{% url 'aniuzu_search' %}?q={{ query }}&page={{ p }}">{{ p }}</a>
+{% endif %}
+{% endfor %}
+{% if page < total_pages %}
+<a href="{% url 'aniuzu_search' %}?q={{ query }}&page={{ page|add:'1' }}">Next &#8250;</a>
+{% endif %}
+</div>
+{% endif %}
+
+{% elif query %}
+
+<div class="az-search-empty">
+<p>No anime found matching your search. Try a different keyword.</p>
+</div>
+
+{% endif %}
+
+</div>
+{% endblock %}

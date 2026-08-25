@@ -1,0 +1,183 @@
+{% extends 'uzzutv/layout.html' %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'uzzutv/home.css' %}">
+<link rel="stylesheet" href="{% static 'uzzutv/aniuzu.css' %}">
+{% endblock %}
+
+{% block title %}Aniuzu - {{ title|default:romaji|default:"Anime" }}{% endblock %}
+{% block meta_description %}{{ description|striptags|truncatewords:40 }}{% endblock %}
+{% block canonical %}<link rel="canonical" href="https://uzzutv.pythonanywhere.com/aniuzu/anime/{{ anilist_id }}/">{% endblock %}
+{% block og_type %}video.other{% endblock %}
+{% block og_title %}Aniuzu - {{ title|default:romaji|default:"Anime" }}{% endblock %}
+{% block og_description %}{{ description|striptags|truncatewords:40 }}{% endblock %}
+{% block og_url %}https://uzzutv.pythonanywhere.com/aniuzu/anime/{{ anilist_id }}/{% endblock %}
+
+{% block body %}
+
+{% if anime %}
+<section class="az-detail-hero">
+<div class="az-dhero-bg" style="background-image:url('{{ anime.bannerImage }}');background-size:cover;background-position:center;"></div>
+<div class="az-dhero-layout">
+<div class="az-dhero-poster">
+<img loading="eager" alt="{{ title }} poster" src="{{ anime.coverImage.extraLarge|default:anime.coverImage.large }}">
+</div>
+<div class="az-dhero-info">
+<h1 class="az-dhero-title">{{ title|default:romaji }}</h1>
+{% if romaji and title != romaji %}<p class="az-dhero-alt">{{ romaji }}</p>{% endif %}
+{% if native %}<p class="az-dhero-alt" style="font-size:13px;color:#6b7280;">{{ native }}</p>{% endif %}
+<div class="az-dhero-meta">
+{% if score_str %}<span class="az-hero-rating">&#9733; {{ score_str }}</span>{% endif %}
+{% if anime.format %}<span class="az-hero-type">{{ anime.format }}</span>{% endif %}
+{% if anime.episodes %}<span class="az-meta-item">{{ anime.episodes }} Episodes</span>{% endif %}
+{% if anime.duration %}<span class="az-meta-item">&bull; {{ anime.duration }} min/ep</span>{% endif %}
+{% if anime.season %}<span class="az-meta-item">&bull; {{ anime.season|title }} {{ anime.seasonYear }}</span>{% endif %}
+{% if anime.status %}<span class="az-meta-item">&bull; {{ anime.status }}</span>{% endif %}
+</div>
+{% if genres %}
+<div class="az-dhero-genres">
+{% for g in genres %}<span>{{ g }}</span>{% endfor %}
+</div>
+{% endif %}
+{% if description %}
+<p class="az-hero-desc">{{ description|striptags|truncatewords:40 }}</p>
+{% endif %}
+<div class="az-actions">
+<button class="az-watch-btn disabled"><span class="material-icons">play_arrow</span> Watch</button>
+<button class="az-watchlist-btn" data-id="{{ anilist_id }}" data-type="anime" data-title="{{ title|default:romaji }}" data-poster="{{ anime.coverImage.large }}">&#65291; Add to Watchlist</button>
+</div>
+</div>
+</div>
+</section>
+
+<p class="az-mobile-desc">{{ description|striptags }}</p>
+
+{% if description %}
+<div class="az-desc">
+<h2 class="section-title">Synopsis</h2>
+<div class="az-desc-text collapsed" id="az-desc-text">{{ description|striptags }}</div>
+<button class="az-desc-toggle" id="az-desc-toggle" onclick="azToggleDesc()">Show More <span class="material-icons" style="font-size:18px;">expand_more</span></button>
+</div>
+{% endif %}
+
+{% if score_raw or anime.popularity %}
+<div class="az-info-grid">
+{% if anime.format %}<div class="az-info-item"><span class="az-info-label">Format</span><span class="az-info-value">{{ anime.format }}</span></div>{% endif %}
+{% if anime.episodes %}<div class="az-info-item"><span class="az-info-label">Episodes</span><span class="az-info-value">{{ anime.episodes }}</span></div>{% endif %}
+{% if anime.duration %}<div class="az-info-item"><span class="az-info-label">Duration</span><span class="az-info-value">{{ anime.duration }} min</span></div>{% endif %}
+{% if anime.status %}<div class="az-info-item"><span class="az-info-label">Status</span><span class="az-info-value">{{ anime.status }}</span></div>{% endif %}
+{% if anime.season %}<div class="az-info-item"><span class="az-info-label">Season</span><span class="az-info-value">{{ anime.season|title }} {{ anime.seasonYear }}</span></div>{% endif %}
+{% if studios %}<div class="az-info-item"><span class="az-info-label">Studio</span><span class="az-info-value">{% for s in studios %}{{ s }}{% if not forloop.last %}, {% endif %}{% endfor %}</span></div>{% endif %}
+{% if anime.source %}<div class="az-info-item"><span class="az-info-label">Source</span><span class="az-info-value">{{ anime.source }}</span></div>{% endif %}
+{% if score_str %}<div class="az-info-item"><span class="az-info-label">Score</span><span class="az-info-value">{{ score_str }}/100</span></div>{% endif %}
+{% if anime.popularity %}<div class="az-info-item"><span class="az-info-label">Popularity</span><span class="az-info-value">#{{ anime.popularity }}</span></div>{% endif %}
+</div>
+{% endif %}
+
+{% if characters %}
+<div class="az-content-section">
+<div class="az-slider-header">
+<h2 class="section-title">Characters</h2>
+</div>
+<div class="az-char-row">
+{% for char in characters|slice:":20" %}
+<div class="az-char-card">
+<img loading="lazy" alt="{{ char.name }}" src="{% if char.image %}{{ char.image }}{% else %}{% static 'uzzutv/images/logo.png' %}{% endif %}">
+<p>{{ char.name }}</p>
+{% if char.role %}<p class="az-char-role">{{ char.role }}</p>{% endif %}
+</div>
+{% endfor %}
+</div>
+</div>
+{% endif %}
+
+{% if related %}
+<div class="az-content-section az-related-section">
+<div class="az-slider-header">
+<h2 class="section-title">Related Anime</h2>
+<div class="az-slider-controls">
+<button onclick="azSlideLeft('az-related-slider')"><span class="material-icons">chevron_left</span></button>
+<button onclick="azSlideRight('az-related-slider')"><span class="material-icons">chevron_right</span></button>
+</div>
+</div>
+<div class="az-row" id="az-related-slider">
+{% for item in related|slice:":12" %}
+<div class="az-card">
+<a class="card-link" href="{% url 'aniuzu_detail' item.id %}">
+<div class="card-poster">
+<img loading="lazy" decoding="async" alt="{{ item.title }} poster" {% if item.cover %}src="{{ item.cover }}"{% else %}src="{% static 'uzzutv/images/logo.png' %}{% endif %}">
+<span class="card-gradient"></span>
+{% if item.score %}<span class="card-rating">&#9733; {{ item.score }}</span>{% endif %}
+</div>
+</a>
+<div class="card-info">
+<div class="card-title">{{ item.title|truncatewords:4 }}</div>
+<div class="card-meta">{% if item.format %}{{ item.format }}{% endif %}{% if item.episodes %} &bull; {{ item.episodes }} ep{% endif %}</div>
+</div>
+</div>
+{% endfor %}
+</div>
+</div>
+{% endif %}
+
+{% if recommendations %}
+<div class="az-content-section az-related-section">
+<div class="az-slider-header">
+<h2 class="section-title">You Might Also Like</h2>
+<div class="az-slider-controls">
+<button onclick="azSlideLeft('az-rec-slider')"><span class="material-icons">chevron_left</span></button>
+<button onclick="azSlideRight('az-rec-slider')"><span class="material-icons">chevron_right</span></button>
+</div>
+</div>
+<div class="az-row" id="az-rec-slider">
+{% for item in recommendations|slice:":12" %}
+<div class="az-card">
+<a class="card-link" href="{% url 'aniuzu_detail' item.id %}">
+<div class="card-poster">
+<img loading="lazy" decoding="async" alt="{{ item.title }} poster" {% if item.cover %}src="{{ item.cover }}"{% else %}src="{% static 'uzzutv/images/logo.png' %}{% endif %}">
+<span class="card-gradient"></span>
+{% if item.score %}<span class="card-rating">&#9733; {{ item.score }}</span>{% endif %}
+</div>
+</a>
+<div class="card-info">
+<div class="card-title">{{ item.title|truncatewords:4 }}</div>
+<div class="card-meta">{% if item.format %}{{ item.format }}{% endif %}{% if item.episodes %} &bull; {{ item.episodes }} ep{% endif %}</div>
+</div>
+</div>
+{% endfor %}
+</div>
+</div>
+{% endif %}
+
+{% else %}
+
+<div class="az-error">
+<h2>Anime Not Found</h2>
+<p>Sorry, we couldn't find the anime you're looking for.</p>
+<a href="{% url 'aniuzu' %}" class="watch-btn"><span class="material-icons">arrow_back</span> Back to Aniuzu</a>
+</div>
+
+{% endif %}
+
+<script>
+function azSlideLeft(id){var s=document.getElementById(id);if(s)s.scrollBy({left:-600,behavior:"smooth"})}
+function azSlideRight(id){var s=document.getElementById(id);if(s)s.scrollBy({left:600,behavior:"smooth"})}
+function azToggleDesc(){
+var t=document.getElementById("az-desc-text");
+var b=document.getElementById("az-desc-toggle");
+if(!t||!b)return;
+if(t.classList.contains("collapsed")){t.classList.remove("collapsed");b.innerHTML='Show Less <span class="material-icons" style="font-size:18px;">expand_less</span>';}
+else{t.classList.add("collapsed");b.innerHTML='Show More <span class="material-icons" style="font-size:18px;">expand_more</span>';}
+}
+var wlBtn=document.querySelector(".az-watchlist-btn");
+if(wlBtn){
+wlBtn.addEventListener("click",function(){
+toggleWatchlist(wlBtn.dataset.id,wlBtn.dataset.type,wlBtn.dataset.title,wlBtn.dataset.poster,wlBtn);
+});
+document.addEventListener("DOMContentLoaded",function(){
+updateWatchlistButton(wlBtn.dataset.id,wlBtn.dataset.type,wlBtn);
+});
+}
+</script>
+{% endblock %}

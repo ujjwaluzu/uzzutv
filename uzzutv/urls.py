@@ -22,8 +22,13 @@ path("rated/<uuid:user_id>/", views.rated, name="rated_user"),
     path("profile/", views.profile, name="profile"),
     path("profile/<uuid:user_id>/", views.public_profile, name="public_profile"),
     path("media-info/<str:type>/<int:id>/", views.media_info, name="media_info"),
+    path("aniuzu/", views.aniuzu, name="aniuzu"),
+    path("aniuzu/search/", views.aniuzu_search, name="aniuzu_search"),
+    path("aniuzu/anime/<int:anilist_id>/", views.aniuzu_detail, name="aniuzu_detail"),
+    path("aniuzu/schedule/", views.aniuzu_schedule, name="aniuzu_schedule"),
+    path("aniuzu/genres/", views.aniuzu_genre_list, name="aniuzu_genre_list"),
+    path("aniuzu/genres/<str:genre>/", views.aniuzu_genre, name="aniuzu_genre"),
     path("robots.txt", views.robots_txt, name="robots_txt"),
     path("sitemap.xml", views.sitemap_xml, name="sitemap_xml"),
-
 
 ]
