@@ -80,6 +80,41 @@ async function saveContinueTV(id, poster, season, episode) {
 
 
 /* =========================================================
+   SAVE ANIME EPISODE
+========================================================= */
+
+async function saveContinueAnime(id, episode, variant, poster) {
+
+    const user = await getCurrentUser();
+
+    if (!user) {
+        return;
+    }
+
+    const { error } = await supabaseClient
+        .from("continue_watching")
+        .upsert(
+            {
+                user_id: user.id,
+                media_id: Number(id),
+                media_type: "anime",
+                poster: poster || "",
+                season: null,
+                episode: Number(episode),
+                updated_at: new Date().toISOString()
+            },
+            {
+                onConflict: "user_id,media_id,media_type"
+            }
+        );
+
+    if (error) {
+        console.error("Error saving anime episode:", error);
+    }
+}
+
+
+/* =========================================================
    GET ALL CONTINUE WATCHING
 ========================================================= */
 

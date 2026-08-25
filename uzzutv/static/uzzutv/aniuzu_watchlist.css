@@ -1,0 +1,53 @@
+/* =========================================================
+   ANIUZU WATCHLIST PAGE
+   ========================================================= */
+
+.azwlist-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 80px 24px 70px;
+}
+
+.azwlist-title {
+    font-size: clamp(24px, 2.5vw, 36px);
+    font-weight: 800;
+    color: #ffffff;
+    margin: 0 0 4px;
+    letter-spacing: -0.5px;
+}
+
+.azwlist-subtitle {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0 0 28px;
+}
+
+.azwlist-skeleton {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 16px;
+}
+
+/* Card grid — reuse az-row from aniuzu.css */
+
+#az-watchlist-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 16px;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 767px) {
+
+    .azwlist-container {
+        padding: 68px 12px 48px;
+    }
+
+    #az-watchlist-grid {
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        gap: 12px;
+    }
+}

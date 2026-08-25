@@ -30,6 +30,8 @@
 <link rel="preconnect" href="https://vidsrcme.ru">
 <link rel="preconnect" href="https://vidfast.pro">
 <link rel="preconnect" href="https://player.videasy.net">
+<link rel="preconnect" href="https://anilink.cc">
+<link rel="preconnect" href="https://tryembed.us.cc">
 <link href="https://fonts.googleapis.com/css2?family=Passero+One&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
@@ -79,6 +81,9 @@
         </li>
         <li class="nav-item">
           <a class="nav-link {% if request.resolver_match.url_name == 'aniuzu_collections' or request.resolver_match.url_name == 'aniuzu_collection' %}active{% endif %}" href="{% url 'aniuzu_collections'%}">Collections</a>
+        </li>
+        <li class="nav-item d-none" id="az-watchlist-nav">
+          <a class="nav-link {% if request.resolver_match.url_name == 'aniuzu_watchlist' %}active{% endif %}" href="{% url 'aniuzu_watchlist'%}">Watchlist</a>
         </li>
       </ul>
       <form method="get" action="{% url 'aniuzu_search'%}" class="uzz-search az-search">
@@ -197,7 +202,6 @@
         <li><a href="{% url 'movie' %}">Movies</a></li>
         <li><a href="{% url 'tv' %}">Series</a></li>
         <li><a href="{% url 'aniuzu' %}">Aniuzu</a></li>
-        <li><a href="{% url 'watchlist' %}">Watchlist</a></li>
       </ul>
     </div>
 
@@ -238,6 +242,8 @@
 <script src="{% static 'uzzutv/auth.js' %}"></script>
 <script src="{% static 'uzzutv/continue_watching.js' %}"></script>
 <script src="{% static 'uzzutv/watchlist.js' %}"></script>
+<script src="{% static 'uzzutv/aniuzu_continue_watching.js' %}"></script>
+<script src="{% static 'uzzutv/aniuzu_watchlist.js' %}"></script>
 {% block extra_js %}{% endblock %}
 <button id="az-back-to-top" class="az-back-to-top" aria-label="Back to top"><span class="material-icons">keyboard_arrow_up</span></button>
 </body>

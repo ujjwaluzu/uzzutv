@@ -13,6 +13,7 @@ async function updateAuthNavbar() {
     const accountNav = document.getElementById("account-nav");
     const userUsername = document.getElementById("user-username");
     const partyNav = document.getElementById("party-nav-item");
+    const azWatchlistNav = document.getElementById("az-watchlist-nav");
 
     if (!loginNav || !accountNav) {
         return;
@@ -32,6 +33,10 @@ async function updateAuthNavbar() {
 
         if (partyNav) {
             partyNav.classList.remove("d-none");
+        }
+
+        if (azWatchlistNav) {
+            azWatchlistNav.classList.remove("d-none");
         }
 
         if (userUsername) {
@@ -91,6 +96,10 @@ async function updateAuthNavbar() {
 
         if (partyNav) {
             partyNav.classList.add("d-none");
+        }
+
+        if (azWatchlistNav) {
+            azWatchlistNav.classList.add("d-none");
         }
 
     }

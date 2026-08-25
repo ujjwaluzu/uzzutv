@@ -65,33 +65,11 @@ function azSlideRight(id){var s=document.getElementById(id);if(s)s.scrollBy({lef
 ========================================================= */
 
 async function removeContinueAnime(id){
-var user=await getCurrentUser();
-if(!user)return;
-var{error}=await supabaseClient.from("continue_watching").delete().eq("user_id",user.id).eq("media_id",Number(id)).eq("media_type","anime");
-if(error){console.error("Error removing anime:",error);return;}
-renderContinueAnime("continue-anime");
+    removeAniuzuContinue(id);
 }
 
 async function renderContinueAnime(containerId){
-var container=document.getElementById(containerId);
-if(!container)return;
-var skel=document.getElementById("continue-skeleton");
-var list=await getAllContinue();
-var animeList=list.filter(function(item){return item.media_type==="anime"});
-if(animeList.length===0){if(skel)skel.style.display="none";container.innerHTML="";return;}
-if(skel)skel.style.display="none";
-var cardsHtml=animeList.map(function(item){
-return '<div class="az-card" style="position:relative;">' +
-'<button onclick="removeContinueAnime('+item.media_id+')" style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.7);border:none;color:white;width:28px;height:28px;border-radius:50%;cursor:pointer;z-index:10;font-size:14px;line-height:28px;text-align:center;">&#10005;</button>' +
-'<a class="card-link" href="/aniuzu/anime/'+item.media_id+'/">' +
-'<div class="card-poster">' +
-'<img loading="lazy" decoding="async" src="'+item.poster+'">' +
-'<span class="card-gradient"></span>' +
-'</div></a>' +
-'<div class="card-info"><div class="card-title" style="font-size:12px;">Recently Viewed</div></div>' +
-'</div>';
-}).join("");
-container.innerHTML='<div class="az-content-section"><div class="az-slider-header"><h2 class="section-title">Continue Watching</h2><div class="az-slider-controls"><button onclick="azSlideLeft(\'az-continue-slider\')"><span class="material-icons">chevron_left</span></button><button onclick="azSlideRight(\'az-continue-slider\')"><span class="material-icons">chevron_right</span></button></div></div><div class="az-row" id="az-continue-slider">'+cardsHtml+'</div></div>';
+    renderAniuzuContinueHome(containerId);
 }
 
 /* =========================================================
@@ -113,10 +91,10 @@ else{t.classList.add("collapsed");b.innerHTML='Show More <span class="material-i
 var wlBtn=document.querySelector(".az-watchlist-btn");
 if(wlBtn){
 wlBtn.addEventListener("click",function(){
-toggleWatchlist(wlBtn.dataset.id,wlBtn.dataset.type,wlBtn.dataset.title,wlBtn.dataset.poster,wlBtn);
+toggleAniuzuWatchlist(wlBtn.dataset.id,wlBtn.dataset.title,wlBtn.dataset.poster,wlBtn);
 });
 document.addEventListener("DOMContentLoaded",function(){
-updateWatchlistButton(wlBtn.dataset.id,wlBtn.dataset.type,wlBtn);
+updateAniuzuWatchlistButton(wlBtn.dataset.id,wlBtn);
 });
 }
 
@@ -154,9 +132,9 @@ btn.setAttribute("data-type","anime");
 btn.setAttribute("data-title",t);
 btn.setAttribute("data-poster",poster);
 btn.setAttribute("aria-label","Add to Watchlist");
-btn.addEventListener("click",function(e){e.preventDefault();e.stopPropagation();toggleWatchlist(id,"anime",t,poster,btn)});
+btn.addEventListener("click",function(e){e.preventDefault();e.stopPropagation();toggleAniuzuWatchlist(id,t,poster,btn)});
 card.appendChild(btn);
-if(typeof isInWatchlist==="function"){isInWatchlist(id,"anime").then(function(exists){if(exists){btn.innerHTML="&#10003;";btn.classList.add("in-watchlist")}})}
+if(typeof isInAniuzuWatchlist==="function"){isInAniuzuWatchlist(id).then(function(exists){if(exists){btn.innerHTML="&#10003;";btn.classList.add("in-watchlist")}})}
 });
 var btt=document.getElementById("az-back-to-top");
 if(btt){window.addEventListener("scroll",function(){btt.classList.toggle("visible",window.scrollY>400)});btt.addEventListener("click",function(){window.scrollTo({top:0,behavior:"smooth"})})}

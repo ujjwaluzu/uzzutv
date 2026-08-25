@@ -1334,6 +1334,7 @@ ANIME_DETAIL_QUERY = """
 query ($id: Int) {
   Media(id: $id, type: ANIME) {
     id
+    idMal
     title { romaji english native }
     coverImage { large extraLarge }
     bannerImage
@@ -1354,6 +1355,7 @@ query ($id: Int) {
     endDate { year month day }
     studios(isMain: true) { nodes { name } }
     source
+    streamingEpisodes { title thumbnail site }
     rankings { rank type context year season }
     trailer { id site thumbnail }
     relations {
@@ -1840,6 +1842,7 @@ def anilist_anime_detail(anilist_id):
         "characters": characters,
         "staff": staff_list,
         "trailer": _clean_trailer(media.get("trailer")),
+        "id_mal": media.get("idMal"),
         "meta_desc": f"Watch {title} on UzzUTV Aniuzu. Explore details, genres and related anime.",
     }
 
@@ -1940,6 +1943,38 @@ def sanitize_anilist_description(text):
     return clean.strip()
 
 
+def jikan_episode_count(mal_id):
+    """Fetch episode count from Jikan (MyAnimeList) as fallback."""
+    if not mal_id:
+        return None
+    cache_key = f"jikan_epcount_{mal_id}"
+    cached = cache.get(cache_key)
+    if cached is not None:
+        return cached
+
+    try:
+        resp = requests.get(
+            f"https://api.jikan.moe/v4/anime/{mal_id}",
+            timeout=10,
+        )
+        if resp.status_code == 429:
+            time.sleep(1)
+            resp = requests.get(
+                f"https://api.jikan.moe/v4/anime/{mal_id}",
+                timeout=10,
+            )
+        data = resp.json().get("data", {})
+        count = data.get("episodes")
+        if count:
+            cache.set(cache_key, count, 86400)
+            return count
+    except requests.RequestException:
+        pass
+
+    cache.set(cache_key, 0, 3600)
+    return None
+
+
 # ================================================================
 # ANIZU VIEWS
 # ================================================================
@@ -1995,6 +2030,86 @@ def aniuzu_detail(request, anilist_id):
     ctx["description"] = sanitize_anilist_description(ctx["description"])
 
     return render(request, "uzzutv/aniuzu_detail.html", ctx)
+
+
+def aniuzu_watch(request, anilist_id, episode):
+    """Aniuzu anime watch page with AniLink/TryEmbed player."""
+    ctx = anilist_anime_detail(anilist_id)
+    if ctx is None:
+        return render(request, "uzzutv/aniuzu_404.html", status=404)
+
+    episode = max(1, _safe_int(episode, 1))
+    total_episodes = 1
+    if ctx.get("anime") and ctx["anime"].get("episodes"):
+        total_episodes = max(1, ctx["anime"]["episodes"])
+
+    if total_episodes <= 1 and ctx.get("id_mal"):
+        jikan_eps = jikan_episode_count(ctx["id_mal"])
+        if jikan_eps and jikan_eps > 0:
+            total_episodes = jikan_eps
+
+    streaming_eps_raw = (ctx.get("anime") or {}).get("streamingEpisodes") or []
+
+    streaming_eps = []
+    for ep in streaming_eps_raw:
+        streaming_eps.append({
+            "title": ep.get("title", ""),
+            "thumbnail": ep.get("thumbnail", ""),
+            "site": ep.get("site", ""),
+        })
+
+    if total_episodes <= 1 and streaming_eps:
+        total_episodes = len(streaming_eps)
+
+    episode = min(episode, total_episodes)
+
+    variant = request.GET.get("variant", "sub").lower()
+    if variant not in ("sub", "dub"):
+        variant = "sub"
+
+    source = request.GET.get("source", "anilink").lower()
+    if source not in ("anilink", "tryembed"):
+        source = "anilink"
+
+    episodes_list = []
+    if streaming_eps and total_episodes == len(streaming_eps):
+        for i, se in enumerate(streaming_eps, 1):
+            episodes_list.append({
+                "number": i,
+                "title": se.get("title", ""),
+                "thumbnail": se.get("thumbnail", ""),
+            })
+    else:
+        for i in range(1, total_episodes + 1):
+            ep_entry = {"number": i, "title": "", "thumbnail": ""}
+            for se in streaming_eps:
+                try:
+                    import re
+                    nums = re.findall(r'\d+', se.get("title", ""))
+                    if nums and int(nums[-1]) == i:
+                        ep_entry["title"] = se.get("title", "")
+                        ep_entry["thumbnail"] = se.get("thumbnail", "")
+                        break
+                except (ValueError, IndexError):
+                    pass
+            episodes_list.append(ep_entry)
+
+    ctx.update({
+        "anilist_id": anilist_id,
+        "current_episode": episode,
+        "total_episodes": total_episodes,
+        "variant": variant,
+        "source": source,
+        "episodes_list": episodes_list,
+        "title": ctx.get("title") or ctx.get("romaji") or "",
+    })
+
+    return render(request, "uzzutv/aniuzu_watch.html", ctx)
+
+
+def aniuzu_watchlist(request):
+    """Aniuzu anime watchlist page."""
+    return render(request, "uzzutv/aniuzu_watchlist.html")
 
 
 def aniuzu_search(request):
