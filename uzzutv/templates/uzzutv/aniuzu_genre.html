@@ -16,14 +16,16 @@
 {% block body %}
 <h1 class="visually-hidden">{{ genre }} Anime - Aniuzu</h1>
 
-<div class="az-content-section" style="max-width:1200px;margin:0 auto;padding:32px 16px;">
+<div class="az-page-container">
 
-<h2 style="font-family:'Anton',sans-serif;font-size:1.8rem;color:#fff;text-align:center;margin-bottom:20px;letter-spacing:.5px;text-transform:uppercase;">{{ genre }} Anime</h2>
+<div class="az-breadcrumb"><a href="{% url 'aniuzu' %}">Home</a><span class="az-bc-sep">/</span><a href="{% url 'aniuzu_genre_list' %}">Genres</a><span class="az-bc-sep">/</span><span>{{ genre }}</span></div>
+
+<h2 class="az-page-title">{{ genre }} Anime</h2>
 
 {% if genres %}
 <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-bottom:32px;">
 {% for g in genres %}
-<a href="{% url 'aniuzu_genre' g %}" style="display:inline-block;padding:6px 14px;border-radius:16px;font-size:12px;font-weight:600;text-decoration:none;transition:all .2s;letter-spacing:.2px;{% if g == genre %}background:#ff3c3c;color:#fff;{% else %}background:#1a1a1a;color:#9ca3af;border:1px solid #333;{% endif %}">{{ g }}</a>
+<a href="{% url 'aniuzu_genre' g %}" class="az-chip{% if g == genre %} active{% endif %}">{{ g }}</a>
 {% endfor %}
 </div>
 {% endif %}
@@ -32,19 +34,7 @@
 
 <div class="az-search-grid">
 {% for anime in items %}
-<div class="az-card">
-<a class="card-link" href="{% url 'aniuzu_detail' anime.id %}">
-<div class="card-poster">
-<img loading="lazy" decoding="async" alt="{{ anime.title.english|default:anime.title.romaji }} poster" {% if anime.coverImage.large %}src="{{ anime.coverImage.large }}"{% else %}src="{% static 'uzzutv/images/logo.png' %}"{% endif %}>
-<span class="card-gradient"></span>
-{% if anime.averageScore %}<span class="card-rating">&#9733; {{ anime.averageScore }}</span>{% endif %}
-</div>
-</a>
-<div class="card-info">
-<div class="card-title">{{ anime.title.english|default:anime.title.romaji|truncatewords:4 }}</div>
-<div class="card-meta">{% if anime.format %}{{ anime.format }}{% endif %}{% if anime.episodes %} &bull; {{ anime.episodes }} ep{% endif %}{% if anime.seasonYear %} &bull; {{ anime.seasonYear }}{% endif %}</div>
-</div>
-</div>
+{% include 'uzzutv/_aniuzu_card.html' %}
 {% endfor %}
 </div>
 
@@ -70,8 +60,8 @@
 
 {% else %}
 
-<div style="text-align:center;padding:60px 20px;">
-<p style="color:#6b7280;font-size:15px;">No anime found for this genre.</p>
+<div class="az-empty">
+<p>No anime found for this genre.</p>
 </div>
 
 {% endif %}

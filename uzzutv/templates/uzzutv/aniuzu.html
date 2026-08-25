@@ -33,7 +33,7 @@
 {% for item in hero|slice:":10" %}
 {% if item.bannerImage %}
 <div class="az-hero-slide">
-<img class="az-hero-bg" alt="" fetchpriority="high" src="{{ item.bannerImage }}">
+<img class="az-hero-bg" alt="" {% if forloop.first %}fetchpriority="high" src="{{ item.bannerImage }}"{% else %}loading="lazy" decoding="async" src="{{ item.bannerImage }}"{% endif %}>
 <div class="az-hero-content">
 <h2 class="az-hero-title">{{ item.title.english|default:item.title.romaji|truncatewords:4 }}</h2>
 <div class="az-hero-meta">
@@ -61,6 +61,19 @@
 </div>
 {% endif %}
 
+<div id="continue-anime">
+<div class="az-content-section" id="continue-skeleton">
+<div class="az-slider-header">
+<h2 class="section-title">Continue Watching</h2>
+</div>
+<div class="az-row">
+{% for i in "123456" %}
+<div class="az-skeleton-card"><div class="az-skeleton-poster"></div><div class="az-skeleton-info"><div class="az-skeleton-line"></div><div class="az-skeleton-line"></div></div></div>
+{% endfor %}
+</div>
+</div>
+</div>
+
 {% if trending %}
 <div class="az-content-section">
 <div class="az-slider-header">
@@ -72,19 +85,7 @@
 </div>
 <div class="az-row" id="az-trending-slider">
 {% for anime in trending|slice:":12" %}
-<div class="az-card">
-<a class="card-link" href="{% url 'aniuzu_detail' anime.id %}">
-<div class="card-poster">
-<img loading="lazy" decoding="async" alt="{{ anime.title.english|default:anime.title.romaji }} poster" {% if anime.coverImage.large %}src="{{ anime.coverImage.large }}"{% else %}src="{% static 'uzzutv/images/logo.png' %}"{% endif %}>
-<span class="card-gradient"></span>
-{% if anime.averageScore %}<span class="card-rating">&#9733; {{ anime.averageScore }}</span>{% endif %}
-</div>
-</a>
-<div class="card-info">
-<div class="card-title">{{ anime.title.english|default:anime.title.romaji|truncatewords:4 }}</div>
-<div class="card-meta">{% if anime.format %}{{ anime.format }}{% endif %}{% if anime.episodes %} &bull; {{ anime.episodes }} ep{% endif %}{% if anime.seasonYear %} &bull; {{ anime.seasonYear }}{% endif %}</div>
-</div>
-</div>
+{% include 'uzzutv/_aniuzu_card.html' %}
 {% endfor %}
 </div>
 </div>
@@ -101,19 +102,7 @@
 </div>
 <div class="az-row" id="az-popular-slider">
 {% for anime in popular|slice:":12" %}
-<div class="az-card">
-<a class="card-link" href="{% url 'aniuzu_detail' anime.id %}">
-<div class="card-poster">
-<img loading="lazy" decoding="async" alt="{{ anime.title.english|default:anime.title.romaji }} poster" {% if anime.coverImage.large %}src="{{ anime.coverImage.large }}"{% else %}src="{% static 'uzzutv/images/logo.png' %}"{% endif %}>
-<span class="card-gradient"></span>
-{% if anime.averageScore %}<span class="card-rating">&#9733; {{ anime.averageScore }}</span>{% endif %}
-</div>
-</a>
-<div class="card-info">
-<div class="card-title">{{ anime.title.english|default:anime.title.romaji|truncatewords:4 }}</div>
-<div class="card-meta">{% if anime.format %}{{ anime.format }}{% endif %}{% if anime.episodes %} &bull; {{ anime.episodes }} ep{% endif %}{% if anime.seasonYear %} &bull; {{ anime.seasonYear }}{% endif %}</div>
-</div>
-</div>
+{% include 'uzzutv/_aniuzu_card.html' %}
 {% endfor %}
 </div>
 </div>
@@ -130,25 +119,21 @@
 </div>
 <div class="az-row" id="az-airing-slider">
 {% for anime in airing|slice:":12" %}
-<div class="az-card">
-<a class="card-link" href="{% url 'aniuzu_detail' anime.id %}">
-<div class="card-poster">
-<img loading="lazy" decoding="async" alt="{{ anime.title.english|default:anime.title.romaji }} poster" {% if anime.coverImage.large %}src="{{ anime.coverImage.large }}"{% else %}src="{% static 'uzzutv/images/logo.png' %}"{% endif %}>
-<span class="card-gradient"></span>
-{% if anime.averageScore %}<span class="card-rating">&#9733; {{ anime.averageScore }}</span>{% endif %}
-</div>
-</a>
-<div class="card-info">
-<div class="card-title">{{ anime.title.english|default:anime.title.romaji|truncatewords:4 }}</div>
-<div class="card-meta">{% if anime.format %}{{ anime.format }}{% endif %}{% if anime.episodes %} &bull; {{ anime.episodes }} ep{% endif %}{% if anime.seasonYear %} &bull; {{ anime.seasonYear }}{% endif %}</div>
-</div>
-</div>
+{% include 'uzzutv/_aniuzu_card.html' %}
 {% endfor %}
 </div>
 </div>
 {% endif %}
 
 {% if seasonal %}
+<div class="az-season-banner">
+<span class="material-icons">local_fire_department</span>
+<div class="az-season-banner-text">
+<h3>Popular This Season</h3>
+<p>Discover what's trending right now</p>
+</div>
+<a href="{% url 'aniuzu_seasons' %}?season={{ current_season }}&year={{ current_year }}">Browse All</a>
+</div>
 <div class="az-content-section">
 <div class="az-slider-header">
 <h2 class="section-title">Popular This Season</h2>
@@ -159,19 +144,7 @@
 </div>
 <div class="az-row" id="az-season-slider">
 {% for anime in seasonal|slice:":12" %}
-<div class="az-card">
-<a class="card-link" href="{% url 'aniuzu_detail' anime.id %}">
-<div class="card-poster">
-<img loading="lazy" decoding="async" alt="{{ anime.title.english|default:anime.title.romaji }} poster" {% if anime.coverImage.large %}src="{{ anime.coverImage.large }}"{% else %}src="{% static 'uzzutv/images/logo.png' %}"{% endif %}>
-<span class="card-gradient"></span>
-{% if anime.averageScore %}<span class="card-rating">&#9733; {{ anime.averageScore }}</span>{% endif %}
-</div>
-</a>
-<div class="card-info">
-<div class="card-title">{{ anime.title.english|default:anime.title.romaji|truncatewords:4 }}</div>
-<div class="card-meta">{% if anime.format %}{{ anime.format }}{% endif %}{% if anime.episodes %} &bull; {{ anime.episodes }} ep{% endif %}{% if anime.seasonYear %} &bull; {{ anime.seasonYear }}{% endif %}</div>
-</div>
-</div>
+{% include 'uzzutv/_aniuzu_card.html' %}
 {% endfor %}
 </div>
 </div>
@@ -188,19 +161,24 @@
 </div>
 <div class="az-row" id="az-top-slider">
 {% for anime in top_rated|slice:":12" %}
-<div class="az-card">
-<a class="card-link" href="{% url 'aniuzu_detail' anime.id %}">
-<div class="card-poster">
-<img loading="lazy" decoding="async" alt="{{ anime.title.english|default:anime.title.romaji }} poster" {% if anime.coverImage.large %}src="{{ anime.coverImage.large }}"{% else %}src="{% static 'uzzutv/images/logo.png' %}"{% endif %}>
-<span class="card-gradient"></span>
-{% if anime.averageScore %}<span class="card-rating">&#9733; {{ anime.averageScore }}</span>{% endif %}
-</div>
-</a>
-<div class="card-info">
-<div class="card-title">{{ anime.title.english|default:anime.title.romaji|truncatewords:4 }}</div>
-<div class="card-meta">{% if anime.format %}{{ anime.format }}{% endif %}{% if anime.episodes %} &bull; {{ anime.episodes }} ep{% endif %}{% if anime.seasonYear %} &bull; {{ anime.seasonYear }}{% endif %}</div>
+{% include 'uzzutv/_aniuzu_card.html' %}
+{% endfor %}
 </div>
 </div>
+{% endif %}
+
+{% if upcoming %}
+<div class="az-content-section">
+<div class="az-slider-header">
+<h2 class="section-title">Upcoming Anime</h2>
+<div class="az-slider-controls">
+<button onclick="azSlideLeft('az-upcoming-slider')"><span class="material-icons">chevron_left</span></button>
+<button onclick="azSlideRight('az-upcoming-slider')"><span class="material-icons">chevron_right</span></button>
+</div>
+</div>
+<div class="az-row" id="az-upcoming-slider">
+{% for anime in upcoming|slice:":12" %}
+{% include 'uzzutv/_aniuzu_card.html' %}
 {% endfor %}
 </div>
 </div>
@@ -209,8 +187,13 @@
 <script>
 window.addEventListener("DOMContentLoaded",function(){
 azBuildHeroDots();
+renderContinueAnime("continue-anime");
 var l=document.getElementById("az-loader");
 if(l){l.classList.add("fade-out");setTimeout(function(){l.style.display="none"},1000);}
+});
+document.addEventListener("keydown",function(e){
+if(e.key==="ArrowLeft"){azHeroMove(-1)}
+else if(e.key==="ArrowRight"){azHeroMove(1)}
 });
 function azBuildHeroDots(){
 var c=document.getElementById("az-hero-dots");
@@ -254,5 +237,36 @@ azWrapper.addEventListener("mouseleave",function(){azTimer=setInterval(azShowSli
 }
 function azSlideLeft(id){var s=document.getElementById(id);if(s)s.scrollBy({left:-600,behavior:"smooth"})}
 function azSlideRight(id){var s=document.getElementById(id);if(s)s.scrollBy({left:600,behavior:"smooth"})}
+</script>
+<script>
+async function removeContinueAnime(id){
+var user=await getCurrentUser();
+if(!user)return;
+var{error}=await supabaseClient.from("continue_watching").delete().eq("user_id",user.id).eq("media_id",Number(id)).eq("media_type","anime");
+if(error){console.error("Error removing anime:",error);return;}
+renderContinueAnime("continue-anime");
+}
+
+async function renderContinueAnime(containerId){
+var container=document.getElementById(containerId);
+if(!container)return;
+var skel=document.getElementById("continue-skeleton");
+var list=await getAllContinue();
+var animeList=list.filter(function(item){return item.media_type==="anime"});
+if(animeList.length===0){if(skel)skel.style.display="none";container.innerHTML="";return;}
+if(skel)skel.style.display="none";
+var cardsHtml=animeList.map(function(item){
+return '<div class="az-card" style="position:relative;">' +
+'<button onclick="removeContinueAnime('+item.media_id+')" style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.7);border:none;color:white;width:28px;height:28px;border-radius:50%;cursor:pointer;z-index:10;font-size:14px;line-height:28px;text-align:center;">&#10005;</button>' +
+'<a class="card-link" href="/aniuzu/anime/'+item.media_id+'/">' +
+'<div class="card-poster">' +
+'<img loading="lazy" decoding="async" src="'+item.poster+'">' +
+'<span class="card-gradient"></span>' +
+'</div></a>' +
+'<div class="card-info"><div class="card-title" style="font-size:12px;">Recently Viewed</div></div>' +
+'</div>';
+}).join("");
+container.innerHTML='<div class="az-content-section"><div class="az-slider-header"><h2 class="section-title">Continue Watching</h2><div class="az-slider-controls"><button onclick="azSlideLeft(\'az-continue-slider\')"><span class="material-icons">chevron_left</span></button><button onclick="azSlideRight(\'az-continue-slider\')"><span class="material-icons">chevron_right</span></button></div></div><div class="az-row" id="az-continue-slider">'+cardsHtml+'</div></div>';
+}
 </script>
 {% endblock %}

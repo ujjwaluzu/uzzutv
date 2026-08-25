@@ -1,16 +1,16 @@
 from django.shortcuts import render
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, Http404
 from django.core.cache import cache
+from concurrent.futures import ThreadPoolExecutor
 import requests
 import os
+import datetime
+import time
 from dotenv import load_dotenv
 
 load_dotenv()
 API_KEY = os.getenv("TMDB_KEY")
 BASE_URL = "https://api.themoviedb.org/3"
-
-from django.shortcuts import render, redirect
-from django.http import Http404
 
 def auth(request):
     return render(request, "uzzutv/auth.html")
@@ -999,7 +999,7 @@ def category(request, slug):
         raise Http404("Category not found")
 
     try:
-        page = max(1, int(request.GET.get("page", 1)))
+        page = max(1, _safe_int(request.GET.get("page"), 1))
     except (TypeError, ValueError):
         page = 1
 
@@ -1018,13 +1018,7 @@ def category(request, slug):
     else:
         data = load_category_page(slug, page)
 
-    pages = []
-    total = data["total_pages"]
-    for p in range(1, total + 1):
-        if p == 1 or p == total or abs(p - page) <= 2:
-            if pages and pages[-1] != "..." and p - 1 != pages[-1]:
-                pages.append("...")
-            pages.append(p)
+    pages = build_page_numbers(page, data["total_pages"])
 
     return render(request, "uzzutv/category.html", {
         "slug": slug,
@@ -1155,6 +1149,14 @@ def sitemap_xml(request):
             {"loc": f"{SITE_URL}/search/", "priority": "0.5"},
             {"loc": f"{SITE_URL}/terms/", "priority": "0.3"},
             {"loc": f"{SITE_URL}/dmca/", "priority": "0.3"},
+            {"loc": f"{SITE_URL}/aniuzu/", "priority": "0.9"},
+            {"loc": f"{SITE_URL}/aniuzu/top/", "priority": "0.8"},
+            {"loc": f"{SITE_URL}/aniuzu/seasons/", "priority": "0.8"},
+            {"loc": f"{SITE_URL}/aniuzu/studios/", "priority": "0.7"},
+            {"loc": f"{SITE_URL}/aniuzu/upcoming/", "priority": "0.7"},
+            {"loc": f"{SITE_URL}/aniuzu/collections/", "priority": "0.7"},
+            {"loc": f"{SITE_URL}/aniuzu/schedule/", "priority": "0.6"},
+            {"loc": f"{SITE_URL}/aniuzu/search/", "priority": "0.5"},
         ]
 
         seen = set()
@@ -1185,6 +1187,23 @@ def sitemap_xml(request):
         except Exception:
             pass
 
+        try:
+            for fetcher in [anilist_trending, anilist_popular, anilist_top_rated]:
+                items_list = fetcher()
+                if not items_list:
+                    continue
+                for item in items_list[:20]:
+                    item_id = item.get("id")
+                    if not item_id or item_id in seen:
+                        continue
+                    seen.add(item_id)
+                    urls.append({
+                        "loc": f"{SITE_URL}/aniuzu/anime/{item_id}/",
+                        "priority": "0.8",
+                    })
+        except Exception:
+            pass
+
         cache.set(cache_key, urls, 21600)
 
     items = "".join(
@@ -1203,25 +1222,85 @@ def sitemap_xml(request):
 
 
 # ================================================================
-# ANILOST API
+# ANILIST HELPERS
+# ================================================================
+
+
+def _safe_int(val, default=1):
+    try:
+        return int(val)
+    except (TypeError, ValueError):
+        return default
+
+
+def build_page_numbers(page, total_pages, window=2):
+    """Build pagination page list with ellipsis."""
+    pages = []
+    for p in range(1, total_pages + 1):
+        if p == 1 or p == total_pages or abs(p - page) <= window:
+            if pages and pages[-1] != "..." and p - 1 != pages[-1]:
+                pages.append("...")
+            pages.append(p)
+    return pages
+
+
+def _current_season():
+    """Return (season_name_lowercase, season_label, year)."""
+    now = datetime.date.today()
+    month = now.month
+    year = now.year
+    if month <= 3:
+        return "winter", f"Winter {year}", year
+    elif month <= 6:
+        return "spring", f"Spring {year}", year
+    elif month <= 9:
+        return "summer", f"Summer {year}", year
+    else:
+        return "fall", f"Fall {year}", year
+
+
+def _season_to_upper(season_lower):
+    """Convert lowercase season name to uppercase for AniList API."""
+    return {"winter": "WINTER", "spring": "SPRING", "summer": "SUMMER", "fall": "FALL"}.get(season_lower, "WINTER")
+
+
+# ================================================================
+# ANILIST API
 # ================================================================
 
 ANILIST_URL = "https://graphql.anilist.co"
 
+_anilist_session = None
 
-def anilist_query(query, variables=None):
-    """Execute a GraphQL query against the AniList API with caching."""
-    try:
-        resp = requests.post(
-            ANILIST_URL,
-            json={"query": query, "variables": variables or {}},
-            timeout=15,
-        )
-        if resp.status_code != 200:
-            return None
-        return resp.json().get("data")
-    except Exception:
-        return None
+
+def _get_anilist_session():
+    global _anilist_session
+    if _anilist_session is None:
+        _anilist_session = requests.Session()
+    return _anilist_session
+
+
+def anilist_query(query, variables=None, retries=2):
+    """Execute a GraphQL query against the AniList API with retry."""
+    session = _get_anilist_session()
+    for attempt in range(retries + 1):
+        try:
+            resp = session.post(
+                ANILIST_URL,
+                json={"query": query, "variables": variables or {}},
+                timeout=15,
+            )
+            if resp.status_code == 429:
+                time.sleep(1 * (attempt + 1))
+                continue
+            if resp.status_code != 200:
+                return None
+            return resp.json().get("data")
+        except requests.RequestException:
+            if attempt < retries:
+                time.sleep(0.5)
+            continue
+    return None
 
 
 # ----------------------------------------------------------------
@@ -1412,6 +1491,106 @@ query ($search: String, $page: Int, $perPage: Int) {
 
 """
 
+STUDIO_MEDIA_QUERY = """
+query ($id: Int, $page: Int, $perPage: Int) {
+  Studio(id: $id) {
+    name
+    media(page: $page, perPage: $perPage, sort: POPULARITY_DESC, isMain: true) {
+      nodes {
+        id
+        type
+        title { romaji english }
+        coverImage { large }
+        averageScore
+        format
+        episodes
+        seasonYear
+      }
+      pageInfo { total lastPage hasNextPage }
+    }
+  }
+}
+
+"""
+
+COLLECTION_MEDIA_QUERY = """
+query ($ids: [Int]) {
+  Page(page: 1, perPage: 25) {
+    media(id_in: $ids, type: ANIME) {
+      id
+      title { romaji english }
+      coverImage { large }
+      averageScore
+      format
+      episodes
+      seasonYear
+      popularity
+    }
+  }
+}
+
+"""
+
+ANIZU_COLLECTIONS = [
+    {
+        "slug": "best-isekai",
+        "title": "Best Isekai",
+        "description": "Top isekai anime that transport you to another world.",
+        "ids": [104598, 101922, 117599, 108684, 103767, 101164, 114173, 127238, 108775, 105879, 142070, 101167, 115825, 104361, 102834, 110237, 116498, 130060, 155527, 155058],
+    },
+    {
+        "slug": "classic-mecha",
+        "title": "Classic Mecha",
+        "description": "Iconic mecha anime that defined the genre.",
+        "ids": [30, 46, 80, 418, 420, 205, 2728, 436, 300, 1060, 390, 245, 642, 2060, 367, 964, 562, 564, 477, 1073],
+    },
+    {
+        "slug": "must-watch-shounen",
+        "title": "Must-Watch Shounen",
+        "description": "Essential shounen anime everyone should watch.",
+        "ids": [21, 1535, 117599, 101922, 104598, 20, 1735, 235, 5114, 9253, 108684, 108775, 101164, 108684, 117599, 813, 4360, 103767, 105879, 22319],
+    },
+    {
+        "slug": "best-anime-movies",
+        "title": "Best Anime Movies",
+        "description": "The greatest anime films of all time.",
+        "ids": [104598, 11061, 32281, 101164, 436, 5152, 199, 31706, 22319, 4897, 10020, 2123, 12037, 11341, 12177, 101898, 1278, 31706, 14510, 568],
+    },
+    {
+        "slug": "hidden-gems",
+        "title": "Hidden Gems",
+        "description": "Underrated anime you probably missed.",
+        "ids": [99163, 110237, 102834, 104361, 115825, 127238, 130060, 116498, 155527, 155058, 142070, 136556, 14510, 12355, 102182, 133903, 109872, 105341, 116347, 122544],
+    },
+    {
+        "slug": "top-rated-of-all-time",
+        "title": "Top Rated of All Time",
+        "description": "Highest rated anime series on AniList.",
+        "ids": [21, 1535, 104598, 101922, 9253, 20, 5114, 101164, 117599, 1735, 235, 108684, 108775, 103767, 105879, 22319, 813, 4360, 30, 46],
+    },
+]
+
+ANIZU_STUDIOS = [
+    {"name": "MAPPA", "slug": "mappa", "anilist_id": 569},
+    {"name": "Ufotable", "slug": "ufotable", "anilist_id": 43},
+    {"name": "Wit Studio", "slug": "wit-studio", "anilist_id": 858},
+    {"name": "Madhouse", "slug": "madhouse", "anilist_id": 11},
+    {"name": "Bones", "slug": "bones", "anilist_id": 4},
+    {"name": "A-1 Pictures", "slug": "a-1-pictures", "anilist_id": 561},
+    {"name": "Kyoto Animation", "slug": "kyoto-animation", "anilist_id": 2},
+    {"name": "Trigger", "slug": "trigger", "anilist_id": 803},
+    {"name": "CloverWorks", "slug": "cloverworks", "anilist_id": 6222},
+    {"name": "Shaft", "slug": "shaft", "anilist_id": 44},
+    {"name": "Production I.G", "slug": "production-ig", "anilist_id": 10},
+    {"name": "Sunrise", "slug": "sunrise", "anilist_id": 14},
+    {"name": "Pierrot", "slug": "pierrot", "anilist_id": 1},
+    {"name": "TMS Entertainment", "slug": "tms-entertainment", "anilist_id": 73},
+    {"name": "J.C.Staff", "slug": "j-c-staff", "anilist_id": 7},
+    {"name": "Science SARU", "slug": "science-saru", "anilist_id": 6145},
+    {"name": "NAZ", "slug": "naz", "anilist_id": 951},
+    {"name": "feel.", "slug": "feel", "anilist_id": 91},
+]
+
 
 # ----------------------------------------------------------------
 # DATA FETCHERS
@@ -1450,19 +1629,8 @@ def anilist_popular():
 
 
 def anilist_current_season():
-    import datetime
-    now = datetime.date.today()
-    month = now.month
-    if month <= 3:
-        season = "WINTER"
-    elif month <= 6:
-        season = "SPRING"
-    elif month <= 9:
-        season = "SUMMER"
-    else:
-        season = "FALL"
-
-    year = now.year
+    _, _, year = _current_season()
+    season = _season_to_upper(_current_season()[0])
 
     cache_key = f"anilist_season_{season}_{year}"
     data = cache.get(cache_key)
@@ -1512,6 +1680,68 @@ def anilist_top_rated():
     items = (data or {}).get("Page", {}).get("media", [])
     cache.set(cache_key, items, 21600)
     return items
+
+
+def anilist_upcoming():
+    cache_key = "anilist_upcoming"
+    data = cache.get(cache_key)
+    if data:
+        return data
+
+    data = anilist_query(ANIME_PAGE_QUERY, {
+        "page": 1, "perPage": 15,
+        "sort": ["POPULARITY_DESC"],
+        "status": "NOT_YET_RELEASED",
+        "type": "ANIME",
+    })
+    items = (data or {}).get("Page", {}).get("media", [])
+    cache.set(cache_key, items, 21600)
+    return items
+
+
+def anilist_studio(studio_name, page=1):
+    slug = studio_name.lower().replace(" ", "-")
+    cache_key = f"anilist_studio_{slug}_p{page}"
+    cached = cache.get(cache_key)
+    if cached:
+        return cached
+
+    studio_obj = None
+    for s in ANIZU_STUDIOS:
+        if s["slug"] == slug:
+            studio_obj = s
+            break
+    if not studio_obj:
+        return {"items": [], "total_pages": 1}
+
+    studio_id = studio_obj.get("anilist_id")
+    if not studio_id:
+        return {"items": [], "total_pages": 1}
+
+    data = anilist_query(STUDIO_MEDIA_QUERY, {
+        "id": studio_id,
+        "page": page,
+        "perPage": 24,
+    })
+    studio_data = (data or {}).get("Studio", {})
+    media_conn = studio_data.get("media", {})
+    items = media_conn.get("nodes", [])
+    total_pages = (media_conn.get("pageInfo") or {}).get("lastPage", 1)
+
+    result = {"items": items, "total_pages": total_pages}
+    cache.set(cache_key, result, 3600)
+    return result
+
+
+def _clean_trailer(trailer):
+    if not trailer:
+        return None
+    trailer["id"] = (trailer.get("id") or "").strip()
+    trailer["site"] = (trailer.get("site") or "").strip().lower()
+    trailer["thumbnail"] = (trailer.get("thumbnail") or "").strip()
+    if not trailer["id"] or not trailer["site"]:
+        return None
+    return trailer
 
 
 def anilist_anime_detail(anilist_id):
@@ -1609,6 +1839,7 @@ def anilist_anime_detail(anilist_id):
         "recommendations": recommendations,
         "characters": characters,
         "staff": staff_list,
+        "trailer": _clean_trailer(media.get("trailer")),
         "meta_desc": f"Watch {title} on UzzUTV Aniuzu. Explore details, genres and related anime.",
     }
 
@@ -1637,7 +1868,6 @@ def anilist_search(query, page=1):
 
 
 def anilist_schedule(start_ts, end_ts, page=1):
-    import datetime
     date_label = datetime.date.fromtimestamp(start_ts).isoformat()
     cache_key = f"anilist_schedule_{date_label}_p{page}"
     cached = cache.get(cache_key)
@@ -1699,7 +1929,7 @@ def anilist_by_genre(genre, page=1):
 
 
 # ================================================================
-# ANILOST HELPER — sanitize HTML descriptions
+# ANILIST HELPER — sanitize HTML descriptions
 # ================================================================
 
 def sanitize_anilist_description(text):
@@ -1716,13 +1946,29 @@ def sanitize_anilist_description(text):
 
 def aniuzu(request):
     """Main Aniuzu anime browsing page."""
-    trending = anilist_trending()
-    popular = anilist_popular()
-    airing = anilist_airing()
-    seasonal = anilist_current_season()
-    top_rated = anilist_top_rated()
+    fetchers = {
+        "trending": anilist_trending,
+        "popular": anilist_popular,
+        "airing": anilist_airing,
+        "seasonal": anilist_current_season,
+        "top_rated": anilist_top_rated,
+        "upcoming": anilist_upcoming,
+    }
+    results = {}
+    with ThreadPoolExecutor(max_workers=6) as executor:
+        for key, fn in fetchers.items():
+            results[key] = executor.submit(fn)
+
+    trending = results["trending"].result()
+    popular = results["popular"].result()
+    airing = results["airing"].result()
+    seasonal = results["seasonal"].result()
+    top_rated = results["top_rated"].result()
+    upcoming = results["upcoming"].result()
 
     hero = trending[:5] if trending else []
+
+    season, season_label, year = _current_season()
 
     return render(request, "uzzutv/aniuzu.html", {
         "hero": hero,
@@ -1731,6 +1977,10 @@ def aniuzu(request):
         "airing": airing,
         "seasonal": seasonal,
         "top_rated": top_rated,
+        "upcoming": upcoming,
+        "current_season": season,
+        "current_season_label": season_label,
+        "current_year": year,
     })
 
 
@@ -1738,7 +1988,7 @@ def aniuzu_detail(request, anilist_id):
     """Anime detail page."""
     ctx = anilist_anime_detail(anilist_id)
     if ctx is None:
-        raise Http404("Anime not found")
+        return render(request, "uzzutv/aniuzu_404.html", status=404)
 
     ctx["anilist_id"] = anilist_id
     ctx["meta_desc"] = sanitize_anilist_description(ctx["meta_desc"])
@@ -1750,7 +2000,7 @@ def aniuzu_detail(request, anilist_id):
 def aniuzu_search(request):
     """Aniuzu anime search."""
     query = request.GET.get("q", "").strip()
-    page = max(1, int(request.GET.get("page", 1)))
+    page = max(1, _safe_int(request.GET.get("page"), 1))
 
     items = []
     total_pages = 1
@@ -1760,12 +2010,7 @@ def aniuzu_search(request):
         items = result["items"]
         total_pages = result["total_pages"]
 
-    pages = []
-    for p in range(1, total_pages + 1):
-        if p == 1 or p == total_pages or abs(p - page) <= 2:
-            if pages and pages[-1] != "..." and p - 1 != pages[-1]:
-                pages.append("...")
-            pages.append(p)
+    pages = build_page_numbers(page, total_pages)
 
     return render(request, "uzzutv/aniuzu_search.html", {
         "query": query,
@@ -1778,8 +2023,6 @@ def aniuzu_search(request):
 
 def aniuzu_schedule(request):
     """Airing schedule page — shows anime airing this week."""
-    import datetime, calendar, time
-
     today = datetime.date.today()
     start_of_week = today - datetime.timedelta(days=today.weekday())
     end_of_week = start_of_week + datetime.timedelta(days=6)
@@ -1818,17 +2061,15 @@ def aniuzu_genre_list(request):
 
 def aniuzu_genre(request, genre):
     """Anime filtered by a specific genre with pagination."""
-    page = max(1, int(request.GET.get("page", 1)))
+    genre = genre.strip().title()
+    canonical = next((g for g in ANILIST_GENRES if g.lower() == genre.lower()), genre)
+    genre = canonical
+    page = max(1, _safe_int(request.GET.get("page"), 1))
     result = anilist_by_genre(genre, page)
     items = result["items"]
     total_pages = result["total_pages"]
 
-    pages = []
-    for p in range(1, total_pages + 1):
-        if p == 1 or p == total_pages or abs(p - page) <= 2:
-            if pages and pages[-1] != "..." and p - 1 != pages[-1]:
-                pages.append("...")
-            pages.append(p)
+    pages = build_page_numbers(page, total_pages)
 
     return render(request, "uzzutv/aniuzu_genre.html", {
         "genre": genre,
@@ -1837,4 +2078,188 @@ def aniuzu_genre(request, genre):
         "total_pages": total_pages,
         "pages": pages,
         "genres": ANILIST_GENRES,
+    })
+
+
+def aniuzu_top(request):
+    """Top anime browse page with sort toggles."""
+    sort_param = request.GET.get("sort", "score")
+    page = max(1, _safe_int(request.GET.get("page"), 1))
+
+    sort_map = {
+        "score": "SCORE_DESC",
+        "popular": "POPULARITY_DESC",
+        "trending": "TRENDING_DESC",
+    }
+    sort_value = sort_map.get(sort_param, "SCORE_DESC")
+
+    cache_key = f"anilist_top_{sort_param}_p{page}"
+    cached = cache.get(cache_key)
+    if cached:
+        items = cached["items"]
+        total_pages = cached["total_pages"]
+    else:
+        data = anilist_query(ANIME_PAGE_QUERY, {
+            "page": page, "perPage": 24,
+            "sort": [sort_value],
+            "type": "ANIME",
+        })
+        page_data = (data or {}).get("Page", {})
+        items = page_data.get("media", [])
+        total_pages = (page_data.get("pageInfo") or {}).get("lastPage", 1)
+        cache.set(cache_key, {"items": items, "total_pages": total_pages}, 3600)
+
+    pages = build_page_numbers(page, total_pages)
+
+    return render(request, "uzzutv/aniuzu_top.html", {
+        "items": items,
+        "sort": sort_param,
+        "page": page,
+        "total_pages": total_pages,
+        "pages": pages,
+    })
+
+
+def aniuzu_upcoming(request):
+    """Upcoming anime page — NOT_YET_RELEASED sorted by popularity."""
+    page = max(1, _safe_int(request.GET.get("page"), 1))
+
+    cache_key = f"anilist_upcoming_p{page}"
+    cached = cache.get(cache_key)
+    if cached:
+        items = cached["items"]
+        total_pages = cached["total_pages"]
+    else:
+        data = anilist_query(ANIME_PAGE_QUERY, {
+            "page": page, "perPage": 24,
+            "sort": ["POPULARITY_DESC"],
+            "status": "NOT_YET_RELEASED",
+            "type": "ANIME",
+        })
+        page_data = (data or {}).get("Page", {})
+        items = page_data.get("media", [])
+        total_pages = (page_data.get("pageInfo") or {}).get("lastPage", 1)
+        cache.set(cache_key, {"items": items, "total_pages": total_pages}, 3600)
+
+    pages = build_page_numbers(page, total_pages)
+
+    return render(request, "uzzutv/aniuzu_upcoming.html", {
+        "items": items,
+        "page": page,
+        "total_pages": total_pages,
+        "pages": pages,
+    })
+
+
+def aniuzu_seasons(request):
+    """Season browser — pick a season and year, see anime from that season."""
+    _, _, current_year = _current_season()
+    current_season = _season_to_upper(_current_season()[0])
+
+    season = request.GET.get("season", current_season).upper()
+    if season not in ("WINTER", "SPRING", "SUMMER", "FALL"):
+        season = current_season
+    year = max(2015, min(current_year, _safe_int(request.GET.get("year"), current_year)))
+    page = max(1, _safe_int(request.GET.get("page"), 1))
+
+    cache_key = f"anilist_season_{season}_{year}_p{page}"
+    cached = cache.get(cache_key)
+    if cached:
+        items = cached["items"]
+        total_pages = cached["total_pages"]
+    else:
+        data = anilist_query(ANIME_PAGE_QUERY, {
+            "page": page, "perPage": 24,
+            "sort": ["SCORE_DESC"],
+            "season": season,
+            "seasonYear": year,
+            "type": "ANIME",
+        })
+        page_data = (data or {}).get("Page", {})
+        items = page_data.get("media", [])
+        total_pages = (page_data.get("pageInfo") or {}).get("lastPage", 1)
+        cache.set(cache_key, {"items": items, "total_pages": total_pages}, 3600)
+
+    pages = build_page_numbers(page, total_pages)
+
+    seasons_list = ["WINTER", "SPRING", "SUMMER", "FALL"]
+    years_list = list(range(current_year, 2014, -1))
+
+    return render(request, "uzzutv/aniuzu_seasons.html", {
+        "items": items,
+        "season": season,
+        "year": year,
+        "page": page,
+        "total_pages": total_pages,
+        "pages": pages,
+        "seasons_list": seasons_list,
+        "years_list": years_list,
+    })
+
+
+def aniuzu_studios(request):
+    """Studios hub page — curated grid of popular anime studios."""
+    return render(request, "uzzutv/aniuzu_studios.html", {
+        "studios": ANIZU_STUDIOS,
+    })
+
+
+def aniuzu_studio(request, studio_name):
+    """Studio detail page — anime by a specific studio."""
+    slug = studio_name.lower().replace(" ", "-")
+    studio_obj = None
+    for s in ANIZU_STUDIOS:
+        if s["slug"] == slug:
+            studio_obj = s
+            break
+    if not studio_obj:
+        raise Http404("Studio not found")
+
+    page = max(1, _safe_int(request.GET.get("page"), 1))
+    result = anilist_studio(studio_obj["name"], page)
+    items = result["items"]
+    total_pages = result["total_pages"]
+
+    pages = build_page_numbers(page, total_pages)
+
+    return render(request, "uzzutv/aniuzu_studio.html", {
+        "items": items,
+        "studio_name": studio_obj["name"],
+        "studio_slug": studio_obj["slug"],
+        "page": page,
+        "total_pages": total_pages,
+        "pages": pages,
+        "studios": ANIZU_STUDIOS,
+    })
+
+
+def aniuzu_collections(request):
+    """Curated collections hub page."""
+    return render(request, "uzzutv/aniuzu_collections.html", {
+        "collections": ANIZU_COLLECTIONS,
+    })
+
+
+def aniuzu_collection(request, slug):
+    """Single curated collection — resolves AniList IDs to anime data."""
+    collection = None
+    for c in ANIZU_COLLECTIONS:
+        if c["slug"] == slug:
+            collection = c
+            break
+    if not collection:
+        raise Http404("Collection not found")
+
+    cache_key = f"anilist_collection_{slug}"
+    cached = cache.get(cache_key)
+    if cached:
+        items = cached
+    else:
+        data = anilist_query(COLLECTION_MEDIA_QUERY, {"ids": collection["ids"]})
+        items = (data or {}).get("Page", {}).get("media", [])
+        cache.set(cache_key, items, 21600)
+
+    return render(request, "uzzutv/aniuzu_collection.html", {
+        "collection": collection,
+        "items": items,
     })

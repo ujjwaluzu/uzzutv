@@ -13,10 +13,14 @@
 {% block og_title %}Aniuzu - {{ title|default:romaji|default:"Anime" }}{% endblock %}
 {% block og_description %}{{ description|striptags|truncatewords:40 }}{% endblock %}
 {% block og_url %}https://uzzutv.pythonanywhere.com/aniuzu/anime/{{ anilist_id }}/{% endblock %}
+{% block og_image %}{% if anime.coverImage.large %}{{ anime.coverImage.large }}{% else %}https://uzzutv.pythonanywhere.com/static/uzzutv/images/logo.png{% endif %}{% endblock %}
 
 {% block body %}
 
 {% if anime %}
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TVSeries","name":"{{ title|default:romaji }}","alternateName":"{{ romaji }}","description":"{{ description|striptags|truncatewords:60 }}","image":"{{ anime.coverImage.extraLarge|default:anime.coverImage.large }}","url":"https://uzzutv.pythonanywhere.com/aniuzu/anime/{{ anilist_id }}/","genre":{{ genres|safe }},"numberOfEpisodes":{{ anime.episodes|default:"null" }},"duration":{{ anime.duration|default:"null" }},"datePublished":"{{ anime.startDate.year|default:'' }}{% if anime.startDate.month %}-{{ anime.startDate.month|stringformat:'02d' }}{% endif %}{% if anime.startDate.day %}-{{ anime.startDate.day|stringformat:'02d' }}{% endif %}","aggregateRating":{% if score_raw %}{"@type":"AggregateRating","ratingValue":{{ score_raw }},"bestRating":100,"ratingCount":{{ anime.popularity|default:1 }}}{% else %}null{% endif %},"productionCompany":{% if studios %}[{% for s in studios %}{"@type":"Organization","name":"{{ s }}"}{% if not forloop.last %},{% endif %}{% endfor %}]{% else %}null{% endif %}}
+</script>
 <section class="az-detail-hero">
 <div class="az-dhero-bg" style="background-image:url('{{ anime.bannerImage }}');background-size:cover;background-position:center;"></div>
 <div class="az-dhero-layout">
@@ -28,7 +32,7 @@
 {% if romaji and title != romaji %}<p class="az-dhero-alt">{{ romaji }}</p>{% endif %}
 {% if native %}<p class="az-dhero-alt" style="font-size:13px;color:#6b7280;">{{ native }}</p>{% endif %}
 <div class="az-dhero-meta">
-{% if score_str %}<span class="az-hero-rating">&#9733; {{ score_str }}</span>{% endif %}
+{% if score_str %}<span class="az-hero-rating" data-score="{{ score_raw }}">&#9733; {{ score_str }}</span>{% endif %}
 {% if anime.format %}<span class="az-hero-type">{{ anime.format }}</span>{% endif %}
 {% if anime.episodes %}<span class="az-meta-item">{{ anime.episodes }} Episodes</span>{% endif %}
 {% if anime.duration %}<span class="az-meta-item">&bull; {{ anime.duration }} min/ep</span>{% endif %}
@@ -37,7 +41,7 @@
 </div>
 {% if genres %}
 <div class="az-dhero-genres">
-{% for g in genres %}<span>{{ g }}</span>{% endfor %}
+{% for g in genres %}<a href="{% url 'aniuzu_genre' g %}">{{ g }}</a>{% endfor %}
 </div>
 {% endif %}
 {% if description %}
@@ -58,6 +62,15 @@
 <h2 class="section-title">Synopsis</h2>
 <div class="az-desc-text collapsed" id="az-desc-text">{{ description|striptags }}</div>
 <button class="az-desc-toggle" id="az-desc-toggle" onclick="azToggleDesc()">Show More <span class="material-icons" style="font-size:18px;">expand_more</span></button>
+</div>
+{% endif %}
+
+{% if trailer and trailer.site == "youtube" %}
+<div class="az-desc">
+<h2 class="section-title">Trailer</h2>
+<div class="az-trailer">
+<iframe src="https://www.youtube.com/embed/{{ trailer.id }}" frameborder="0" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+</div>
 </div>
 {% endif %}
 
@@ -179,5 +192,9 @@ document.addEventListener("DOMContentLoaded",function(){
 updateWatchlistButton(wlBtn.dataset.id,wlBtn.dataset.type,wlBtn);
 });
 }
+document.addEventListener("DOMContentLoaded",function(){
+if(typeof saveContinue==="function"){saveContinue('{{ anilist_id }}','anime','{{ anime.coverImage.large }}');}
+document.querySelectorAll(".az-hero-rating[data-score]").forEach(function(el){var s=parseInt(el.getAttribute("data-score"));if(s>=80)el.classList.add("score-high");else if(s>=60)el.classList.add("score-mid");else el.classList.add("score-low")});
+});
 </script>
 {% endblock %}

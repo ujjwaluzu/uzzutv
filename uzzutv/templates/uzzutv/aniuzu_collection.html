@@ -1,0 +1,46 @@
+{% extends 'uzzutv/layout.html' %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'uzzutv/home.css' %}">
+<link rel="stylesheet" href="{% static 'uzzutv/aniuzu.css' %}">
+{% endblock %}
+
+{% block title %}{{ collection.title }} - Aniuzu{% endblock %}
+{% block meta_description %}{{ collection.description }} Browse this curated collection on Aniuzu.{% endblock %}
+{% block canonical %}<link rel="canonical" href="https://uzzutv.pythonanywhere.com/aniuzu/collections/{{ collection.slug }}/">{% endblock %}
+{% block og_url %}https://uzzutv.pythonanywhere.com/aniuzu/collections/{{ collection.slug }}/{% endblock %}
+{% block og_title %}{{ collection.title }} - Aniuzu{% endblock %}
+{% block og_description %}{{ collection.description }}{% endblock %}
+
+{% block body %}
+<h1 class="visually-hidden">{{ collection.title }} - Aniuzu</h1>
+
+<div class="az-page-container">
+
+<div class="az-breadcrumb"><a href="{% url 'aniuzu' %}">Home</a><span class="az-bc-sep">/</span><a href="{% url 'aniuzu_collections' %}">Collections</a><span class="az-bc-sep">/</span><span>{{ collection.title }}</span></div>
+
+<div style="text-align:center;margin-bottom:32px;">
+<a href="{% url 'aniuzu_collections' %}" style="display:inline-flex;align-items:center;gap:6px;color:#9ca3af;font-size:13px;text-decoration:none;margin-bottom:12px;transition:color .2s;"><span class="material-icons" style="font-size:16px;">arrow_back</span> All Collections</a>
+<h2 style="font-family:'Anton',sans-serif;font-size:1.8rem;color:#fff;margin-bottom:8px;letter-spacing:.5px;text-transform:uppercase;">{{ collection.title }}</h2>
+<p style="color:#9ca3af;font-size:14px;margin:0;">{{ collection.description }}</p>
+</div>
+
+{% if items %}
+
+<div class="az-search-grid">
+{% for anime in items %}
+{% include 'uzzutv/_aniuzu_card.html' %}
+{% endfor %}
+</div>
+
+{% else %}
+
+<div class="az-empty">
+<p>No anime found for this collection.</p>
+</div>
+
+{% endif %}
+
+</div>
+{% endblock %}

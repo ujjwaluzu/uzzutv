@@ -1,0 +1,23 @@
+{% extends 'uzzutv/layout.html' %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'uzzutv/home.css' %}">
+<link rel="stylesheet" href="{% static 'uzzutv/aniuzu.css' %}">
+{% endblock %}
+
+{% block title %}Anime Not Found - Aniuzu{% endblock %}
+
+{% block body %}
+<h1 class="visually-hidden">Anime Not Found</h1>
+
+<div class="az-content-section" style="max-width:600px;margin:0 auto;padding:80px 16px;text-align:center;">
+<div style="font-size:72px;color:#ff3c3c;margin-bottom:20px;">&#128531;</div>
+<h2 style="font-family:'Anton',sans-serif;font-size:2rem;color:#fff;margin-bottom:12px;letter-spacing:.5px;text-transform:uppercase;">Anime Not Found</h2>
+<p style="color:#9ca3af;font-size:15px;margin:0 0 32px;line-height:1.6;">Sorry, the anime you're looking for doesn't exist or may have been removed.</p>
+<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:12px;">
+<a href="{% url 'aniuzu' %}" class="watch-btn"><span class="material-icons">home</span> Aniuzu Home</a>
+<a href="{% url 'aniuzu_search' %}" class="watch-btn" style="background:transparent;border:1px solid rgba(255,255,255,.2);"><span class="material-icons">search</span> Search Anime</a>
+</div>
+</div>
+{% endblock %}

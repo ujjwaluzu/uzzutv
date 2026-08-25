@@ -8,6 +8,7 @@
 
 {% block title %}Aniuzu Search{% if query %}: {{ query }}{% endif %}{% endblock %}
 {% block meta_description %}Search anime on Aniuzu and discover titles to watch.{% endblock %}
+{% block robots %}noindex, follow{% endblock %}
 {% block canonical %}<link rel="canonical" href="https://uzzutv.pythonanywhere.com/aniuzu/search/">{% endblock %}
 {% block og_url %}https://uzzutv.pythonanywhere.com/aniuzu/search/{% endblock %}
 
@@ -17,7 +18,9 @@
 
 <h1 class="visually-hidden">Search Anime - Aniuzu</h1>
 
-<h2 style="font-family:'Anton',sans-serif;font-size:1.8rem;color:#fff;text-align:center;margin-bottom:24px;letter-spacing:.5px;text-transform:uppercase;">Search Anime</h2>
+<div class="az-breadcrumb" style="margin-bottom:8px;"><a href="{% url 'aniuzu' %}">Home</a><span class="az-bc-sep">/</span><span>Search</span></div>
+
+<h2 class="az-page-title" style="margin-bottom:24px;">Search Anime</h2>
 
 <form class="az-search-form" method="get" action="{% url 'aniuzu_search' %}">
 <input type="text" name="q" placeholder="Search anime..." value="{{ query|default:'' }}" autocomplete="off">
@@ -32,19 +35,7 @@
 
 <div class="az-search-grid">
 {% for anime in items %}
-<div class="az-card">
-<a class="card-link" href="{% url 'aniuzu_detail' anime.id %}">
-<div class="card-poster">
-<img loading="lazy" decoding="async" alt="{{ anime.title.english|default:anime.title.romaji }} poster" {% if anime.coverImage.large %}src="{{ anime.coverImage.large }}"{% else %}src="{% static 'uzzutv/images/logo.png' %}"{% endif %}>
-<span class="card-gradient"></span>
-{% if anime.averageScore %}<span class="card-rating">&#9733; {{ anime.averageScore }}</span>{% endif %}
-</div>
-</a>
-<div class="card-info">
-<div class="card-title">{{ anime.title.english|default:anime.title.romaji|truncatewords:4 }}</div>
-<div class="card-meta">{% if anime.format %}{{ anime.format }}{% endif %}{% if anime.episodes %} &bull; {{ anime.episodes }} ep{% endif %}{% if anime.seasonYear %} &bull; {{ anime.seasonYear }}{% endif %}</div>
-</div>
-</div>
+{% include 'uzzutv/_aniuzu_card.html' %}
 {% endfor %}
 </div>
 

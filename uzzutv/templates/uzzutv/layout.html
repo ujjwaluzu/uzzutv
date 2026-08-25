@@ -589,6 +589,21 @@ body{
         <li class="nav-item">
           <a class="nav-link {% if request.resolver_match.url_name == 'aniuzu_genre_list' or request.resolver_match.url_name == 'aniuzu_genre' %}active{% endif %}" href="{% url 'aniuzu_genre_list'%}">Genres</a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.resolver_match.url_name == 'aniuzu_seasons' %}active{% endif %}" href="{% url 'aniuzu_seasons'%}">Seasons</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.resolver_match.url_name == 'aniuzu_studios' or request.resolver_match.url_name == 'aniuzu_studio' %}active{% endif %}" href="{% url 'aniuzu_studios'%}">Studios</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.resolver_match.url_name == 'aniuzu_top' %}active{% endif %}" href="{% url 'aniuzu_top'%}">Top</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.resolver_match.url_name == 'aniuzu_upcoming' %}active{% endif %}" href="{% url 'aniuzu_upcoming'%}">Upcoming</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.resolver_match.url_name == 'aniuzu_collections' or request.resolver_match.url_name == 'aniuzu_collection' %}active{% endif %}" href="{% url 'aniuzu_collections'%}">Collections</a>
+        </li>
       </ul>
       <form method="get" action="{% url 'aniuzu_search'%}" class="uzz-search az-search">
         <input class="uzz-search-input az-search-input" type="search" placeholder="Search anime..." aria-label="Search anime" name="q" value="{{ query|default:'' }}">
@@ -1798,6 +1813,42 @@ async function updateWatchlistButton(
         button.classList.remove("in-watchlist");
     }
 }
+document.addEventListener("DOMContentLoaded",function(){
+document.querySelectorAll(".card-rating").forEach(function(el){
+var m=el.textContent.match(/(\d+)/);
+if(m){var n=parseInt(m[1]);if(n>=80)el.classList.add("score-high");else if(n>=60)el.classList.add("score-mid");else el.classList.add("score-low")}
+});
+document.querySelectorAll(".az-hero-rating:not([data-score])").forEach(function(el){
+var m=el.textContent.match(/(\d+)/);
+if(m){var n=parseInt(m[1]);if(n>=80)el.classList.add("score-high");else if(n>=60)el.classList.add("score-mid");else el.classList.add("score-low")}
+});
+document.querySelectorAll(".az-card").forEach(function(card){
+var link=card.querySelector(".card-link");
+if(!link)return;
+var href=link.getAttribute("href")||"";
+var m=href.match(/\/anime\/(\d+)\//);
+if(!m)return;
+var id=m[1];
+var img=card.querySelector(".card-poster img");
+var title=card.querySelector(".card-title");
+var poster=img?img.src:"";
+var t=title?title.textContent.trim():"";
+var btn=document.createElement("button");
+btn.className="az-card-watchlist";
+btn.innerHTML="&#65291;";
+btn.setAttribute("data-id",id);
+btn.setAttribute("data-type","anime");
+btn.setAttribute("data-title",t);
+btn.setAttribute("data-poster",poster);
+btn.setAttribute("aria-label","Add to Watchlist");
+btn.addEventListener("click",function(e){e.preventDefault();e.stopPropagation();toggleWatchlist(id,"anime",t,poster,btn)});
+card.appendChild(btn);
+if(typeof isInWatchlist==="function"){isInWatchlist(id,"anime").then(function(exists){if(exists){btn.innerHTML="&#10003;";btn.classList.add("in-watchlist")}})}
+});
+var btt=document.getElementById("az-back-to-top");
+if(btt){window.addEventListener("scroll",function(){btt.classList.toggle("visible",window.scrollY>400)});btt.addEventListener("click",function(){window.scrollTo({top:0,behavior:"smooth"})})}
+});
 </script>
+<button id="az-back-to-top" class="az-back-to-top" aria-label="Back to top"><span class="material-icons">keyboard_arrow_up</span></button>
 </body>
 </html>
