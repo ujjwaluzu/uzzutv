@@ -7,7 +7,7 @@ var AZWProviders = {
         name: "AniLink",
         origin: "https://anilink.cc",
         buildUrl: function(anilistId, episode, variant, resumeTime) {
-            var url = "https://anilink.cc/watch/" + anilistId + "/" + episode + "?variant=" + variant;
+            var url = "https://anilink.cc/watch/" + anilistId + "/" + episode + "?variant=" + variant + "&autonext=true";
             if (resumeTime && resumeTime > 0) url += "&start=" + Math.floor(resumeTime);
             return url;
         }
@@ -53,6 +53,7 @@ document.addEventListener("DOMContentLoaded", function() {
     azwSetupMessageListener();
     azwSetupVariantButtons();
     azwSetupSourceButtons();
+    azwSetupIframeDetection();
 });
 
 function azwInitState() {
@@ -431,6 +432,14 @@ function azwHandleAniLinkMessage(data) {
                 azwSaveProgress(payload.position, payload.duration);
             }
             break;
+        case "episodechange":
+            if (typeof payload.episodeNumber === "number") {
+                azwNavigateToEpisode(payload.episodeNumber);
+            }
+            break;
+        case "autonext":
+            azwOnEpisodeEnded();
+            break;
         case "ended":
             azwOnEpisodeEnded();
             break;
@@ -447,6 +456,10 @@ function azwHandleTryEmbedMessage(data) {
 
     if (typeof evt.currentTime === "number" && typeof evt.duration === "number" && evt.duration > 0) {
         azwSaveProgress(evt.currentTime, evt.duration);
+    }
+
+    if (evt.event === "ended") {
+        azwOnEpisodeEnded();
     }
 
     if (evt.event === "error") {
@@ -477,12 +490,22 @@ function azwSaveProgress(position, duration) {
 }
 
 /* =========================================================
-   EPISODE ENDED
+   EPISODE ENDED / EPISODE CHANGE
    ========================================================= */
 
 function azwOnEpisodeEnded() {
     var nextEp = azwFindAdjacentEpisode(1);
-    if (nextEp) azwSwitchEpisode(nextEp);
+    if (nextEp) azwNavigateToEpisode(nextEp);
+}
+
+function azwNavigateToEpisode(epNum) {
+    if (!AZW) return;
+    var target = Math.max(1, Math.min(epNum, AZW.totalEpisodes));
+    if (target === AZW.currentEpisode) return;
+
+    var url = "/aniuzu/anime/" + AZW.anilistId + "/watch/" + target
+        + "/?variant=" + AZW.variant + "&source=" + AZW.source;
+    window.location.href = url;
 }
 
 /* =========================================================
@@ -524,4 +547,55 @@ function azwShowError(msg, failedSource) {
         if (targetBtn) azwSetSource(fallbackSource, targetBtn);
         overlay.remove();
     });
+}
+
+/* =========================================================
+   IFRAME NAVIGATION DETECTION
+   Detect when the iframe navigates to a new episode
+   (for TryEmbed which doesn't send episodechange events)
+   ========================================================= */
+
+var _azwLastIframeSrc = "";
+var _azwIframeLoadBusy = false;
+
+function azwSetupIframeDetection() {
+    var player = document.getElementById("azw-player");
+    if (!player) return;
+
+    _azwLastIframeSrc = player.src || "";
+
+    player.addEventListener("load", function() {
+        if (_azwIframeLoadBusy) return;
+
+        var currentSrc = player.src || "";
+
+        if (currentSrc && currentSrc !== _azwLastIframeSrc) {
+            _azwLastIframeSrc = currentSrc;
+
+            var epMatch = currentSrc.match(/\/(\d+)(?:\/|\?|$)/);
+            if (epMatch) {
+                var newEp = parseInt(epMatch[1], 10);
+                if (!isNaN(newEp) && newEp !== AZW.currentEpisode && newEp > 0) {
+                    _azwIframeLoadBusy = true;
+                    setTimeout(function() { _azwIframeLoadBusy = false; }, 3000);
+                    azwNavigateToEpisode(newEp);
+                }
+            }
+        }
+    });
+
+    if (typeof MutationObserver !== "undefined") {
+        var observer = new MutationObserver(function(mutations) {
+            for (var i = 0; i < mutations.length; i++) {
+                var mut = mutations[i];
+                if (mut.attributeName === "src") {
+                    var newSrc = player.src || "";
+                    if (newSrc && newSrc !== _azwLastIframeSrc) {
+                        _azwLastIframeSrc = newSrc;
+                    }
+                }
+            }
+        });
+        observer.observe(player, { attributes: true, attributeFilter: ["src"] });
+    }
 }
