@@ -4,7 +4,12 @@
 
 window.addEventListener("DOMContentLoaded",function(){
 azBuildHeroDots();
+updateAuthNavbar().then(function(){
 renderContinueAnime("continue-anime");
+}).catch(function(e){
+console.error("Auth navbar error:", e);
+renderContinueAnime("continue-anime");
+});
 var l=document.getElementById("az-loader");
 if(l){l.classList.add("fade-out");setTimeout(function(){l.style.display="none"},1000);}
 });
@@ -64,10 +69,6 @@ function azSlideRight(id){var s=document.getElementById(id);if(s)s.scrollBy({lef
    ANIME CONTINUE WATCHING
 ========================================================= */
 
-async function removeContinueAnime(id){
-    removeAniuzuContinue(id);
-}
-
 async function renderContinueAnime(containerId){
     renderAniuzuContinueHome(containerId);
 }
@@ -80,23 +81,23 @@ function azToggleDesc(){
 var t=document.getElementById("az-desc-text");
 var b=document.getElementById("az-desc-toggle");
 if(!t||!b)return;
-if(t.classList.contains("collapsed")){t.classList.remove("collapsed");b.innerHTML='Show Less <span class="material-icons" style="font-size:18px;">expand_less</span>';}
-else{t.classList.add("collapsed");b.innerHTML='Show More <span class="material-icons" style="font-size:18px;">expand_more</span>';}
+if(t.classList.contains("collapsed")){t.classList.remove("collapsed");b.innerHTML='Show Less <span class="material-icons" style="font-size:18px;">expand_less</span>';b.setAttribute("aria-expanded","true");}
+else{t.classList.add("collapsed");b.innerHTML='Show More <span class="material-icons" style="font-size:18px;">expand_more</span>';b.setAttribute("aria-expanded","false");}
 }
 
 /* =========================================================
    DETAIL PAGE WATCHLIST BUTTON
 ========================================================= */
 
+document.addEventListener("DOMContentLoaded",function(){
 var wlBtn=document.querySelector(".az-watchlist-btn");
 if(wlBtn){
 wlBtn.addEventListener("click",function(){
 toggleAniuzuWatchlist(wlBtn.dataset.id,wlBtn.dataset.title,wlBtn.dataset.poster,wlBtn);
 });
-document.addEventListener("DOMContentLoaded",function(){
-updateAniuzuWatchlistButton(wlBtn.dataset.id,wlBtn);
-});
+updateAniuzuWatchlistButton(wlBtn.dataset.id,wlBtn).catch(function(e){console.error("Watchlist button init error:",e);});
 }
+});
 
 /* =========================================================
    SCORE COLORING
@@ -134,8 +135,22 @@ btn.setAttribute("data-poster",poster);
 btn.setAttribute("aria-label","Add to Watchlist");
 btn.addEventListener("click",function(e){e.preventDefault();e.stopPropagation();toggleAniuzuWatchlist(id,t,poster,btn)});
 card.appendChild(btn);
-if(typeof isInAniuzuWatchlist==="function"){isInAniuzuWatchlist(id).then(function(exists){if(exists){btn.innerHTML="&#10003;";btn.classList.add("in-watchlist")}})}
+card._azWatchId=id;
+card._azWatchBtn=btn;
 });
+if(typeof getAniuzuWatchlistIds==="function"){
+var allIds=[];
+document.querySelectorAll(".az-card[data-id],.az-card").forEach(function(card){if(card._azWatchId)allIds.push(card._azWatchId)});
+if(allIds.length>0){
+getAniuzuWatchlistIds(allIds).then(function(inWatchlist){
+document.querySelectorAll(".az-card").forEach(function(card){
+var id=card._azWatchId;var btn=card._azWatchBtn;
+if(!id||!btn)return;
+if(inWatchlist[id]){btn.innerHTML="&#10003;";btn.classList.add("in-watchlist")}
+});
+});
+}
+}
 var btt=document.getElementById("az-back-to-top");
 if(btt){window.addEventListener("scroll",function(){btt.classList.toggle("visible",window.scrollY>400)});btt.addEventListener("click",function(){window.scrollTo({top:0,behavior:"smooth"})})}
 });

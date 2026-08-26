@@ -8,10 +8,10 @@
 
 {% block title %}UzzUTV - {{ category_title }} Movies & Series{% endblock %}
 {% block meta_description %}Explore {{ category_title }} movies and TV series on UzzUTV. Discover what to watch next and stream your favourites instantly.{% endblock %}
-{% block canonical %}<link rel="canonical" href="https://uzzutv.pythonanywhere.com/category/{{ slug }}/">{% endblock %}
+{% block canonical %}<link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}/category/{{ slug }}/">{% endblock %}
 {% block og_title %}UzzUTV - {{ category_title }} Movies & Series{% endblock %}
 {% block og_description %}Explore {{ category_title }} movies and TV series on UzzUTV. Discover what to watch next and stream your favourites instantly.{% endblock %}
-{% block og_url %}https://uzzutv.pythonanywhere.com/category/{{ slug }}/{% endblock %}
+{% block og_url %}{{ request.scheme }}://{{ request.get_host }}/category/{{ slug }}/{% endblock %}
 
 {% block body %}
 

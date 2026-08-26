@@ -8,8 +8,8 @@
 
 {% block title %}Aniuzu - Watch Anime Online{% endblock %}
 {% block meta_description %}Discover trending, popular and top-rated anime on Aniuzu. Browse currently airing series, popular this season, and more.{% endblock %}
-{% block canonical %}<link rel="canonical" href="https://uzzutv.pythonanywhere.com/aniuzu/">{% endblock %}
-{% block og_url %}https://uzzutv.pythonanywhere.com/aniuzu/{% endblock %}
+{% block canonical %}<link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}/aniuzu/">{% endblock %}
+{% block og_url %}{{ request.scheme }}://{{ request.get_host }}/aniuzu/{% endblock %}
 {% block og_title %}Aniuzu - Watch Anime Online{% endblock %}
 {% block og_description %}Discover trending, popular and top-rated anime on Aniuzu.{% endblock %}
 
@@ -75,8 +75,8 @@
 <div class="az-slider-header">
 <h2 class="section-title">Trending Anime</h2>
 <div class="az-slider-controls">
-<button onclick="azSlideLeft('az-trending-slider')"><span class="material-icons">chevron_left</span></button>
-<button onclick="azSlideRight('az-trending-slider')"><span class="material-icons">chevron_right</span></button>
+<button aria-label="Scroll left" onclick="azSlideLeft('az-trending-slider')"><span class="material-icons">chevron_left</span></button>
+<button aria-label="Scroll right" onclick="azSlideRight('az-trending-slider')"><span class="material-icons">chevron_right</span></button>
 </div>
 </div>
 <div class="az-row" id="az-trending-slider">
@@ -92,8 +92,8 @@
 <div class="az-slider-header">
 <h2 class="section-title">Popular Anime</h2>
 <div class="az-slider-controls">
-<button onclick="azSlideLeft('az-popular-slider')"><span class="material-icons">chevron_left</span></button>
-<button onclick="azSlideRight('az-popular-slider')"><span class="material-icons">chevron_right</span></button>
+<button aria-label="Scroll left" onclick="azSlideLeft('az-popular-slider')"><span class="material-icons">chevron_left</span></button>
+<button aria-label="Scroll right" onclick="azSlideRight('az-popular-slider')"><span class="material-icons">chevron_right</span></button>
 </div>
 </div>
 <div class="az-row" id="az-popular-slider">
@@ -109,8 +109,8 @@
 <div class="az-slider-header">
 <h2 class="section-title">Currently Airing</h2>
 <div class="az-slider-controls">
-<button onclick="azSlideLeft('az-airing-slider')"><span class="material-icons">chevron_left</span></button>
-<button onclick="azSlideRight('az-airing-slider')"><span class="material-icons">chevron_right</span></button>
+<button aria-label="Scroll left" onclick="azSlideLeft('az-airing-slider')"><span class="material-icons">chevron_left</span></button>
+<button aria-label="Scroll right" onclick="azSlideRight('az-airing-slider')"><span class="material-icons">chevron_right</span></button>
 </div>
 </div>
 <div class="az-row" id="az-airing-slider">
@@ -134,8 +134,8 @@
 <div class="az-slider-header">
 <h2 class="section-title">Popular This Season</h2>
 <div class="az-slider-controls">
-<button onclick="azSlideLeft('az-season-slider')"><span class="material-icons">chevron_left</span></button>
-<button onclick="azSlideRight('az-season-slider')"><span class="material-icons">chevron_right</span></button>
+<button aria-label="Scroll left" onclick="azSlideLeft('az-season-slider')"><span class="material-icons">chevron_left</span></button>
+<button aria-label="Scroll right" onclick="azSlideRight('az-season-slider')"><span class="material-icons">chevron_right</span></button>
 </div>
 </div>
 <div class="az-row" id="az-season-slider">
@@ -151,8 +151,8 @@
 <div class="az-slider-header">
 <h2 class="section-title">Top Rated Anime</h2>
 <div class="az-slider-controls">
-<button onclick="azSlideLeft('az-top-slider')"><span class="material-icons">chevron_left</span></button>
-<button onclick="azSlideRight('az-top-slider')"><span class="material-icons">chevron_right</span></button>
+<button aria-label="Scroll left" onclick="azSlideLeft('az-top-slider')"><span class="material-icons">chevron_left</span></button>
+<button aria-label="Scroll right" onclick="azSlideRight('az-top-slider')"><span class="material-icons">chevron_right</span></button>
 </div>
 </div>
 <div class="az-row" id="az-top-slider">
@@ -168,8 +168,8 @@
 <div class="az-slider-header">
 <h2 class="section-title">Upcoming Anime</h2>
 <div class="az-slider-controls">
-<button onclick="azSlideLeft('az-upcoming-slider')"><span class="material-icons">chevron_left</span></button>
-<button onclick="azSlideRight('az-upcoming-slider')"><span class="material-icons">chevron_right</span></button>
+<button aria-label="Scroll left" onclick="azSlideLeft('az-upcoming-slider')"><span class="material-icons">chevron_left</span></button>
+<button aria-label="Scroll right" onclick="azSlideRight('az-upcoming-slider')"><span class="material-icons">chevron_right</span></button>
 </div>
 </div>
 <div class="az-row" id="az-upcoming-slider">

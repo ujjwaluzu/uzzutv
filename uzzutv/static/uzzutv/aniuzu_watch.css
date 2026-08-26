@@ -164,6 +164,7 @@
     transition:background .2s, border-color .2s, color .2s, box-shadow .2s, transform .15s;
     cursor:pointer;
     user-select:none;
+    min-height:44px;
 }
 
 .azw-nav-btn:hover{
@@ -226,6 +227,7 @@
     cursor:pointer;
     transition:background .2s, border-color .2s, color .2s, box-shadow .2s, transform .15s;
     user-select:none;
+    min-height:44px;
 }
 
 .azw-btn:hover{
@@ -279,13 +281,14 @@
     background:#0f0f0f;
     border:1px solid rgba(255,255,255,.08);
     border-radius:8px;
-    padding:9px 12px;
+    padding:11px 12px;
     color:#ffffff;
     font-size:13px;
     font-family:inherit;
     outline:none;
     margin-bottom:10px;
     transition:border-color .2s, box-shadow .2s;
+    min-height:44px;
 }
 
 .azw-search::placeholder{
@@ -329,7 +332,7 @@
     display:flex;
     align-items:center;
     gap:10px;
-    padding:9px 11px;
+    padding:11px 11px;
     border-radius:8px;
     text-decoration:none;
     color:#b0b0b0;
@@ -338,6 +341,7 @@
     margin-bottom:2px;
     border-left:3px solid transparent;
     cursor:pointer;
+    min-height:44px;
 }
 
 .azw-ep-item:hover{
@@ -359,7 +363,7 @@
     text-align:right;
     font-size:12px;
     font-weight:700;
-    color:#555;
+    color:#888;
     flex-shrink:0;
     transition:color .15s;
 }
@@ -396,7 +400,7 @@
 .azw-ep-empty{
     padding:24px 12px;
     text-align:center;
-    color:#555;
+    color:#9ca3af;
     font-size:13px;
 }
 
@@ -413,6 +417,7 @@
     cursor:pointer;
     font-family:inherit;
     transition:background .2s, transform .15s;
+    min-height:44px;
 }
 
 .azw-fallback-btn:hover{
@@ -479,7 +484,7 @@
 }
 
 .azw-ep-list{
-    max-height:360px;
+    max-height:50vh;
     overflow-y:auto;
     scrollbar-width:thin;
     scrollbar-color:#2a2a2a transparent;
@@ -543,3 +548,8 @@
 }
 
 }
+
+/* Focus-visible styles for keyboard navigation */
+.azw-nav-btn:focus-visible,.azw-btn:focus-visible,.azw-fallback-btn:focus-visible{outline:2px solid #ff3c3c;outline-offset:2px}
+.azw-ep-item:focus-visible{outline:2px solid #ff3c3c;outline-offset:1px}
+.azw-search:focus-visible{outline:none;border-color:#ff3c3c;box-shadow:0 0 0 3px rgba(255,60,60,.2)}

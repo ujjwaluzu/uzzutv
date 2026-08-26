@@ -10,12 +10,12 @@
 {% block title %}{{ title }} - Episode {{ current_episode }} | Aniuzu{% endblock %}
 {% block meta_description %}Watch {{ title }} Episode {{ current_episode }} on UzzUTV Aniuzu.{% endblock %}
 {% block robots %}noindex, follow{% endblock %}
-{% block canonical %}<link rel="canonical" href="https://uzzutv.pythonanywhere.com/aniuzu/anime/{{ anilist_id }}/watch/{{ current_episode }}/">{% endblock %}
+{% block canonical %}<link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}/aniuzu/anime/{{ anilist_id }}/watch/{{ current_episode }}/">{% endblock %}
 {% block og_type %}video.episode{% endblock %}
 {% block og_title %}{{ title }} - Episode {{ current_episode }} | Aniuzu{% endblock %}
 {% block og_description %}Watch {{ title }} Episode {{ current_episode }} on UzzUTV Aniuzu.{% endblock %}
-{% block og_url %}https://uzzutv.pythonanywhere.com/aniuzu/anime/{{ anilist_id }}/watch/{{ current_episode }}/{% endblock %}
-{% block og_image %}{% if anime.coverImage.large %}{{ anime.coverImage.large }}{% else %}https://uzzutv.pythonanywhere.com/static/uzzutv/images/logo.png{% endif %}{% endblock %}
+{% block og_url %}{{ request.scheme }}://{{ request.get_host }}/aniuzu/anime/{{ anilist_id }}/watch/{{ current_episode }}/{% endblock %}
+{% block og_image %}{% if anime.coverImage.large %}{{ anime.coverImage.large }}{% else %}{{ request.scheme }}://{{ request.get_host }}/static/uzzutv/images/logo.png{% endif %}{% endblock %}
 
 {% block body %}
 
@@ -26,9 +26,9 @@
      data-total="{{ total_episodes }}"
      data-variant="{{ variant }}"
      data-source="{{ source }}"
-     data-title="{{ title|escapejs }}"
+     data-title="{{ title }}"
      data-cover="{{ anime.coverImage.large|default:'' }}"
-     data-episodes='[{% for ep in episodes_list %}{"number":{{ ep.number }},"title":"{{ ep.title|escapejs }}","thumbnail":"{{ ep.thumbnail|escapejs }}"}{% if not forloop.last %},{% endif %}{% endfor %}]'
+     data-episodes='{{ episodes_json|escape }}'
      data-sources='["anilink","tryembed"]'>
 
     <header class="azw-header">
@@ -49,10 +49,11 @@
                 <iframe
                     id="azw-player"
                     src=""
-                    title="Episode Playback"
+                    title="{{ title }} Episode {{ current_episode }} - Aniuzu"
                     allow="autoplay; fullscreen; picture-in-picture; presentation"
                     allowfullscreen
                     referrerpolicy="origin"
+                    sandbox="allow-scripts allow-same-origin allow-presentation allow-popups"
                 ></iframe>
             </div>
 
@@ -87,7 +88,7 @@
 
         <aside class="azw-sidebar" id="azw-sidebar">
             <h2 class="azw-sidebar-title">EPISODES</h2>
-            <input type="text" class="azw-search" id="azw-search" placeholder="Search episodes..." autocomplete="off">
+            <input type="text" class="azw-search" id="azw-search" placeholder="Search episodes..." autocomplete="off" aria-label="Search episodes">
             <div class="azw-ep-list" id="azw-ep-list"></div>
         </aside>
 

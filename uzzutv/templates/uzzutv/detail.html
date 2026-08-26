@@ -8,19 +8,19 @@
 
 {% block title %}UzzUTV - {{ title_full }}{% endblock %}
 {% block meta_description %}{{ meta_desc|truncatewords:40 }}{% endblock %}
-{% block canonical %}<link rel="canonical" href="https://uzzutv.pythonanywhere.com/{{ type }}/{{ data.id }}/">{% endblock %}
+{% block canonical %}<link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}/{{ type }}/{{ data.id }}/">{% endblock %}
 {% block og_type %}{% if type == "movie" %}video.movie{% else %}video.tv_show{% endif %}{% endblock %}
 {% block og_title %}UzzUTV - {{ title_full }}{% endblock %}
 {% block og_description %}{{ meta_desc|truncatewords:40 }}{% endblock %}
-{% block og_url %}https://uzzutv.pythonanywhere.com/{{ type }}/{{ data.id }}/{% endblock %}
-{% block og_image %}{% if data.poster_path %}https://image.tmdb.org/t/p/w500{{ data.poster_path }}{% else %}https://uzzutv.pythonanywhere.com/static/uzzutv/images/logo.png{% endif %}{% endblock %}
+{% block og_url %}{{ request.scheme }}://{{ request.get_host }}/{{ type }}/{{ data.id }}/{% endblock %}
+{% block og_image %}{% if data.poster_path %}https://image.tmdb.org/t/p/w500{{ data.poster_path }}{% else %}{{ request.scheme }}://{{ request.get_host }}/static/uzzutv/images/logo.png{% endif %}{% endblock %}
 {% block head %}
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "{% if type == 'movie' %}Movie{% else %}TVSeries{% endif %}",
   "name": "{% if type == 'movie' %}{{ data.title|escapejs }}{% else %}{{ data.name|escapejs }}{% endif %}",
-  "url": "https://uzzutv.pythonanywhere.com/{{ type }}/{{ data.id }}/"
+  "url": "{{ request.scheme }}://{{ request.get_host }}/{{ type }}/{{ data.id }}/"
   {% if data.poster_path %},"image": "https://image.tmdb.org/t/p/w500{{ data.poster_path }}"{% endif %}
   {% if data.overview %},"description": "{{ data.overview|escapejs }}"{% endif %}
   {% if data.release_date %},"datePublished": "{{ data.release_date }}"{% elif data.first_air_date %},"datePublished": "{{ data.first_air_date }}"{% endif %}
@@ -43,19 +43,19 @@
       "@type": "ListItem",
       "position": 1,
       "name": "Home",
-      "item": "https://uzzutv.pythonanywhere.com/home/"
+      "item": "{{ request.scheme }}://{{ request.get_host }}/home/"
     },
     {
       "@type": "ListItem",
       "position": 2,
       "name": "{% if type == 'movie' %}Movies{% else %}TV Series{% endif %}",
-      "item": "https://uzzutv.pythonanywhere.com/{% if type == 'movie' %}movie{% else %}tv{% endif %}/"
+      "item": "{{ request.scheme }}://{{ request.get_host }}/{% if type == 'movie' %}movie{% else %}tv{% endif %}/"
     },
     {
       "@type": "ListItem",
       "position": 3,
       "name": "{% if type == 'movie' %}{{ data.title|escapejs }}{% else %}{{ data.name|escapejs }}{% endif %}",
-      "item": "https://uzzutv.pythonanywhere.com/{{ type }}/{{ data.id }}/"
+      "item": "{{ request.scheme }}://{{ request.get_host }}/{{ type }}/{{ data.id }}/"
     }
   ]
 }
@@ -443,10 +443,11 @@ body{
     color:#6b7280;
     cursor:pointer;
     font-size:12px;
-    padding:4px 8px;
+    padding:10px 12px;
     margin-left:-8px;
     border-radius:6px;
     transition:color .15s ease, background .15s ease;
+    min-height:44px;
 }
 
 .rating-remove-btn:hover{
@@ -696,9 +697,10 @@ body{
     color:#6b7280;
     cursor:pointer;
     font-size:12px;
-    padding:5px 10px;
+    padding:10px 14px;
     border-radius:6px;
     transition:color .15s ease, background .15s ease;
+    min-height:44px;
 }
 
 .comment-delete:hover{
@@ -733,10 +735,11 @@ body{
     font-size:13px;
     font-weight:500;
     font-family:inherit;
-    padding:8px 16px;
+    padding:10px 18px;
     border-radius:8px;
     cursor:pointer;
     transition:background .15s ease, border-color .15s ease, color .15s ease;
+    min-height:44px;
 }
 
 .pagination-btn:hover:not(:disabled){
@@ -927,7 +930,7 @@ data-poster="{{data.poster_path}}">
 
 <div class="cast-card">
 
-<img loading="lazy" alt="{{ actor.name }}" src="{% if actor.profile_path %}https://image.tmdb.org/t/p/w185{{actor.profile_path}}{% else %}https://uzzutv.pythonanywhere.com/static/uzzutv/images/logo.png{% endif %}">
+<img loading="lazy" alt="{{ actor.name }}" src="{% if actor.profile_path %}https://image.tmdb.org/t/p/w185{{actor.profile_path}}{% else %}{{ request.scheme }}://{{ request.get_host }}/static/uzzutv/images/logo.png{% endif %}">
 
 <p>{{actor.name}}</p>
 
@@ -1116,7 +1119,7 @@ data-poster="{{data.poster_path}}">
 <a class="card-link" href="/{{type}}/{{rec.id}}/">
 
 <div class="card-poster">
-<img loading="lazy" decoding="async" alt="{% if type == 'movie' %}{{ rec.title }}{% else %}{{ rec.name }}{% endif %} poster" {% if rec.poster_path %}src="https://image.tmdb.org/t/p/w342{{rec.poster_path}}"{% else %}src="https://uzzutv.pythonanywhere.com/static/uzzutv/images/logo.png"{% endif %}>
+<img loading="lazy" decoding="async" alt="{% if type == 'movie' %}{{ rec.title }}{% else %}{{ rec.name }}{% endif %} poster" {% if rec.poster_path %}src="https://image.tmdb.org/t/p/w342{{rec.poster_path}}"{% else %}src="{{ request.scheme }}://{{ request.get_host }}/static/uzzutv/images/logo.png"{% endif %}>
 <span class="card-gradient"></span>
 <span class="card-rating">★ {{ rec.vote_average|floatformat:1 }}</span>
 </div>

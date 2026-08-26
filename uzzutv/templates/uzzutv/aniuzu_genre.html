@@ -8,8 +8,8 @@
 
 {% block title %}{{ genre }} Anime - Aniuzu{% endblock %}
 {% block meta_description %}Browse {{ genre }} anime on Aniuzu. Discover the best {{ genre|lower }} titles to watch.{% endblock %}
-{% block canonical %}<link rel="canonical" href="https://uzzutv.pythonanywhere.com/aniuzu/genre/{{ genre }}/">{% endblock %}
-{% block og_url %}https://uzzutv.pythonanywhere.com/aniuzu/genre/{{ genre }}/{% endblock %}
+{% block canonical %}<link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}/aniuzu/genre/{{ genre }}/">{% endblock %}
+{% block og_url %}{{ request.scheme }}://{{ request.get_host }}/aniuzu/genre/{{ genre }}/{% endblock %}
 {% block og_title %}{{ genre }} Anime - Aniuzu{% endblock %}
 {% block og_description %}Browse {{ genre }} anime on Aniuzu.{% endblock %}
 

@@ -6,11 +6,11 @@
 <link rel="stylesheet" href="{% static 'uzzutv/aniuzu.css' %}">
 {% endblock %}
 
-{% block title %}Aniuzu Search{% if query %}: {{ query }}{% endif %}{% endblock %}
+{% block title %}Aniuzu Search{% if query %}: {{ query|urlencode }}{% endif %}{% endblock %}
 {% block meta_description %}Search anime on Aniuzu and discover titles to watch.{% endblock %}
 {% block robots %}noindex, follow{% endblock %}
-{% block canonical %}<link rel="canonical" href="https://uzzutv.pythonanywhere.com/aniuzu/search/">{% endblock %}
-{% block og_url %}https://uzzutv.pythonanywhere.com/aniuzu/search/{% endblock %}
+{% block canonical %}<link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}/aniuzu/search/">{% endblock %}
+{% block og_url %}{{ request.scheme }}://{{ request.get_host }}/aniuzu/search/{% endblock %}
 
 {% block body %}
 
@@ -28,7 +28,7 @@
 </form>
 
 {% if query %}
-<p class="az-results-desc">Results for "<strong>{{ query }}</strong>"</p>
+<p class="az-results-desc">Results for "<strong>{{ query|urlencode }}</strong>"</p>
 {% endif %}
 
 {% if items %}
@@ -42,7 +42,7 @@
 {% if total_pages > 1 %}
 <div class="az-pagination">
 {% if page > 1 %}
-<a href="{% url 'aniuzu_search' %}?q={{ query }}&page={{ page|add:'-1' }}">&#8249; Prev</a>
+<a href="{% url 'aniuzu_search' %}?q={{ query|urlencode }}&page={{ page|add:'-1' }}">&#8249; Prev</a>
 {% endif %}
 {% for p in pages %}
 {% if p == page %}
@@ -50,11 +50,11 @@
 {% elif p == '...' %}
 <span class="az-page-dots">...</span>
 {% else %}
-<a href="{% url 'aniuzu_search' %}?q={{ query }}&page={{ p }}">{{ p }}</a>
+<a href="{% url 'aniuzu_search' %}?q={{ query|urlencode }}&page={{ p }}">{{ p }}</a>
 {% endif %}
 {% endfor %}
 {% if page < total_pages %}
-<a href="{% url 'aniuzu_search' %}?q={{ query }}&page={{ page|add:'1' }}">Next &#8250;</a>
+<a href="{% url 'aniuzu_search' %}?q={{ query|urlencode }}&page={{ page|add:'1' }}">Next &#8250;</a>
 {% endif %}
 </div>
 {% endif %}

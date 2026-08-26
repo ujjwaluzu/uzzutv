@@ -7,17 +7,17 @@
     <title>{% block title %}UzzUTV - Movies & TV Series{% endblock %}</title>
     <meta name="description" content="{% block meta_description %}Watch movies and TV series online on UzzUTV. Explore trending, popular and top-rated films and shows, and start watching instantly.{% endblock %}">
     <meta name="robots" content="{% block robots %}index, follow{% endblock %}">
-    {% block canonical %}<link rel="canonical" href="https://uzzutv.pythonanywhere.com/">{% endblock %}
+    {% block canonical %}<link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}/">{% endblock %}
     <meta property="og:type" content="{% block og_type %}website{% endblock %}">
     <meta property="og:site_name" content="UzzUTV">
     <meta property="og:title" content="{% block og_title %}UzzUTV - Movies & TV Series{% endblock %}">
     <meta property="og:description" content="{% block og_description %}Watch movies and TV series online on UzzUTV. Explore trending, popular and top-rated films and shows, and start watching instantly.{% endblock %}">
-    <meta property="og:url" content="{% block og_url %}https://uzzutv.pythonanywhere.com/{% endblock %}">
-    <meta property="og:image" content="{% block og_image %}https://uzzutv.pythonanywhere.com/static/uzzutv/images/logo.png{% endblock %}">
+    <meta property="og:url" content="{% block og_url %}{{ request.scheme }}://{{ request.get_host }}/{% endblock %}">
+    <meta property="og:image" content="{% block og_image %}{{ request.scheme }}://{{ request.get_host }}/static/uzzutv/images/logo.png{% endblock %}">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="{% block twitter_title %}UzzUTV - Movies & TV Series{% endblock %}">
     <meta name="twitter:description" content="{% block twitter_description %}Watch movies and TV series online on UzzUTV. Explore trending, popular and top-rated films and shows, and start watching instantly.{% endblock %}">
-    <meta name="twitter:image" content="{% block twitter_image %}https://uzzutv.pythonanywhere.com/static/uzzutv/images/logo.png{% endblock %}">
+    <meta name="twitter:image" content="{% block twitter_image %}{{ request.scheme }}://{{ request.get_host }}/static/uzzutv/images/logo.png{% endblock %}">
     {% block css %}{% endblock %}
     <link rel="icon" type="image/x-icon" href="https://img.icons8.com/?size=100&id=dpUQB4dX6yQC&format=png&color=000000">
     <link rel="preconnect" href="https://fonts.googleapis.com">

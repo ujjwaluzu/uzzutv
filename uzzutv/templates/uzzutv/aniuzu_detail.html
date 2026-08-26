@@ -8,18 +8,18 @@
 
 {% block title %}Aniuzu - {{ title|default:romaji|default:"Anime" }}{% endblock %}
 {% block meta_description %}{{ description|striptags|truncatewords:40 }}{% endblock %}
-{% block canonical %}<link rel="canonical" href="https://uzzutv.pythonanywhere.com/aniuzu/anime/{{ anilist_id }}/">{% endblock %}
+{% block canonical %}<link rel="canonical" href="{{ site_url }}/aniuzu/anime/{{ anilist_id }}/">{% endblock %}
 {% block og_type %}video.other{% endblock %}
 {% block og_title %}Aniuzu - {{ title|default:romaji|default:"Anime" }}{% endblock %}
 {% block og_description %}{{ description|striptags|truncatewords:40 }}{% endblock %}
-{% block og_url %}https://uzzutv.pythonanywhere.com/aniuzu/anime/{{ anilist_id }}/{% endblock %}
-{% block og_image %}{% if anime.coverImage.large %}{{ anime.coverImage.large }}{% else %}https://uzzutv.pythonanywhere.com/static/uzzutv/images/logo.png{% endif %}{% endblock %}
+{% block og_url %}{{ site_url }}/aniuzu/anime/{{ anilist_id }}/{% endblock %}
+{% block og_image %}{% if anime.coverImage.large %}{{ anime.coverImage.large }}{% else %}{{ site_url }}/static/uzzutv/images/logo.png{% endif %}{% endblock %}
 
 {% block body %}
 
 {% if anime %}
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"TVSeries","name":"{{ title|default:romaji }}","alternateName":"{{ romaji }}","description":"{{ description|striptags|truncatewords:60 }}","image":"{{ anime.coverImage.extraLarge|default:anime.coverImage.large }}","url":"https://uzzutv.pythonanywhere.com/aniuzu/anime/{{ anilist_id }}/","genre":{{ genres|safe }},"numberOfEpisodes":{{ anime.episodes|default:"null" }},"duration":{{ anime.duration|default:"null" }},"datePublished":"{{ anime.startDate.year|default:'' }}{% if anime.startDate.month %}-{{ anime.startDate.month|stringformat:'02d' }}{% endif %}{% if anime.startDate.day %}-{{ anime.startDate.day|stringformat:'02d' }}{% endif %}","aggregateRating":{% if score_raw %}{"@type":"AggregateRating","ratingValue":{{ score_raw }},"bestRating":100,"ratingCount":{{ anime.popularity|default:1 }}}{% else %}null{% endif %},"productionCompany":{% if studios %}[{% for s in studios %}{"@type":"Organization","name":"{{ s }}"}{% if not forloop.last %},{% endif %}{% endfor %}]{% else %}null{% endif %}}
+{{ jsonld_json|safe }}
 </script>
 <section class="az-detail-hero">
 <div class="az-dhero-bg" style="background-image:url('{{ anime.bannerImage }}');background-size:cover;background-position:center;"></div>
@@ -55,22 +55,11 @@
 </div>
 </section>
 
-<p class="az-mobile-desc">{{ description|striptags }}</p>
-
 {% if description %}
 <div class="az-desc">
 <h2 class="section-title">Synopsis</h2>
 <div class="az-desc-text collapsed" id="az-desc-text">{{ description|striptags }}</div>
-<button class="az-desc-toggle" id="az-desc-toggle" onclick="azToggleDesc()">Show More <span class="material-icons" style="font-size:18px;">expand_more</span></button>
-</div>
-{% endif %}
-
-{% if trailer and trailer.site == "youtube" %}
-<div class="az-desc">
-<h2 class="section-title">Trailer</h2>
-<div class="az-trailer">
-<iframe src="https://www.youtube.com/embed/{{ trailer.id }}" frameborder="0" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
-</div>
+<button class="az-desc-toggle" id="az-desc-toggle" aria-expanded="false" onclick="azToggleDesc()">Show More <span class="material-icons" style="font-size:18px;">expand_more</span></button>
 </div>
 {% endif %}
 
@@ -110,8 +99,8 @@
 <div class="az-slider-header">
 <h2 class="section-title">Related Anime</h2>
 <div class="az-slider-controls">
-<button onclick="azSlideLeft('az-related-slider')"><span class="material-icons">chevron_left</span></button>
-<button onclick="azSlideRight('az-related-slider')"><span class="material-icons">chevron_right</span></button>
+<button aria-label="Scroll left" onclick="azSlideLeft('az-related-slider')"><span class="material-icons">chevron_left</span></button>
+<button aria-label="Scroll right" onclick="azSlideRight('az-related-slider')"><span class="material-icons">chevron_right</span></button>
 </div>
 </div>
 <div class="az-row" id="az-related-slider">
@@ -139,8 +128,8 @@
 <div class="az-slider-header">
 <h2 class="section-title">You Might Also Like</h2>
 <div class="az-slider-controls">
-<button onclick="azSlideLeft('az-rec-slider')"><span class="material-icons">chevron_left</span></button>
-<button onclick="azSlideRight('az-rec-slider')"><span class="material-icons">chevron_right</span></button>
+<button aria-label="Scroll left" onclick="azSlideLeft('az-rec-slider')"><span class="material-icons">chevron_left</span></button>
+<button aria-label="Scroll right" onclick="azSlideRight('az-rec-slider')"><span class="material-icons">chevron_right</span></button>
 </div>
 </div>
 <div class="az-row" id="az-rec-slider">

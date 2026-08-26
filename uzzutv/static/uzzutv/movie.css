@@ -179,10 +179,49 @@ left:0;
 right:0;
 }
 
+/* =========================================================
+   TABLET (< 992px)
+   ========================================================= */
 
+@media (max-width: 991px){
+.hero-slider{height:70vh}
+.movie-card{width:200px}
+.movie-header{height:280px}
+.hero-logo{max-width:280px}
+.hero-content{max-width:400px}
+}
 
+/* =========================================================
+   MOBILE (< 768px)
+   ========================================================= */
 
+@media (max-width: 767px){
+.hero-slider{height:60vh;min-height:380px}
+.movie-card{width:160px}
+.movie-header{height:240px}
+.hero-logo{max-width:220px}
+.hero-content{max-width:300px;bottom:15%;left:4%}
+.watch-btn{padding:8px 16px;font-size:14px}
+.slider-wrapper{padding:0 16px}
+.section-title{font-size:18px;margin:20px 0 12px 6px}
+.slider{gap:12px;padding:12px}
+}
 
+/* =========================================================
+   EXTRA SMALL (< 480px)
+   ========================================================= */
+
+@media (max-width: 480px){
+.hero-slider{height:50vh;min-height:320px}
+.movie-card{width:140px}
+.movie-header{height:200px}
+.hero-logo{max-width:180px}
+.hero-content{max-width:260px;bottom:12%;left:3%}
+.movie-title{font-size:14px}
+.movie-content{padding:10px}
+.slider{gap:10px;padding:10px}
+.slide-btn{display:none}
+}
 
 
 

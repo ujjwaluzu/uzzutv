@@ -50,8 +50,12 @@ async function updateAuthNavbar() {
                 link.href = "/profile/";
                 link.className = "navbar-text text-white text-decoration-none";
 
-                link.innerHTML =
-                    `<span class="material-icons" style="font-size:18px;vertical-align:-3px;">person</span> ${profile.username}`;
+                var iconSpan = document.createElement("span");
+                iconSpan.className = "material-icons";
+                iconSpan.style.cssText = "font-size:18px;vertical-align:-3px;";
+                iconSpan.textContent = "person";
+                link.appendChild(iconSpan);
+                link.appendChild(document.createTextNode(" " + profile.username));
 
                 link.addEventListener("mouseenter", () => {
                     link.style.color = "#ff3c3c";
@@ -150,6 +154,7 @@ document.addEventListener("click", async (event) => {
         return;
     }
 
+    _clearUserCache();
     window.location.href = "/home/";
 
 });
@@ -162,6 +167,7 @@ document.addEventListener("click", async (event) => {
 supabaseClient.auth.onAuthStateChange(
     (event, session) => {
 
+        _clearUserCache();
         updateAuthNavbar();
 
     }
@@ -179,18 +185,34 @@ document.addEventListener(
 
 
 /* =========================================================
-   GET CURRENT USER
-========================================================= */
+   GET CURRENT USER (with cache)
+   ========================================================= */
+
+var _cachedUser = null;
+var _userFetchDone = false;
 
 async function getCurrentUser() {
 
+    if (_userFetchDone) {
+        return _cachedUser;
+    }
+
     const { data, error } = await supabaseClient.auth.getUser();
 
+    _userFetchDone = true;
+
     if (error || !data.user) {
+        _cachedUser = null;
         return null;
     }
 
-    return data.user;
+    _cachedUser = data.user;
+    return _cachedUser;
+}
+
+function _clearUserCache() {
+    _cachedUser = null;
+    _userFetchDone = false;
 }
 
 

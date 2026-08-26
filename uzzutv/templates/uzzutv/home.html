@@ -62,9 +62,9 @@ pointer-events:none;
 
 {% block title %}UzzUTV - Movies & TV Series{% endblock %}
 {% block meta_description %}Watch movies and TV series online on UzzUTV. Discover trending titles, explore genres like action, romance, comedy and animation, and start watching instantly.{% endblock %}
-{% block canonical %}<link rel="canonical" href="https://uzzutv.pythonanywhere.com/home/">{% endblock %}
-{% block og_url %}https://uzzutv.pythonanywhere.com/home/{% endblock %}
-{% block og_image %}{% if hero %}{% with hero|first as first_item %}{% if first_item.backdrop_path %}https://image.tmdb.org/t/p/original{{ first_item.backdrop_path }}{% else %}https://uzzutv.pythonanywhere.com/static/uzzutv/images/logo.png{% endif %}{% endwith %}{% else %}https://uzzutv.pythonanywhere.com/static/uzzutv/images/logo.png{% endif %}{% endblock %}
+{% block canonical %}<link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}/home/">{% endblock %}
+{% block og_url %}{{ request.scheme }}://{{ request.get_host }}/home/{% endblock %}
+{% block og_image %}{% if hero %}{% with hero|first as first_item %}{% if first_item.backdrop_path %}https://image.tmdb.org/t/p/original{{ first_item.backdrop_path }}{% else %}{{ request.scheme }}://{{ request.get_host }}/static/uzzutv/images/logo.png{% endif %}{% endwith %}{% else %}{{ request.scheme }}://{{ request.get_host }}/static/uzzutv/images/logo.png{% endif %}{% endblock %}
 {% block head %}
 <script type="application/ld+json">
 {
@@ -72,12 +72,12 @@ pointer-events:none;
   "@type": "WebSite",
   "name": "UzzUTV",
   "alternateName": "UzzuTV",
-  "url": "https://uzzutv.pythonanywhere.com/home/",
+  "url": "{{ request.scheme }}://{{ request.get_host }}/home/",
   "potentialAction": {
     "@type": "SearchAction",
     "target": {
       "@type": "EntryPoint",
-      "urlTemplate": "https://uzzutv.pythonanywhere.com/search/?q={search_term_string}"
+      "urlTemplate": "{{ request.scheme }}://{{ request.get_host }}/search/?q={search_term_string}"
     },
     "query-input": "required name=search_term_string"
   }
@@ -411,7 +411,6 @@ class="watch-btn"><span class="material-icons">play_arrow</span> Watch Now</a>
 
 <script>
 window.addEventListener("DOMContentLoaded", () => {
-renderContinueHome("continue-home");
 buildHeroDots();
 });
 

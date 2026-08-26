@@ -8,11 +8,11 @@
 
 {% block title %}UzzUTV - Movies{% endblock %}
 {% block meta_description %}Explore trending, popular and top-rated movies on UzzUTV. Discover what to watch next and stream your favourite films instantly.{% endblock %}
-{% block canonical %}<link rel="canonical" href="https://uzzutv.pythonanywhere.com/movie/">{% endblock %}
+{% block canonical %}<link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}/movie/">{% endblock %}
 {% block og_title %}UzzUTV - Watch Movies Online{% endblock %}
 {% block og_description %}Explore trending, popular and top-rated movies on UzzUTV. Discover what to watch next and stream your favourite films instantly.{% endblock %}
-{% block og_url %}https://uzzutv.pythonanywhere.com/movie/{% endblock %}
-{% block og_image %}{% with trendingMovie|first as first_movie %}{% if first_movie.backdrop_path %}https://image.tmdb.org/t/p/original{{ first_movie.backdrop_path }}{% else %}https://uzzutv.pythonanywhere.com/static/uzzutv/images/logo.png{% endif %}{% endwith %}{% endblock %}
+{% block og_url %}{{ request.scheme }}://{{ request.get_host }}/movie/{% endblock %}
+{% block og_image %}{% with trendingMovie|first as first_movie %}{% if first_movie.backdrop_path %}https://image.tmdb.org/t/p/original{{ first_movie.backdrop_path }}{% else %}{{ request.scheme }}://{{ request.get_host }}/static/uzzutv/images/logo.png{% endif %}{% endwith %}{% endblock %}
 <style>
 
 

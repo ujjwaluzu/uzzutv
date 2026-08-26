@@ -1,6 +1,20 @@
 /* =========================================================
-   SAVE MOVIE
+   CONTINUE WATCHING
 ========================================================= */
+
+function _cwHtmlEscape(text) {
+    var div = document.createElement("div");
+    div.appendChild(document.createTextNode(text));
+    return div.innerHTML;
+}
+
+function _cwSlideLeft(id) {
+    if (typeof slideLeft === "function") slideLeft(id);
+}
+
+function _cwSlideRight(id) {
+    if (typeof slideRight === "function") slideRight(id);
+}
 
 async function saveContinue(id, type, poster) {
 
@@ -178,11 +192,11 @@ async function renderContinueTV(containerId) {
 
                 <div class="slider-controls">
 
-                    <button onclick="slideLeft('${containerId}-slider')">
+                    <button onclick="_cwSlideLeft('${containerId}-slider')">
                         ❮
                     </button>
 
-                    <button onclick="slideRight('${containerId}-slider')">
+                    <button onclick="_cwSlideRight('${containerId}-slider')">
                         ❯
                     </button>
 
@@ -201,7 +215,7 @@ async function renderContinueTV(containerId) {
                         <!-- DELETE -->
 
                         <button
-                            onclick="removeContinueTV('${item.media_id}')"
+                            onclick="removeContinueTV(${Number(item.media_id)})"
                             style="
                                 position:absolute;
                                 top:8px;
@@ -243,7 +257,7 @@ async function renderContinueTV(containerId) {
                             <img
                                 loading="lazy"
                                 decoding="async"
-                                src="https://image.tmdb.org/t/p/w342${item.poster}"
+                                src="https://image.tmdb.org/t/p/w342${_cwHtmlEscape(item.poster || '')}"
                             >
 
                         </a>
@@ -350,11 +364,11 @@ async function renderContinueMovies(containerId) {
 
                 <div class="slider-controls">
 
-                    <button onclick="slideLeft('${containerId}-slider')">
+                    <button onclick="_cwSlideLeft('${containerId}-slider')">
                         ❮
                     </button>
 
-                    <button onclick="slideRight('${containerId}-slider')">
+                    <button onclick="_cwSlideRight('${containerId}-slider')">
                         ❯
                     </button>
 
@@ -373,7 +387,7 @@ async function renderContinueMovies(containerId) {
                         <!-- DELETE -->
 
                         <button
-                            onclick="removeContinueMovie('${item.media_id}')"
+                            onclick="removeContinueMovie(${Number(item.media_id)})"
                             style="
                                 position:absolute;
                                 top:8px;
@@ -400,7 +414,7 @@ async function renderContinueMovies(containerId) {
                             <img
                                 loading="lazy"
                                 decoding="async"
-                                src="https://image.tmdb.org/t/p/w342${item.poster}"
+                                src="https://image.tmdb.org/t/p/w342${_cwHtmlEscape(item.poster || '')}"
                             >
 
                         </a>
@@ -449,11 +463,11 @@ async function renderContinueHome(containerId) {
 
                 <div class="slider-controls">
 
-                    <button onclick="slideLeft('${containerId}-slider')">
+                    <button onclick="_cwSlideLeft('${containerId}-slider')">
                         ❮
                     </button>
 
-                    <button onclick="slideRight('${containerId}-slider')">
+                    <button onclick="_cwSlideRight('${containerId}-slider')">
                         ❯
                     </button>
 
@@ -472,7 +486,7 @@ async function renderContinueHome(containerId) {
                         <!-- DELETE -->
 
                         <button
-                            onclick="removeMixed('${item.media_id}', '${item.media_type}')"
+                            onclick="removeMixed(${Number(item.media_id)}, '${_cwHtmlEscape(item.media_type || '')}')"
                             style="
                                 position:absolute;
                                 top:8px;
@@ -525,7 +539,7 @@ async function renderContinueHome(containerId) {
                             <img
                                 loading="lazy"
                                 decoding="async"
-                                src="https://image.tmdb.org/t/p/w342${item.poster}"
+                                src="https://image.tmdb.org/t/p/w342${_cwHtmlEscape(item.poster || '')}"
                             >
 
                         </a>

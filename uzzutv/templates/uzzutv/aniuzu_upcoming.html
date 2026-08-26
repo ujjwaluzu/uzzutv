@@ -8,8 +8,8 @@
 
 {% block title %}Upcoming Anime - Aniuzu{% endblock %}
 {% block meta_description %}Discover upcoming anime on Aniuzu. Browse anticipated anime titles.{% endblock %}
-{% block canonical %}<link rel="canonical" href="https://uzzutv.pythonanywhere.com/aniuzu/upcoming/">{% endblock %}
-{% block og_url %}https://uzzutv.pythonanywhere.com/aniuzu/upcoming/{% endblock %}
+{% block canonical %}<link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}/aniuzu/upcoming/">{% endblock %}
+{% block og_url %}{{ request.scheme }}://{{ request.get_host }}/aniuzu/upcoming/{% endblock %}
 {% block og_title %}Upcoming Anime - Aniuzu{% endblock %}
 {% block og_description %}Discover upcoming anime on Aniuzu.{% endblock %}
 

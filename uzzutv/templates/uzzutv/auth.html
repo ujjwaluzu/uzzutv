@@ -912,7 +912,7 @@ authForm.addEventListener("submit", async (event) => {
                 window.location.hostname === "127.0.0.1" ||
                 window.location.hostname === "localhost"
                     ? `${window.location.origin}/home/`
-                    : "https://uzzutv.pythonanywhere.com/home/";
+                    : "{{ request.scheme }}://{{ request.get_host }}/home/";
 
 
             const { data, error } =

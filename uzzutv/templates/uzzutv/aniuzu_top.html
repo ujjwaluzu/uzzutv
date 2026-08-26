@@ -8,8 +8,8 @@
 
 {% block title %}Top Anime - Aniuzu{% endblock %}
 {% block meta_description %}Browse the top rated, most popular and trending anime on Aniuzu.{% endblock %}
-{% block canonical %}<link rel="canonical" href="https://uzzutv.pythonanywhere.com/aniuzu/top/">{% endblock %}
-{% block og_url %}https://uzzutv.pythonanywhere.com/aniuzu/top/{% endblock %}
+{% block canonical %}<link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}/aniuzu/top/">{% endblock %}
+{% block og_url %}{{ request.scheme }}://{{ request.get_host }}/aniuzu/top/{% endblock %}
 {% block og_title %}Top Anime - Aniuzu{% endblock %}
 {% block og_description %}Browse the top rated, most popular and trending anime on Aniuzu.{% endblock %}
 
@@ -39,7 +39,7 @@
 {% if total_pages > 1 %}
 <div class="az-pagination">
 {% if page > 1 %}
-<a href="{% url 'aniuzu_top' %}?sort={{ sort }}&page={{ page|add:'-1' }}">&#8249; Prev</a>
+<a href="{% url 'aniuzu_top' %}?sort={{ sort|urlencode }}&page={{ page|add:'-1' }}">&#8249; Prev</a>
 {% endif %}
 {% for p in pages %}
 {% if p == page %}
@@ -47,11 +47,11 @@
 {% elif p == '...' %}
 <span class="az-page-dots">...</span>
 {% else %}
-<a href="{% url 'aniuzu_top' %}?sort={{ sort }}&page={{ p }}">{{ p }}</a>
+<a href="{% url 'aniuzu_top' %}?sort={{ sort|urlencode }}&page={{ p }}">{{ p }}</a>
 {% endif %}
 {% endfor %}
 {% if page < total_pages %}
-<a href="{% url 'aniuzu_top' %}?sort={{ sort }}&page={{ page|add:'1' }}">Next &#8250;</a>
+<a href="{% url 'aniuzu_top' %}?sort={{ sort|urlencode }}&page={{ page|add:'1' }}">Next &#8250;</a>
 {% endif %}
 </div>
 {% endif %}

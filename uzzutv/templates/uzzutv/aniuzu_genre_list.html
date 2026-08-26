@@ -8,8 +8,8 @@
 
 {% block title %}Browse by Genre - Aniuzu{% endblock %}
 {% block meta_description %}Browse anime by genre on Aniuzu. Find action, romance, comedy and more.{% endblock %}
-{% block canonical %}<link rel="canonical" href="https://uzzutv.pythonanywhere.com/aniuzu/genres/">{% endblock %}
-{% block og_url %}https://uzzutv.pythonanywhere.com/aniuzu/genres/{% endblock %}
+{% block canonical %}<link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}/aniuzu/genres/">{% endblock %}
+{% block og_url %}{{ request.scheme }}://{{ request.get_host }}/aniuzu/genres/{% endblock %}
 {% block og_title %}Browse by Genre - Aniuzu{% endblock %}
 {% block og_description %}Browse anime by genre on Aniuzu.{% endblock %}
 

@@ -2,6 +2,9 @@ from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse, Http404
 from django.core.cache import cache
 from concurrent.futures import ThreadPoolExecutor
+import copy
+import json
+import re
 import requests
 import os
 import datetime
@@ -40,11 +43,14 @@ def media_info(request, type, id):
 
     params = {"api_key": API_KEY}
 
-    response = requests.get(
-        f"{BASE_URL}/{type}/{id}",
-        params=params,
-        timeout=10
-    )
+    try:
+        response = requests.get(
+            f"{BASE_URL}/{type}/{id}",
+            params=params,
+            timeout=10
+        )
+    except requests.RequestException:
+        return HttpResponse("Service unavailable", status=502)
 
     if response.status_code != 200:
         return HttpResponse("Not found", status=404)
@@ -59,14 +65,17 @@ def media_info(request, type, id):
         "imdb_id": ""
     }
 
-    external = requests.get(
-        f"{BASE_URL}/{type}/{id}/external_ids",
-        params=params,
-        timeout=10
-    )
+    try:
+        external = requests.get(
+            f"{BASE_URL}/{type}/{id}/external_ids",
+            params=params,
+            timeout=10
+        )
 
-    if external.status_code == 200:
-        info["imdb_id"] = external.json().get("imdb_id", "") or ""
+        if external.status_code == 200:
+            info["imdb_id"] = external.json().get("imdb_id", "") or ""
+    except (requests.RequestException, ValueError):
+        pass
 
     cache.set(cache_key, info, 43200)  # 12 hours
 
@@ -83,41 +92,20 @@ def load_homepage_data():
 
     params = {"api_key": API_KEY}
 
-    trending_movies = requests.get(
-        f"{BASE_URL}/trending/movie/day",
-        params=params,
-        timeout=10
-    ).json().get("results", [])
+    def _tmdb_get(endpoint, extra_params=None):
+        try:
+            p = {**params, **(extra_params or {})}
+            resp = requests.get(f"{BASE_URL}/{endpoint}", params=p, timeout=10)
+            return resp.json().get("results", [])
+        except (requests.RequestException, ValueError):
+            return []
 
-    popular_movies = requests.get(
-        f"{BASE_URL}/movie/popular",
-        params=params,
-        timeout=10
-    ).json().get("results", [])
-
-    top_movies = requests.get(
-        f"{BASE_URL}/movie/top_rated",
-        params=params,
-        timeout=10
-    ).json().get("results", [])
-
-    trending_tv = requests.get(
-        f"{BASE_URL}/trending/tv/day",
-        params=params,
-        timeout=10
-    ).json().get("results", [])
-
-    popular_tv = requests.get(
-        f"{BASE_URL}/tv/popular",
-        params=params,
-        timeout=10
-    ).json().get("results", [])
-
-    toprated_tv = requests.get(
-        f"{BASE_URL}/tv/top_rated",
-        params=params,
-        timeout=10
-    ).json().get("results", [])
+    trending_movies = _tmdb_get("trending/movie/day")
+    popular_movies = _tmdb_get("movie/popular")
+    top_movies = _tmdb_get("movie/top_rated")
+    trending_tv = _tmdb_get("trending/tv/day")
+    popular_tv = _tmdb_get("tv/popular")
+    toprated_tv = _tmdb_get("tv/top_rated")
 
     # add logos only for hero items
     for movie in trending_movies[:5]:
@@ -277,36 +265,39 @@ def get_movie_logo(movie_id):
     if logo is not None:
         return logo
 
-    url = f"{BASE_URL}/movie/{movie_id}/images"
+    try:
+        url = f"{BASE_URL}/movie/{movie_id}/images"
 
-    params = {
-        "api_key": API_KEY,
-        "include_image_language": "en,null"
-    }
+        params = {
+            "api_key": API_KEY,
+            "include_image_language": "en,null"
+        }
 
-    response = requests.get(url, params=params, timeout=10)
+        response = requests.get(url, params=params, timeout=10)
 
-    if response.status_code != 200:
+        if response.status_code != 200:
+            return None
+
+        data = response.json()
+        logos = data.get("logos", [])
+
+        logo = None
+
+        # Prefer English logos
+        for l in logos:
+            if l.get("iso_639_1") == "en":
+                logo = l["file_path"]
+                break
+
+        # fallback to any logo
+        if not logo and logos:
+            logo = logos[0]["file_path"]
+
+        cache.set(cache_key, logo, 5000)
+
+        return logo
+    except (requests.RequestException, ValueError):
         return None
-
-    data = response.json()
-    logos = data.get("logos", [])
-
-    logo = None
-
-    # Prefer English logos
-    for l in logos:
-        if l.get("iso_639_1") == "en":
-            logo = l["file_path"]
-            break
-
-    # fallback to any logo
-    if not logo and logos:
-        logo = logos[0]["file_path"]
-
-    cache.set(cache_key, logo, 5000)
-
-    return logo
 
 
 def get_tv_logo(tv_id):
@@ -317,34 +308,37 @@ def get_tv_logo(tv_id):
     if logo is not None:
         return logo
 
-    url = f"{BASE_URL}/tv/{tv_id}/images"
+    try:
+        url = f"{BASE_URL}/tv/{tv_id}/images"
 
-    params = {
-        "api_key": API_KEY,
-        "include_image_language": "en,null"
-    }
+        params = {
+            "api_key": API_KEY,
+            "include_image_language": "en,null"
+        }
 
-    response = requests.get(url, params=params, timeout=10)
+        response = requests.get(url, params=params, timeout=10)
 
-    if response.status_code != 200:
+        if response.status_code != 200:
+            return None
+
+        data = response.json()
+        logos = data.get("logos", [])
+
+        logo = None
+
+        for l in logos:
+            if l.get("iso_639_1") == "en":
+                logo = l["file_path"]
+                break
+
+        if not logo and logos:
+            logo = logos[0]["file_path"]
+
+        cache.set(cache_key, logo, 5000)
+
+        return logo
+    except (requests.RequestException, ValueError):
         return None
-
-    data = response.json()
-    logos = data.get("logos", [])
-
-    logo = None
-
-    for l in logos:
-        if l.get("iso_639_1") == "en":
-            logo = l["file_path"]
-            break
-
-    if not logo and logos:
-        logo = logos[0]["file_path"]
-
-    cache.set(cache_key, logo, 5000)
-
-    return logo
 
 
 # ----------------------------
@@ -530,8 +524,17 @@ def tv(request):
 
 def watchtv(request, tv_id):
 
-    season = request.GET.get("season", 1)
-    episode = request.GET.get("episode", 1)
+    season = request.GET.get("season", "1")
+    episode = request.GET.get("episode", "1")
+
+    try:
+        season = int(season)
+    except (ValueError, TypeError):
+        season = 1
+    try:
+        episode = int(episode)
+    except (ValueError, TypeError):
+        episode = 1
     params = {"api_key": API_KEY}
 
     # -----------------------------
@@ -543,11 +546,14 @@ def watchtv(request, tv_id):
 
     if not imdb:
 
-        external = requests.get(
-            f"{BASE_URL}/tv/{tv_id}/external_ids",
-            params=params,
-            timeout=10
-        ).json()
+        try:
+            external = requests.get(
+                f"{BASE_URL}/tv/{tv_id}/external_ids",
+                params=params,
+                timeout=10
+            ).json()
+        except (requests.RequestException, ValueError):
+            return HttpResponse("IMDb ID not available", status=502)
 
         imdb = external.get("imdb_id")
 
@@ -565,11 +571,14 @@ def watchtv(request, tv_id):
 
     if not tv:
 
-        tv = requests.get(
-            f"{BASE_URL}/tv/{tv_id}",
-            params=params,
-            timeout=10
-        ).json()
+        try:
+            tv = requests.get(
+                f"{BASE_URL}/tv/{tv_id}",
+                params=params,
+                timeout=10
+            ).json()
+        except (requests.RequestException, ValueError):
+            return HttpResponse("TV data unavailable", status=502)
 
         cache.set(tv_cache_key, tv, 86400)
 
@@ -584,11 +593,14 @@ def watchtv(request, tv_id):
 
     if not season_data:
 
-        season_data = requests.get(
-            f"{BASE_URL}/tv/{tv_id}/season/{season}",
-            params=params,
-            timeout=10
-        ).json()
+        try:
+            season_data = requests.get(
+                f"{BASE_URL}/tv/{tv_id}/season/{season}",
+                params=params,
+                timeout=10
+            ).json()
+        except (requests.RequestException, ValueError):
+            season_data = {}
 
         cache.set(season_cache_key, season_data, 86400)
 
@@ -597,11 +609,11 @@ def watchtv(request, tv_id):
     # -----------------------------
     # PLAYER URL
     # -----------------------------
-    url5 =f"https://player.videasy.net/tv/{tv_id}/{season}/{episode}?color=8B5CF6&autoPlay=true&nextEpisode=false&episodeSelector=fasle"
+    url5 =f"https://player.videasy.net/tv/{tv_id}/{season}/{episode}?color=8B5CF6&autoPlay=true&nextEpisode=false&episodeSelector=false"
     url4 = f"https://vidfast.pro/tv/{imdb}/{season}/{episode}?autoPlay=true&sub=en&mute=false"
     url2 = f"https://vidnest.fun/tv/{tv_id}/{season}/{episode}"
     url3 = f"https://vidsrcme.ru/embed/tv?imdb={imdb}&season={season}&episode={episode}&ds_lang=en&autoplay=1"
-    url = f"https://www.vidking.net/embed/tv/{tv_id}/{season}/{episode}?color=e50914&autoPlay=true&nextEpisode=false&episodeSelector=fasle"
+    url = f"https://www.vidking.net/embed/tv/{tv_id}/{season}/{episode}?color=e50914&autoPlay=true&nextEpisode=false&episodeSelector=false"
 
     return render(request, "uzzutv/watchtv.html", {
         "id": tv_id,
@@ -615,8 +627,8 @@ def watchtv(request, tv_id):
         "title": tv.get("name", ""),
         "seasons": seasons,
         "episodes": episodes,
-        "current_season": int(season),
-        "current_episode": int(episode)
+        "current_season": season,
+        "current_episode": episode
     })
 
 
@@ -637,11 +649,14 @@ def watchmov(request, movie_id):
 
     if not imdb:
 
-        external = requests.get(
-            f"{BASE_URL}/movie/{movie_id}/external_ids",
-            params=params,
-            timeout=10
-        ).json()
+        try:
+            external = requests.get(
+                f"{BASE_URL}/movie/{movie_id}/external_ids",
+                params=params,
+                timeout=10
+            ).json()
+        except (requests.RequestException, ValueError):
+            return HttpResponse("Movie not available", status=502)
 
         imdb = external.get("imdb_id")
 
@@ -662,11 +677,14 @@ def watchmov(request, movie_id):
 
     if not title:
 
-        movie_data = requests.get(
-            f"{BASE_URL}/movie/{movie_id}",
-            params=params,
-            timeout=10
-        ).json()
+        try:
+            movie_data = requests.get(
+                f"{BASE_URL}/movie/{movie_id}",
+                params=params,
+                timeout=10
+            ).json()
+        except (requests.RequestException, ValueError):
+            return HttpResponse("Movie data unavailable", status=502)
 
         title = movie_data.get("title", "")
 
@@ -717,11 +735,15 @@ def search(request):
             movies, tv = cached
 
         else:
-            movie_url = f"https://api.themoviedb.org/3/search/movie?api_key={API_KEY}&query={query}"
-            tv_url = f"https://api.themoviedb.org/3/search/tv?api_key={API_KEY}&query={query}"
-
-            movies = requests.get(movie_url, timeout=10).json().get("results", [])
-            tv = requests.get(tv_url, timeout=10).json().get("results", [])
+            search_params = {"api_key": API_KEY, "query": query}
+            try:
+                movies = requests.get(f"{BASE_URL}/search/movie", params=search_params, timeout=10).json().get("results", [])
+            except (requests.RequestException, ValueError):
+                movies = []
+            try:
+                tv = requests.get(f"{BASE_URL}/search/tv", params=search_params, timeout=10).json().get("results", [])
+            except (requests.RequestException, ValueError):
+                tv = []
 
             cache.set(cache_key, (movies, tv), 3600)  # 1 hour
 
@@ -741,17 +763,23 @@ def discover_mix(movie_genre, tv_genre, cache_key):
 
     params = {"api_key": API_KEY}
 
-    movie = requests.get(
-        f"{BASE_URL}/discover/movie",
-        params={**params, "with_genres": movie_genre},
-        timeout=10
-    ).json().get("results", [])
+    try:
+        movie = requests.get(
+            f"{BASE_URL}/discover/movie",
+            params={**params, "with_genres": movie_genre},
+            timeout=10
+        ).json().get("results", [])
+    except (requests.RequestException, ValueError):
+        movie = []
 
-    tv = requests.get(
-        f"{BASE_URL}/discover/tv",
-        params={**params, "with_genres": tv_genre},
-        timeout=10
-    ).json().get("results", [])
+    try:
+        tv = requests.get(
+            f"{BASE_URL}/discover/tv",
+            params={**params, "with_genres": tv_genre},
+            timeout=10
+        ).json().get("results", [])
+    except (requests.RequestException, ValueError):
+        tv = []
 
     for m in movie:
         m["media_type"] = "movie"
@@ -776,11 +804,14 @@ def load_homepage_data2():
     params = {"api_key": API_KEY}
 
     # MIXED trending (movie + tv)
-    trending = requests.get(
-        f"{BASE_URL}/trending/all/day",
-        params=params,
-        timeout=10
-    ).json().get("results", [])
+    try:
+        trending = requests.get(
+            f"{BASE_URL}/trending/all/day",
+            params=params,
+            timeout=10
+        ).json().get("results", [])
+    except (requests.RequestException, ValueError):
+        trending = []
 
     # add logos for hero (home.html shows hero|slice:"10:" = items 10-19)
     for item in trending[10:20]:
@@ -1025,7 +1056,7 @@ def category(request, slug):
         "category_title": cfg["title"],
         "items": data["items"],
         "page": page,
-        "total_pages": total,
+        "total_pages": data["total_pages"],
         "per_page": CATEGORY_PER_PAGE,
         "pages": pages,
         "media_type": media_type,
@@ -1039,9 +1070,13 @@ def detail(request, type, id):
 
     if not context:
 
-        url = f"https://api.themoviedb.org/3/{type}/{id}?api_key={API_KEY}&append_to_response=credits,recommendations"
+        url = f"{BASE_URL}/{type}/{id}"
+        params = {"api_key": API_KEY, "append_to_response": "credits,recommendations"}
 
-        response = requests.get(url, timeout=10)
+        try:
+            response = requests.get(url, params=params, timeout=10)
+        except requests.RequestException:
+            raise Http404(f"{type} {id} not found")
 
         if response.status_code != 200:
             raise Http404(f"{type} {id} not found")
@@ -1076,8 +1111,8 @@ def detail(request, type, id):
             "meta_desc": meta_desc,
             "logo": logo,
             "genres": [g.get("name", "") for g in genres],
-            "cast": data["credits"]["cast"][:12],
-            "recommendations": data["recommendations"]["results"][:14]
+            "cast": (data.get("credits") or {}).get("cast", [])[:12],
+            "recommendations": (data.get("recommendations") or {}).get("results", [])[:14]
         }
 
         cache.set(cache_key, context, 43200)  # 12 hours
@@ -1115,10 +1150,8 @@ def dmca(request):
     return render(request, "uzzutv/dmca.html")
 
 
-SITE_URL = "https://uzzutv.pythonanywhere.com"
-
-
 def robots_txt(request):
+    site_url = request.build_absolute_uri('/').rstrip('/')
     lines = [
         "User-agent: *",
         "Allow: /",
@@ -1129,12 +1162,14 @@ def robots_txt(request):
         "Disallow: /admin/",
         "Disallow: /media-info/",
         "",
-        f"Sitemap: {SITE_URL}/sitemap.xml",
+        f"Sitemap: {site_url}/sitemap.xml",
     ]
     return HttpResponse("\n".join(lines), content_type="text/plain")
 
 
 def sitemap_xml(request):
+
+    site_url = request.build_absolute_uri('/').rstrip('/')
 
     cache_key = "sitemap_urls_v2"
     urls = cache.get(cache_key)
@@ -1142,21 +1177,21 @@ def sitemap_xml(request):
     if urls is None:
 
         urls = [
-            {"loc": f"{SITE_URL}/", "priority": "1.0"},
-            {"loc": f"{SITE_URL}/home/", "priority": "1.0"},
-            {"loc": f"{SITE_URL}/movie/", "priority": "0.9"},
-            {"loc": f"{SITE_URL}/tv/", "priority": "0.9"},
-            {"loc": f"{SITE_URL}/search/", "priority": "0.5"},
-            {"loc": f"{SITE_URL}/terms/", "priority": "0.3"},
-            {"loc": f"{SITE_URL}/dmca/", "priority": "0.3"},
-            {"loc": f"{SITE_URL}/aniuzu/", "priority": "0.9"},
-            {"loc": f"{SITE_URL}/aniuzu/top/", "priority": "0.8"},
-            {"loc": f"{SITE_URL}/aniuzu/seasons/", "priority": "0.8"},
-            {"loc": f"{SITE_URL}/aniuzu/studios/", "priority": "0.7"},
-            {"loc": f"{SITE_URL}/aniuzu/upcoming/", "priority": "0.7"},
-            {"loc": f"{SITE_URL}/aniuzu/collections/", "priority": "0.7"},
-            {"loc": f"{SITE_URL}/aniuzu/schedule/", "priority": "0.6"},
-            {"loc": f"{SITE_URL}/aniuzu/search/", "priority": "0.5"},
+            {"loc": f"{site_url}/", "priority": "1.0"},
+            {"loc": f"{site_url}/home/", "priority": "1.0"},
+            {"loc": f"{site_url}/movie/", "priority": "0.9"},
+            {"loc": f"{site_url}/tv/", "priority": "0.9"},
+            {"loc": f"{site_url}/search/", "priority": "0.5"},
+            {"loc": f"{site_url}/terms/", "priority": "0.3"},
+            {"loc": f"{site_url}/dmca/", "priority": "0.3"},
+            {"loc": f"{site_url}/aniuzu/", "priority": "0.9"},
+            {"loc": f"{site_url}/aniuzu/top/", "priority": "0.8"},
+            {"loc": f"{site_url}/aniuzu/seasons/", "priority": "0.8"},
+            {"loc": f"{site_url}/aniuzu/studios/", "priority": "0.7"},
+            {"loc": f"{site_url}/aniuzu/upcoming/", "priority": "0.7"},
+            {"loc": f"{site_url}/aniuzu/collections/", "priority": "0.7"},
+            {"loc": f"{site_url}/aniuzu/schedule/", "priority": "0.6"},
+            {"loc": f"{site_url}/aniuzu/search/", "priority": "0.5"},
         ]
 
         seen = set()
@@ -1181,7 +1216,7 @@ def sitemap_xml(request):
                         continue
                     seen.add(key)
                     urls.append({
-                        "loc": f"{SITE_URL}/{media_type}/{item_id}/",
+                        "loc": f"{site_url}/{media_type}/{item_id}/",
                         "priority": "0.8",
                     })
         except Exception:
@@ -1198,7 +1233,7 @@ def sitemap_xml(request):
                         continue
                     seen.add(item_id)
                     urls.append({
-                        "loc": f"{SITE_URL}/aniuzu/anime/{item_id}/",
+                        "loc": f"{site_url}/aniuzu/anime/{item_id}/",
                         "priority": "0.8",
                     })
         except Exception:
@@ -1769,7 +1804,6 @@ def anilist_anime_detail(anilist_id):
     genres = media.get("genres") or []
 
     studios = [s.get("name", "") for s in (media.get("studios", {}).get("nodes", []))]
-    tags = [t.get("name", "") for t in (media.get("tags") or []) if t.get("name")]
 
     related_edges = media.get("relations", {}).get("edges", [])
     related_anime = []
@@ -1937,7 +1971,6 @@ def anilist_by_genre(genre, page=1):
 
 def sanitize_anilist_description(text):
     """Strip HTML tags from AniList descriptions."""
-    import re
     clean = re.sub(r'<[^>]+>', '', text or '')
     clean = clean.replace('&amp;', '&').replace('&lt;', '<').replace('&gt;', '>').replace('&#039;', "'").replace('&quot;', '"')
     return clean.strip()
@@ -1994,12 +2027,18 @@ def aniuzu(request):
         for key, fn in fetchers.items():
             results[key] = executor.submit(fn)
 
-    trending = results["trending"].result()
-    popular = results["popular"].result()
-    airing = results["airing"].result()
-    seasonal = results["seasonal"].result()
-    top_rated = results["top_rated"].result()
-    upcoming = results["upcoming"].result()
+    def _safe_result(future):
+        try:
+            return future.result()
+        except Exception:
+            return []
+
+    trending = _safe_result(results["trending"])
+    popular = _safe_result(results["popular"])
+    airing = _safe_result(results["airing"])
+    seasonal = _safe_result(results["seasonal"])
+    top_rated = _safe_result(results["top_rated"])
+    upcoming = _safe_result(results["upcoming"])
 
     hero = trending[:5] if trending else []
 
@@ -2029,6 +2068,48 @@ def aniuzu_detail(request, anilist_id):
     ctx["meta_desc"] = sanitize_anilist_description(ctx["meta_desc"])
     ctx["description"] = sanitize_anilist_description(ctx["description"])
 
+    site_url = request.build_absolute_uri("/").rstrip("/")
+    anime = ctx.get("anime") or {}
+    start_date = ""
+    sy = (anime.get("startDate") or {}).get("year")
+    sm = (anime.get("startDate") or {}).get("month")
+    sd = (anime.get("startDate") or {}).get("day")
+    if sy:
+        start_date = str(sy)
+        if sm:
+            start_date += f"-{sm:02d}"
+            if sd:
+                start_date += f"-{sd:02d}"
+
+    jsonld = {
+        "@context": "https://schema.org",
+        "@type": "TVSeries",
+        "name": ctx.get("title", ""),
+        "alternateName": ctx.get("romaji", ""),
+        "description": (ctx.get("description") or "")[:300],
+        "image": (anime.get("coverImage") or {}).get("extraLarge") or (anime.get("coverImage") or {}).get("large", ""),
+        "url": f"{site_url}/aniuzu/anime/{anilist_id}/",
+        "genre": ctx.get("genres", []),
+        "numberOfEpisodes": anime.get("episodes"),
+        "duration": anime.get("duration"),
+        "datePublished": start_date or None,
+    }
+    if ctx.get("score_raw"):
+        jsonld["aggregateRating"] = {
+            "@type": "AggregateRating",
+            "ratingValue": ctx["score_raw"],
+            "bestRating": 100,
+            "ratingCount": anime.get("popularity") or 1,
+        }
+    studios = ctx.get("studios", [])
+    if studios:
+        jsonld["productionCompany"] = [
+            {"@type": "Organization", "name": s} for s in studios
+        ]
+
+    ctx["jsonld_json"] = json.dumps(jsonld, ensure_ascii=False).replace("</script>", "\\u003c/script\\u003e")
+    ctx["site_url"] = site_url
+
     return render(request, "uzzutv/aniuzu_detail.html", ctx)
 
 
@@ -2037,6 +2118,8 @@ def aniuzu_watch(request, anilist_id, episode):
     ctx = anilist_anime_detail(anilist_id)
     if ctx is None:
         return render(request, "uzzutv/aniuzu_404.html", status=404)
+
+    ctx = copy.deepcopy(ctx)
 
     episode = max(1, _safe_int(episode, 1))
     total_episodes = 1
@@ -2084,7 +2167,6 @@ def aniuzu_watch(request, anilist_id, episode):
             ep_entry = {"number": i, "title": "", "thumbnail": ""}
             for se in streaming_eps:
                 try:
-                    import re
                     nums = re.findall(r'\d+', se.get("title", ""))
                     if nums and int(nums[-1]) == i:
                         ep_entry["title"] = se.get("title", "")
@@ -2101,6 +2183,7 @@ def aniuzu_watch(request, anilist_id, episode):
         "variant": variant,
         "source": source,
         "episodes_list": episodes_list,
+        "episodes_json": json.dumps(episodes_list, ensure_ascii=False),
         "title": ctx.get("title") or ctx.get("romaji") or "",
     })
 

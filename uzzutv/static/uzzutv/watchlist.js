@@ -97,6 +97,8 @@ async function toggleWatchlist(id, type, title, poster, button) {
         return;
     }
 
+    if (button) button.disabled = true;
+
     const exists = await isInWatchlist(id, type);
 
     if (exists) {
@@ -122,6 +124,8 @@ async function toggleWatchlist(id, type, title, poster, button) {
             button.classList.add("in-watchlist");
         }
     }
+
+    if (button) button.disabled = false;
 }
 
 

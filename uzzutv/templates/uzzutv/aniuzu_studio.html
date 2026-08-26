@@ -8,8 +8,8 @@
 
 {% block title %}{{ studio_name }} Anime - Aniuzu{% endblock %}
 {% block meta_description %}Browse anime by {{ studio_name }} on Aniuzu. Discover popular titles from {{ studio_name }}.{% endblock %}
-{% block canonical %}<link rel="canonical" href="https://uzzutv.pythonanywhere.com/aniuzu/studios/{{ studio_slug }}/">{% endblock %}
-{% block og_url %}https://uzzutv.pythonanywhere.com/aniuzu/studios/{{ studio_slug }}/{% endblock %}
+{% block canonical %}<link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}/aniuzu/studios/{{ studio_slug }}/">{% endblock %}
+{% block og_url %}{{ request.scheme }}://{{ request.get_host }}/aniuzu/studios/{{ studio_slug }}/{% endblock %}
 {% block og_title %}{{ studio_name }} Anime - Aniuzu{% endblock %}
 {% block og_description %}Browse anime by {{ studio_name }} on Aniuzu.{% endblock %}
 

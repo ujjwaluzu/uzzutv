@@ -4,8 +4,8 @@
 {% block title %}UzzUTV - User Profile{% endblock %}
 {% block meta_description %}View a UzzUTV user's ratings and recent comments on movies and TV shows.{% endblock %}
 {% block robots %}noindex, follow{% endblock %}
-{% block canonical %}<link rel="canonical" href="https://uzzutv.pythonanywhere.com/profile/{{ user_id }}/">{% endblock %}
-{% block og_url %}https://uzzutv.pythonanywhere.com/profile/{{ user_id }}/{% endblock %}
+{% block canonical %}<link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}/profile/{{ user_id }}/">{% endblock %}
+{% block og_url %}{{ request.scheme }}://{{ request.get_host }}/profile/{{ user_id }}/{% endblock %}
 
 {% block css %}
 <style>

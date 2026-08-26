@@ -2,8 +2,8 @@
 
 {% block title %}UzzUTV - DMCA Policy{% endblock %}
 {% block meta_description %}Read the DMCA policy for UzzUTV. Learn how copyright claims are handled for third-party embedded content.{% endblock %}
-{% block canonical %}<link rel="canonical" href="https://uzzutv.pythonanywhere.com/dmca/">{% endblock %}
-{% block og_url %}https://uzzutv.pythonanywhere.com/dmca/{% endblock %}
+{% block canonical %}<link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}/dmca/">{% endblock %}
+{% block og_url %}{{ request.scheme }}://{{ request.get_host }}/dmca/{% endblock %}
 
 {% block body %}
 

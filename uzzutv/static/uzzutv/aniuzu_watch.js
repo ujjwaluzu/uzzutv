@@ -38,7 +38,6 @@ document.addEventListener("DOMContentLoaded", function() {
     if (!AZW) return;
 
     azwRenderEpisodes();
-    azwLoadPlayer(AZW.source);
     azwUpdateNavButtons();
 
     var player = document.getElementById("azw-player");
@@ -47,6 +46,10 @@ document.addEventListener("DOMContentLoaded", function() {
             azwHideLoading();
         });
     }
+
+    azwFetchResumeTime().then(function(resumeTime) {
+        azwLoadPlayer(AZW.source, resumeTime);
+    });
 
     azwSetupSearch();
     azwScrollToActive();
@@ -78,6 +81,14 @@ function azwInitState() {
         coverImage: root.getAttribute("data-cover") || "",
         episodes: episodes
     };
+
+    if (isNaN(AZW.anilistId) || isNaN(AZW.currentEpisode)) {
+        AZW = null;
+        return;
+    }
+    if (isNaN(AZW.totalEpisodes)) {
+        AZW.totalEpisodes = AZW.episodes.length || 1;
+    }
 }
 
 /* =========================================================
@@ -140,6 +151,7 @@ function azwAttrEscape(text) {
 
 function azwOnEpisodeClick(e) {
     e.preventDefault();
+    if (!AZW) return;
     var el = e.currentTarget;
     var epNum = parseInt(el.getAttribute("data-ep"), 10);
     if (isNaN(epNum) || epNum === AZW.currentEpisode) return;
@@ -177,6 +189,7 @@ function azwSwitchEpisode(epNum) {
     azwUpdateNavButtons();
     azwUpdateUrl();
     azwScrollToActive();
+    if (_azwProgressTimer) { clearTimeout(_azwProgressTimer); _azwProgressTimer = null; }
     azwLoadPlayer(AZW.source);
     azwTrackEpisodeSwitch(target);
 }
@@ -229,7 +242,7 @@ function azwFindAdjacentEpisode(direction) {
 
 function azwBuildWatchUrl(epNum) {
     return "/aniuzu/anime/" + AZW.anilistId + "/watch/" + epNum
-        + "/?variant=" + AZW.variant + "&source=" + AZW.source;
+        + "/?variant=" + encodeURIComponent(AZW.variant) + "&source=" + encodeURIComponent(AZW.source);
 }
 
 function azwUpdateUrl() {
@@ -247,21 +260,26 @@ function azwUpdateUrl() {
 function azwTrackEpisodeSwitch(epNum) {
     try {
         if (typeof saveAniuzuContinue === "function") {
-            saveAniuzuContinue(AZW.anilistId, epNum, AZW.variant, AZW.coverImage, AZW.title);
+            saveAniuzuContinue(AZW.anilistId, epNum, AZW.variant, AZW.coverImage, AZW.title, 0, 0);
         }
-    } catch (e) {}
+    } catch (e) {
+        console.error("Error tracking episode switch:", e);
+    }
 }
 
 /* =========================================================
    PLAYER LOADING
-   ========================================================= */
+========================================================= */
 
 function azwLoadPlayer(source, resumeTime) {
     var player = document.getElementById("azw-player");
     if (!player || !AZW) return;
 
     var provider = AZWProviders[source];
-    if (!provider) return;
+    if (!provider) {
+        azwShowError("Unknown player source: " + source, source);
+        return;
+    }
 
     azwShowLoading("Loading Episode " + AZW.currentEpisode + "...");
 
@@ -468,6 +486,30 @@ function azwHandleTryEmbedMessage(data) {
 }
 
 /* =========================================================
+   RESUME TIME — fetch saved position from continue watching
+   ========================================================= */
+
+async function azwFetchResumeTime() {
+    if (!AZW) return 0;
+    try {
+        if (typeof getCurrentUser !== "function" || typeof supabaseClient === "undefined") return 0;
+        var user = await getCurrentUser();
+        if (!user) return 0;
+        var { data, error } = await supabaseClient
+            .from("aniuzu_continue_watching")
+            .select("position")
+            .eq("user_id", user.id)
+            .eq("media_id", Number(AZW.anilistId))
+            .eq("episode", Number(AZW.currentEpisode))
+            .maybeSingle();
+        if (error || !data) return 0;
+        return Number(data.position) || 0;
+    } catch (e) {
+        return 0;
+    }
+}
+
+/* =========================================================
    PROGRESS
    ========================================================= */
 
@@ -484,9 +526,11 @@ function azwSaveProgress(position, duration) {
 
     try {
         if (typeof saveAniuzuContinue === "function") {
-            saveAniuzuContinue(AZW.anilistId, AZW.currentEpisode, AZW.variant, AZW.coverImage, AZW.title);
+            saveAniuzuContinue(AZW.anilistId, AZW.currentEpisode, AZW.variant, AZW.coverImage, AZW.title, position, duration);
         }
-    } catch (e) {}
+    } catch (e) {
+        console.error("Error saving progress:", e);
+    }
 }
 
 /* =========================================================
@@ -504,7 +548,7 @@ function azwNavigateToEpisode(epNum) {
     if (target === AZW.currentEpisode) return;
 
     var url = "/aniuzu/anime/" + AZW.anilistId + "/watch/" + target
-        + "/?variant=" + AZW.variant + "&source=" + AZW.source;
+        + "/?variant=" + encodeURIComponent(AZW.variant) + "&source=" + encodeURIComponent(AZW.source);
     window.location.href = url;
 }
 
@@ -583,19 +627,4 @@ function azwSetupIframeDetection() {
             }
         }
     });
-
-    if (typeof MutationObserver !== "undefined") {
-        var observer = new MutationObserver(function(mutations) {
-            for (var i = 0; i < mutations.length; i++) {
-                var mut = mutations[i];
-                if (mut.attributeName === "src") {
-                    var newSrc = player.src || "";
-                    if (newSrc && newSrc !== _azwLastIframeSrc) {
-                        _azwLastIframeSrc = newSrc;
-                    }
-                }
-            }
-        });
-        observer.observe(player, { attributes: true, attributeFilter: ["src"] });
-    }
 }

@@ -8,8 +8,8 @@
 
 {% block title %}{{ season|title }} {{ year }} Anime - Aniuzu{% endblock %}
 {% block meta_description %}Browse {{ season|title }} {{ year }} anime season on Aniuzu. Discover anime from {{ season|title }} {{ year }}.{% endblock %}
-{% block canonical %}<link rel="canonical" href="https://uzzutv.pythonanywhere.com/aniuzu/seasons/">{% endblock %}
-{% block og_url %}https://uzzutv.pythonanywhere.com/aniuzu/seasons/{% endblock %}
+{% block canonical %}<link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}/aniuzu/seasons/?season={{ season|urlencode }}&year={{ year }}">{% endblock %}
+{% block og_url %}{{ request.scheme }}://{{ request.get_host }}/aniuzu/seasons/?season={{ season|urlencode }}&year={{ year }}{% endblock %}
 {% block og_title %}{{ season|title }} {{ year }} Anime - Aniuzu{% endblock %}
 {% block og_description %}Browse {{ season|title }} {{ year }} anime season on Aniuzu.{% endblock %}
 
@@ -45,7 +45,7 @@
 {% if total_pages > 1 %}
 <div class="az-pagination">
 {% if page > 1 %}
-<a href="{% url 'aniuzu_seasons' %}?season={{ season }}&year={{ year }}&page={{ page|add:'-1' }}">&#8249; Prev</a>
+<a href="{% url 'aniuzu_seasons' %}?season={{ season|urlencode }}&year={{ year|urlencode }}&page={{ page|add:'-1' }}">&#8249; Prev</a>
 {% endif %}
 {% for p in pages %}
 {% if p == page %}
@@ -53,11 +53,11 @@
 {% elif p == '...' %}
 <span class="az-page-dots">...</span>
 {% else %}
-<a href="{% url 'aniuzu_seasons' %}?season={{ season }}&year={{ year }}&page={{ p }}">{{ p }}</a>
+<a href="{% url 'aniuzu_seasons' %}?season={{ season|urlencode }}&year={{ year|urlencode }}&page={{ p }}">{{ p }}</a>
 {% endif %}
 {% endfor %}
 {% if page < total_pages %}
-<a href="{% url 'aniuzu_seasons' %}?season={{ season }}&year={{ year }}&page={{ page|add:'1' }}">Next &#8250;</a>
+<a href="{% url 'aniuzu_seasons' %}?season={{ season|urlencode }}&year={{ year|urlencode }}&page={{ page|add:'1' }}">Next &#8250;</a>
 {% endif %}
 </div>
 {% endif %}
