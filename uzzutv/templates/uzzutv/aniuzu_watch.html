@@ -98,12 +98,4 @@
 
 <script src="{% static 'uzzutv/aniuzu_watch.js' %}"></script>
 
-<script>
-document.addEventListener("DOMContentLoaded", function(){
-    if(typeof saveAniuzuContinue === "function"){
-        saveAniuzuContinue(AZW.anilistId, AZW.currentEpisode, AZW.variant, AZW.coverImage, AZW.title);
-    }
-});
-</script>
-
 {% endblock %}

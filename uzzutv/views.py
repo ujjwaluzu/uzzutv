@@ -2155,26 +2155,18 @@ def aniuzu_watch(request, anilist_id, episode):
         source = "anilink"
 
     episodes_list = []
-    if streaming_eps and total_episodes == len(streaming_eps):
-        for i, se in enumerate(streaming_eps, 1):
-            episodes_list.append({
-                "number": i,
-                "title": se.get("title", ""),
-                "thumbnail": se.get("thumbnail", ""),
-            })
-    else:
-        for i in range(1, total_episodes + 1):
-            ep_entry = {"number": i, "title": "", "thumbnail": ""}
-            for se in streaming_eps:
-                try:
-                    nums = re.findall(r'\d+', se.get("title", ""))
-                    if nums and int(nums[-1]) == i:
-                        ep_entry["title"] = se.get("title", "")
-                        ep_entry["thumbnail"] = se.get("thumbnail", "")
-                        break
-                except (ValueError, IndexError):
-                    pass
-            episodes_list.append(ep_entry)
+    for i in range(1, total_episodes + 1):
+        ep_entry = {"number": i, "title": "", "thumbnail": ""}
+        for se in streaming_eps:
+            try:
+                nums = re.findall(r'\d+', se.get("title", ""))
+                if nums and int(nums[-1]) == i:
+                    ep_entry["title"] = se.get("title", "")
+                    ep_entry["thumbnail"] = se.get("thumbnail", "")
+                    break
+            except (ValueError, IndexError):
+                pass
+        episodes_list.append(ep_entry)
 
     ctx.update({
         "anilist_id": anilist_id,

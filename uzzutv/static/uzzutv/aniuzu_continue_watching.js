@@ -12,7 +12,7 @@ function _azCwHtmlEscape(text) {
         .replace(/>/g, "&gt;");
 }
 
-async function saveAniuzuContinue(anilistId, episode, variant, poster, title, position, duration) {
+async function saveAniuzuContinue(anilistId, episode, variant, poster, title, position, duration, source) {
 
     try {
         var user = await getCurrentUser();
@@ -30,6 +30,7 @@ async function saveAniuzuContinue(anilistId, episode, variant, poster, title, po
                     title: title || "",
                     position: typeof position === "number" ? Math.floor(position) : 0,
                     duration: typeof duration === "number" ? Math.floor(duration) : 0,
+                    source: source || "anilink",
                     updated_at: new Date().toISOString()
                 },
                 { onConflict: "user_id,media_id" }
@@ -119,7 +120,8 @@ async function renderAniuzuContinueHome(containerId) {
     var cardsHtml = list.map(function(item) {
         var ep = (item.episode != null) ? Number(item.episode) : 1;
         var variant = item.variant || "sub";
-        var link = "/aniuzu/anime/" + Number(item.media_id) + "/watch/" + ep + "/?variant=" + encodeURIComponent(variant);
+        var src = item.source || "anilink";
+        var link = "/aniuzu/anime/" + Number(item.media_id) + "/watch/" + ep + "/?variant=" + encodeURIComponent(variant) + "&source=" + encodeURIComponent(src);
         var titleText = item.title || "Anime";
         var pos = Number(item.position) || 0;
         var dur = Number(item.duration) || 0;

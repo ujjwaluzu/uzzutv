@@ -164,6 +164,7 @@ function azwSwitchEpisode(epNum) {
 
     var target = Math.max(1, Math.min(epNum, AZW.totalEpisodes));
     AZW.currentEpisode = target;
+    _azwLastSwitchTime = Date.now();
 
     var items = document.querySelectorAll(".azw-ep-item");
     for (var i = 0; i < items.length; i++) {
@@ -258,12 +259,10 @@ function azwUpdateUrl() {
    ========================================================= */
 
 function azwTrackEpisodeSwitch(epNum) {
-    try {
-        if (typeof saveAniuzuContinue === "function") {
-            saveAniuzuContinue(AZW.anilistId, epNum, AZW.variant, AZW.coverImage, AZW.title, 0, 0);
-        }
-    } catch (e) {
-        console.error("Error tracking episode switch:", e);
+    if (!AZW) return;
+    if (typeof saveAniuzuContinue === "function") {
+        saveAniuzuContinue(AZW.anilistId, epNum, AZW.variant, AZW.coverImage, AZW.title, 0, 0, AZW.source)
+            .catch(function(e) { console.error("Error tracking episode switch:", e); });
     }
 }
 
@@ -452,7 +451,12 @@ function azwHandleAniLinkMessage(data) {
             break;
         case "episodechange":
             if (typeof payload.episodeNumber === "number") {
-                azwNavigateToEpisode(payload.episodeNumber);
+                var ep = payload.episodeNumber;
+                if (!isNaN(ep) && ep > 0 && Date.now() - _azwLastSwitchTime > 5000) {
+                    if (ep !== AZW.currentEpisode) {
+                        azwSwitchEpisode(ep);
+                    }
+                }
             }
             break;
         case "autonext":
@@ -526,7 +530,7 @@ function azwSaveProgress(position, duration) {
 
     try {
         if (typeof saveAniuzuContinue === "function") {
-            saveAniuzuContinue(AZW.anilistId, AZW.currentEpisode, AZW.variant, AZW.coverImage, AZW.title, position, duration);
+            saveAniuzuContinue(AZW.anilistId, AZW.currentEpisode, AZW.variant, AZW.coverImage, AZW.title, position, duration, AZW.source);
         }
     } catch (e) {
         console.error("Error saving progress:", e);
@@ -539,7 +543,7 @@ function azwSaveProgress(position, duration) {
 
 function azwOnEpisodeEnded() {
     var nextEp = azwFindAdjacentEpisode(1);
-    if (nextEp) azwNavigateToEpisode(nextEp);
+    if (nextEp) azwSwitchEpisode(nextEp);
 }
 
 function azwNavigateToEpisode(epNum) {
@@ -601,15 +605,18 @@ function azwShowError(msg, failedSource) {
 
 var _azwLastIframeSrc = "";
 var _azwIframeLoadBusy = false;
+var _azwLastSwitchTime = 0;
 
 function azwSetupIframeDetection() {
     var player = document.getElementById("azw-player");
     if (!player) return;
 
     _azwLastIframeSrc = player.src || "";
+    _azwLastSwitchTime = Date.now();
 
     player.addEventListener("load", function() {
         if (_azwIframeLoadBusy) return;
+        if (Date.now() - _azwLastSwitchTime < 5000) return;
 
         var currentSrc = player.src || "";
 
@@ -622,7 +629,7 @@ function azwSetupIframeDetection() {
                 if (!isNaN(newEp) && newEp !== AZW.currentEpisode && newEp > 0) {
                     _azwIframeLoadBusy = true;
                     setTimeout(function() { _azwIframeLoadBusy = false; }, 3000);
-                    azwNavigateToEpisode(newEp);
+                    azwSwitchEpisode(newEp);
                 }
             }
         }
