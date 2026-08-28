@@ -162,7 +162,19 @@
         });
         list.appendChild(fragment);
         var activeButton = list.querySelector(".az-episode-button.is-active");
-        if (activeButton) activeButton.scrollIntoView({ block: "start", behavior: "auto" });
+        if (activeButton) {
+            // Keep the active episode in view without moving the page itself.
+            var targetScrollTop = activeButton.offsetTop;
+            if (targetScrollTop < list.scrollTop) {
+                list.scrollTop = targetScrollTop;
+            } else {
+                var bottomEdge = targetScrollTop + activeButton.offsetHeight;
+                var visibleBottom = list.scrollTop + list.clientHeight;
+                if (bottomEdge > visibleBottom) {
+                    list.scrollTop = Math.max(0, bottomEdge - list.clientHeight);
+                }
+            }
+        }
         if (source.length > EPISODE_WINDOW) {
             var previous = document.createElement("button");
             previous.type = "button";
