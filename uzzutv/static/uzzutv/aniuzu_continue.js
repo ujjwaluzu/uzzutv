@@ -51,7 +51,7 @@
                 '<img loading="lazy" decoding="async" src="' + escapeHtml(meta.poster) + '" alt="' + escapeHtml(meta.title) + ' poster">' +
                 '<span class="az-continue-progress"><i style="width:' + progress.toFixed(2) + '%"></i></span></div>' +
                 '<div class="az-continue-info"><h3>' + escapeHtml(meta.title) + '</h3><p>' + escapeHtml(season) + ' · Episode ' + Number(record.episode_number) + '</p><span>' + escapeHtml(formatRemaining(record)) + '</span></div></a>' +
-                '<button type="button" class="az-continue-remove" data-anilist-id="' + Number(record.anilist_id) + '" data-episode="' + Number(record.episode_number) + '" aria-label="Remove from Continue Watching">×</button></div>';
+                '<button type="button" class="az-continue-remove" data-anilist-id="' + Number(record.anilist_id) + '" aria-label="Remove from Continue Watching">×</button></div>';
         }).join("");
         if (!cards) return;
         container.innerHTML = '<div class="az-slider-header"><h2 class="section-title">Continue Watching</h2></div><div class="az-continue-row">' + cards + '</div>';
@@ -79,8 +79,7 @@
             button.disabled = true;
             var result = await supabaseClient.from("aniuzu_continue_watching").delete()
                 .eq("user_id", user.id)
-                .eq("anilist_id", Number(button.dataset.anilistId))
-                .eq("episode_number", Number(button.dataset.episode));
+                .eq("anilist_id", Number(button.dataset.anilistId));
             if (result.error) throw result.error;
             var card = button.closest(".az-continue-card");
             if (card) card.remove();

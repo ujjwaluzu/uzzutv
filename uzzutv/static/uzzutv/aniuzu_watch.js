@@ -228,7 +228,7 @@
         var snapshotPercent = snapshot.duration > 0 ? Math.min(100, Math.max(0, (snapshot.position / snapshot.duration) * 100)) : null;
         var snapshotComplete = snapshotPercent !== null && (snapshotPercent >= COMPLETION_PERCENT || (snapshotPercent >= COMPLETION_NEAR_END_PERCENT && snapshot.duration - snapshot.position <= COMPLETION_REMAINING_SECONDS));
         if (snapshotComplete) {
-            await supabaseClient.from("aniuzu_continue_watching").delete().eq("user_id", user.id).eq("anilist_id", snapshot.anilistId).eq("episode_number", snapshot.episodeNumber);
+            await supabaseClient.from("aniuzu_continue_watching").delete().eq("user_id", user.id).eq("anilist_id", snapshot.anilistId);
             lastSaveAt = now;
             return;
         }
@@ -243,7 +243,7 @@
             progress_percent: snapshotPercent === null ? null : Math.round(snapshotPercent * 100) / 100,
             updated_at: new Date().toISOString()
         };
-        var result = await supabaseClient.from("aniuzu_continue_watching").upsert(payload, { onConflict: "user_id,anilist_id,episode_number" });
+        var result = await supabaseClient.from("aniuzu_continue_watching").upsert(payload, { onConflict: "user_id,anilist_id" });
         if (!result.error) {
             lastSavedPosition = snapshot.position;
             lastSaveAt = now;
@@ -341,7 +341,7 @@
         }
         var user = await currentUser();
         if (!user) return;
-        var result = await supabaseClient.from("aniuzu_continue_watching").select("server,variant,position,duration").eq("user_id", user.id).eq("anilist_id", state.anilistId).eq("episode_number", state.episodeNumber).maybeSingle();
+        var result = await supabaseClient.from("aniuzu_continue_watching").select("server,variant,position,duration,episode_number").eq("user_id", user.id).eq("anilist_id", state.anilistId).maybeSingle();
         var record = result.data;
         if (!record || result.error) {
             if (result.error) console.warn("Aniuzu resume lookup failed; using the Continue Watching handoff position.", result.error);

@@ -34,7 +34,7 @@ CREATE INDEX IF NOT EXISTS idx_aniuzu_wl_user ON aniuzu_watchlist(user_id);
 CREATE INDEX IF NOT EXISTS idx_aniuzu_wl_created ON aniuzu_watchlist(user_id, created_at DESC);
 
 -- 2. ANIUZU CONTINUE WATCHING
--- One row is one user's in-progress anime episode. Playback URLs are never
+-- One row is one user's latest in-progress episode per anime. Playback URLs are never
 -- stored: the client rebuilds them from AniList ID, episode, server and audio.
 -- =============================================================
 
@@ -49,13 +49,33 @@ CREATE TABLE IF NOT EXISTS aniuzu_continue_watching (
     duration         numeric(12,3) CHECK (duration IS NULL OR duration > 0),
     progress_percent numeric(5,2) CHECK (progress_percent IS NULL OR (progress_percent >= 0 AND progress_percent <= 100)),
     updated_at       timestamptz NOT NULL DEFAULT now(),
-    CONSTRAINT aniuzu_continue_watching_user_episode_key UNIQUE (user_id, anilist_id, episode_number)
+    CONSTRAINT aniuzu_continue_watching_user_anime_key UNIQUE (user_id, anilist_id)
 );
 
 CREATE INDEX IF NOT EXISTS idx_aniuzu_continue_user_updated
     ON aniuzu_continue_watching(user_id, updated_at DESC);
 CREATE INDEX IF NOT EXISTS idx_aniuzu_continue_anilist
     ON aniuzu_continue_watching(anilist_id);
+
+-- Migration for installations created with the original per-episode key:
+-- retain the most recently updated row for each user/anime, then enforce one
+-- Continue Watching record per anime.
+WITH ranked AS (
+    SELECT id, ROW_NUMBER() OVER (
+        PARTITION BY user_id, anilist_id
+        ORDER BY updated_at DESC, id DESC
+    ) AS row_num
+    FROM aniuzu_continue_watching
+)
+DELETE FROM aniuzu_continue_watching
+WHERE id IN (SELECT id FROM ranked WHERE row_num > 1);
+
+ALTER TABLE aniuzu_continue_watching
+    DROP CONSTRAINT IF EXISTS aniuzu_continue_watching_user_episode_key;
+ALTER TABLE aniuzu_continue_watching
+    DROP CONSTRAINT IF EXISTS aniuzu_continue_watching_user_anime_key;
+CREATE UNIQUE INDEX IF NOT EXISTS idx_aniuzu_continue_user_anime_unique
+    ON aniuzu_continue_watching(user_id, anilist_id);
 
 ALTER TABLE aniuzu_continue_watching ENABLE ROW LEVEL SECURITY;
 
