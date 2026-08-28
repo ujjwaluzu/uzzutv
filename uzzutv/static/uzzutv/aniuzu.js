@@ -4,11 +4,8 @@
 
 window.addEventListener("DOMContentLoaded",function(){
 azBuildHeroDots();
-updateAuthNavbar().then(function(){
-renderContinueAnime("continue-anime");
-}).catch(function(e){
+updateAuthNavbar().catch(function(e){
 console.error("Auth navbar error:", e);
-renderContinueAnime("continue-anime");
 });
 var l=document.getElementById("az-loader");
 if(l){l.classList.add("fade-out");setTimeout(function(){l.style.display="none"},1000);}
@@ -66,16 +63,8 @@ function azSlideLeft(id){var s=document.getElementById(id);if(s)s.scrollBy({left
 function azSlideRight(id){var s=document.getElementById(id);if(s)s.scrollBy({left:600,behavior:"smooth"})}
 
 /* =========================================================
-   ANIME CONTINUE WATCHING
-========================================================= */
-
-async function renderContinueAnime(containerId){
-    renderAniuzuContinueHome(containerId);
-}
-
-/* =========================================================
    TOGGLE DESCRIPTION
-========================================================= */
+   ========================================================= */
 
 function azToggleDesc(){
 var t=document.getElementById("az-desc-text");

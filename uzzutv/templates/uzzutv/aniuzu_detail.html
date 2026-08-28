@@ -48,7 +48,7 @@
 <p class="az-hero-desc">{{ description|striptags|truncatewords:40 }}</p>
 {% endif %}
 <div class="az-actions">
-<a class="az-watch-btn" href="{% url 'aniuzu_watch' anilist_id 1 %}?variant=sub"><span class="material-icons">play_arrow</span> Watch</a>
+<button type="button" class="az-watch-btn disabled" disabled aria-disabled="true" title="Watch coming soon"><span class="material-icons">play_arrow</span> Watch</button>
 <button class="az-watchlist-btn" data-id="{{ anilist_id }}" data-type="anime" data-title="{{ title|default:romaji }}" data-poster="{{ anime.coverImage.large }}">&#65291; Add to Watchlist</button>
 </div>
 </div>
