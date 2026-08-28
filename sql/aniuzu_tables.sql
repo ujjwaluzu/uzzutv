@@ -12,11 +12,19 @@ CREATE TABLE IF NOT EXISTS aniuzu_continue_watching (
     media_id    integer NOT NULL,
     episode     integer NOT NULL DEFAULT 1,
     variant     text NOT NULL DEFAULT 'sub',
+    source      text NOT NULL DEFAULT 'anilink',
     poster      text NOT NULL DEFAULT '',
     title       text NOT NULL DEFAULT '',
+    position    integer NOT NULL DEFAULT 0,
+    duration    integer NOT NULL DEFAULT 0,
     updated_at  timestamptz DEFAULT now() NOT NULL,
     UNIQUE(user_id, media_id)
 );
+
+-- Add missing columns if the table already exists from an older schema
+ALTER TABLE aniuzu_continue_watching ADD COLUMN IF NOT EXISTS source text NOT NULL DEFAULT 'anilink';
+ALTER TABLE aniuzu_continue_watching ADD COLUMN IF NOT EXISTS position integer NOT NULL DEFAULT 0;
+ALTER TABLE aniuzu_continue_watching ADD COLUMN IF NOT EXISTS duration integer NOT NULL DEFAULT 0;
 
 ALTER TABLE aniuzu_continue_watching ENABLE ROW LEVEL SECURITY;
 

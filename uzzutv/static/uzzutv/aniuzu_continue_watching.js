@@ -1,7 +1,14 @@
 /* =========================================================
    ANIUZU CONTINUE WATCHING
    Dedicated table: aniuzu_continue_watching
+   - Resumes video position, keeps server + language
+   - Progress bar on card
    ========================================================= */
+
+var AZW_CW_SOURCES = {
+    anilink: "AniLink",
+    tryembed: "TryEmbed"
+};
 
 function _azCwHtmlEscape(text) {
     return String(text)
@@ -26,11 +33,11 @@ async function saveAniuzuContinue(anilistId, episode, variant, poster, title, po
                     media_id: Number(anilistId),
                     episode: Number(episode),
                     variant: variant || "sub",
+                    source: source || "anilink",
                     poster: poster || "",
                     title: title || "",
                     position: typeof position === "number" ? Math.floor(position) : 0,
                     duration: typeof duration === "number" ? Math.floor(duration) : 0,
-                    source: source || "anilink",
                     updated_at: new Date().toISOString()
                 },
                 { onConflict: "user_id,media_id" }
@@ -110,7 +117,7 @@ async function renderAniuzuContinueHome(containerId) {
     var list = await getAllAniuzuContinue();
 
     if (list.length === 0) {
-        if (skel) skel.style.display = "none";
+        if (skel) skel.parentNode.innerHTML = "";
         container.innerHTML = "";
         return;
     }
@@ -119,23 +126,26 @@ async function renderAniuzuContinueHome(containerId) {
 
     var cardsHtml = list.map(function(item) {
         var ep = (item.episode != null) ? Number(item.episode) : 1;
-        var variant = item.variant || "sub";
-        var src = item.source || "anilink";
-        var link = "/aniuzu/anime/" + Number(item.media_id) + "/watch/" + ep + "/?variant=" + encodeURIComponent(variant) + "&source=" + encodeURIComponent(src);
+        var variant = (item.variant || "sub").toUpperCase();
+        var srcKey = item.source || "anilink";
+        var srcName = AZW_CW_SOURCES[srcKey] || srcKey;
+        var link = "/aniuzu/anime/" + Number(item.media_id) + "/watch/" + ep + "/?variant=" + encodeURIComponent(item.variant || "sub") + "&source=" + encodeURIComponent(srcKey);
         var titleText = item.title || "Anime";
         var pos = Number(item.position) || 0;
         var dur = Number(item.duration) || 0;
         var pct = dur > 0 ? Math.min(Math.round((pos / dur) * 100), 100) : 0;
-        var progressBar = dur > 0 ? '<div style="position:absolute;bottom:0;left:0;width:100%;height:3px;background:rgba(255,255,255,.15);z-index:10;"><div style="height:100%;width:' + pct + '%;background:#ff3c3c;border-radius:0 2px 2px 0;"></div></div>' : '';
-        return '<div class="az-card" style="position:relative;">'
-            + '<button onclick="removeAniuzuContinue(' + Number(item.media_id) + ')" style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.7);border:none;color:white;width:44px;height:44px;border-radius:50%;cursor:pointer;z-index:10;font-size:14px;line-height:44px;text-align:center;" aria-label="Remove from continue watching">&#10005;</button>'
-            + '<div style="position:absolute;bottom:8px;left:8px;background:rgba(0,0,0,0.8);padding:4px 8px;border-radius:6px;font-size:12px;z-index:10;color:white;">Ep ' + ep + ' ' + _azCwHtmlEscape(variant.toUpperCase()) + '</div>'
+        var progressBar = '<div class="az-cw-progress"><div class="az-cw-progress-fill" style="width:' + pct + '%"></div></div>';
+        return '<div class="az-card az-cw-card">'
+            + '<button type="button" onclick="removeAniuzuContinue(' + Number(item.media_id) + ')" class="az-cw-remove" aria-label="Remove from continue watching">&#10005;</button>'
             + '<a class="card-link" href="' + link + '">'
             + '<div class="card-poster">'
             + '<img loading="lazy" decoding="async" alt="' + _azCwHtmlEscape(titleText) + ' poster" src="' + _azCwHtmlEscape(item.poster || '') + '">'
             + '<span class="card-gradient"></span>'
-            + '</div></a>'
+            + '<div class="az-cw-badge">EP ' + ep + ' &bull; ' + _azCwHtmlEscape(variant) + ' &bull; ' + _azCwHtmlEscape(srcName.toUpperCase()) + '</div>'
+            + (dur > 0 ? '<div class="az-cw-pct">' + pct + '%</div>' : '')
             + progressBar
+            + '</div></a>'
+            + '<div class="card-info"><div class="card-title">' + _azCwHtmlEscape(titleText) + '</div><div class="card-meta">Episode ' + ep + '</div></div>'
             + '</div>';
     }).join("");
 

@@ -32,10 +32,10 @@
      data-sources='["anilink","tryembed"]'>
 
     <header class="azw-header">
-        <h1 class="azw-title">{{ title }}</h1>
-        <p class="azw-meta">
-            <span class="azw-meta-ep" id="azw-ep-label">Episode {{ current_episode }}</span>
-        </p>
+        <a class="azw-back" href="/aniuzu/anime/{{ anilist_id }}/" aria-label="Back to series">
+            <span class="material-icons">arrow_back</span> <span>{{ title }}</span>
+        </a>
+        <p class="azw-meta" id="azw-ep-label">Episode {{ current_episode }}</p>
     </header>
 
     <div class="azw-grid">
@@ -44,7 +44,7 @@
             <div class="azw-player" id="azw-player-wrap">
                 <div class="azw-loading" id="azw-loading">
                     <div class="azw-loading-spinner"></div>
-                    <span>Loading Episode {{ current_episode }}...</span>
+                    <span id="azw-loading-msg">Loading Episode {{ current_episode }}...</span>
                 </div>
                 <iframe
                     id="azw-player"
@@ -58,28 +58,29 @@
             </div>
 
             <div class="azw-controls">
-                <div class="azw-controls-main">
+                <div class="azw-controls-nav">
                     <a class="azw-nav-btn" href="#" id="azw-prev">
-                        <span class="material-icons">chevron_left</span> Previous
+                        <span class="material-icons">chevron_left</span> <span>Previous</span>
                     </a>
                     <span class="azw-ep-badge" id="azw-ep-badge">Episode {{ current_episode }}</span>
                     <a class="azw-nav-btn" href="#" id="azw-next">
-                        Next <span class="material-icons">chevron_right</span>
+                        <span>Next</span> <span class="material-icons">chevron_right</span>
                     </a>
                 </div>
-                <div class="azw-controls-secondary">
-                    <div class="azw-btn-group">
-                        <span class="azw-group-label">Language</span>
-                        <div class="azw-btns">
-                            <button class="azw-btn azw-variant-btn {% if variant == 'sub' %}active{% endif %}" data-variant="sub">SUB</button>
-                            <button class="azw-btn azw-variant-btn {% if variant == 'dub' %}active{% endif %}" data-variant="dub">DUB</button>
+
+                <div class="azw-controls-picker">
+                    <div class="azw-picker-group">
+                        <span class="azw-picker-label">Language</span>
+                        <div class="azw-picker-btns" id="azw-variant-btns">
+                            <button type="button" class="azw-picker-btn azw-variant-btn {% if variant == 'sub' %}active{% endif %}" data-variant="sub">SUB</button>
+                            <button type="button" class="azw-picker-btn azw-variant-btn {% if variant == 'dub' %}active{% endif %}" data-variant="dub">DUB</button>
                         </div>
                     </div>
-                    <div class="azw-btn-group">
-                        <span class="azw-group-label">Source</span>
-                        <div class="azw-btns">
-                            <button class="azw-btn azw-source-btn {% if source == 'anilink' %}active{% endif %}" data-source="anilink">AniLink</button>
-                            <button class="azw-btn azw-source-btn {% if source == 'tryembed' %}active{% endif %}" data-source="tryembed">TryEmbed</button>
+                    <div class="azw-picker-group">
+                        <span class="azw-picker-label">Server</span>
+                        <div class="azw-picker-btns" id="azw-source-btns">
+                            <button type="button" class="azw-picker-btn azw-source-btn {% if source == 'anilink' %}active{% endif %}" data-source="anilink">AniLink</button>
+                            <button type="button" class="azw-picker-btn azw-source-btn {% if source == 'tryembed' %}active{% endif %}" data-source="tryembed">TryEmbed</button>
                         </div>
                     </div>
                 </div>

@@ -1,5 +1,5 @@
 /* =========================================================
-   ANIUZU WATCH PAGE
+   ANIUZU WATCH PAGE (reimplemented)
    ========================================================= */
 
 .azw-container{
@@ -14,16 +14,32 @@
 
 .azw-header{
     margin-bottom:16px;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
 }
 
-.azw-title{
-    font-size:clamp(22px, 2.5vw, 32px);
+.azw-back{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    color:#d1d5db;
+    font-size:clamp(18px, 2.2vw, 28px);
     font-weight:800;
     letter-spacing:-.5px;
     line-height:1.15;
-    margin:0 0 4px;
-    color:#ffffff;
+    text-decoration:none;
     overflow-wrap:break-word;
+    transition:color .2s;
+}
+
+.azw-back:hover{
+    color:#ffffff;
+}
+
+.azw-back .material-icons{
+    font-size:28px;
+    flex-shrink:0;
 }
 
 .azw-meta{
@@ -32,29 +48,24 @@
     color:#9ca3af;
 }
 
-.azw-meta-ep{
-    color:#d1d5db;
-    font-weight:600;
-}
-
 /* =========================================================
    GRID — Player + Sidebar
    ========================================================= */
 
 .azw-grid{
     display:grid;
-    grid-template-columns:1fr 280px;
+    grid-template-columns:minmax(0,1fr) 290px;
     gap:20px;
     align-items:start;
 }
 
-/* =========================================================
-   MAIN / PLAYER
-   ========================================================= */
-
 .azw-main{
     min-width:0;
 }
+
+/* =========================================================
+   PLAYER
+   ========================================================= */
 
 .azw-player{
     position:relative;
@@ -76,16 +87,11 @@
     border:none;
 }
 
-/* =========================================================
-   LOADING OVERLAY
-   ========================================================= */
+/* Loading overlay */
 
 .azw-loading{
     position:absolute;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
+    top:0;left:0;width:100%;height:100%;
     display:flex;
     flex-direction:column;
     align-items:center;
@@ -104,8 +110,7 @@
 }
 
 .azw-loading-spinner{
-    width:36px;
-    height:36px;
+    width:36px;height:36px;
     border:3px solid rgba(255,255,255,.08);
     border-top-color:#ff3c3c;
     border-radius:50%;
@@ -116,34 +121,131 @@
     to{transform:rotate(360deg)}
 }
 
+/* Error overlay */
+
+.azw-error-overlay{
+    position:absolute;
+    top:0;left:0;width:100%;height:100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    background:#000;
+    z-index:10;
+    color:#9ca3af;
+    font-size:14px;
+    gap:14px;
+    border-radius:14px;
+}
+
+.azw-error-span{
+    color:#d1d5db;
+    font-weight:600;
+    text-align:center;
+    padding:0 16px;
+}
+
+.azw-fallback-btn{
+    padding:10px 22px;
+    border-radius:8px;
+    background:#ff3c3c;
+    border:none;
+    color:#ffffff;
+    font-size:13px;
+    font-weight:600;
+    cursor:pointer;
+    font-family:inherit;
+    transition:background .2s, transform .15s;
+    min-height:44px;
+}
+
+.azw-fallback-btn:hover{
+    background:#e83535;
+    transform:translateY(-1px);
+}
+
 /* =========================================================
-   CONTROLS
+   CONTROLS (below player)
    ========================================================= */
 
 .azw-controls{
     margin-top:16px;
     display:flex;
     flex-direction:column;
-    gap:12px;
+    gap:14px;
 }
 
-/* Main row: prev / badge / next */
+/* Nav row: prev / badge / next */
 
-.azw-controls-main{
+.azw-controls-nav{
     display:flex;
     align-items:center;
     justify-content:center;
     gap:12px;
 }
 
-/* Secondary row: language + source */
+/* Picker row: Language + Server */
 
-.azw-controls-secondary{
+.azw-controls-picker{
     display:flex;
     align-items:center;
     justify-content:center;
-    gap:24px;
+    gap:28px;
     flex-wrap:wrap;
+}
+
+.azw-picker-group{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.azw-picker-label{
+    font-size:12px;
+    font-weight:600;
+    color:#6b7280;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+}
+
+.azw-picker-btns{
+    display:flex;
+    gap:6px;
+}
+
+/* Buttons */
+
+.azw-btn{
+    padding:8px 18px;
+    border-radius:8px;
+    border:1px solid rgba(255,255,255,.08);
+    background:#181818;
+    color:#d1d5db;
+    font-size:13px;
+    font-weight:600;
+    font-family:inherit;
+    cursor:pointer;
+    transition:background .2s, border-color .2s, color .2s, box-shadow .2s, transform .15s;
+    user-select:none;
+    min-height:44px;
+}
+
+.azw-btn:hover{
+    background:#242424;
+    border-color:rgba(255,255,255,.16);
+    color:#ffffff;
+}
+
+.azw-btn.active{
+    background:#ff3c3c;
+    border-color:#ff3c3c;
+    color:#ffffff;
+    box-shadow:0 0 14px rgba(255,60,60,.3);
+}
+
+.azw-btn.active:hover{
+    background:#e83535;
+    transform:translateY(-1px);
 }
 
 /* Nav buttons */
@@ -194,60 +296,6 @@
     white-space:nowrap;
 }
 
-/* Button groups (Language / Source) */
-
-.azw-btn-group{
-    display:flex;
-    align-items:center;
-    gap:10px;
-}
-
-.azw-group-label{
-    font-size:12px;
-    font-weight:600;
-    color:#6b7280;
-    text-transform:uppercase;
-    letter-spacing:.06em;
-}
-
-.azw-btns{
-    display:flex;
-    gap:6px;
-}
-
-.azw-btn{
-    padding:8px 18px;
-    border-radius:8px;
-    border:1px solid rgba(255,255,255,.08);
-    background:#181818;
-    color:#d1d5db;
-    font-size:13px;
-    font-weight:600;
-    font-family:inherit;
-    cursor:pointer;
-    transition:background .2s, border-color .2s, color .2s, box-shadow .2s, transform .15s;
-    user-select:none;
-    min-height:44px;
-}
-
-.azw-btn:hover{
-    background:#242424;
-    border-color:rgba(255,255,255,.16);
-    color:#ffffff;
-}
-
-.azw-btn.active{
-    background:#ff3c3c;
-    border-color:#ff3c3c;
-    color:#ffffff;
-    box-shadow:0 0 14px rgba(255,60,60,.3);
-}
-
-.azw-btn.active:hover{
-    background:#e83535;
-    transform:translateY(-1px);
-}
-
 /* =========================================================
    EPISODE SIDEBAR
    ========================================================= */
@@ -274,8 +322,6 @@
     text-transform:uppercase;
 }
 
-/* Search */
-
 .azw-search{
     width:100%;
     background:#0f0f0f;
@@ -291,16 +337,12 @@
     min-height:44px;
 }
 
-.azw-search::placeholder{
-    color:#555;
-}
+.azw-search::placeholder{color:#555;}
 
 .azw-search:focus{
     border-color:#ff3c3c;
     box-shadow:0 0 0 3px rgba(255,60,60,.1);
 }
-
-/* Episode list */
 
 .azw-ep-list{
     flex:1;
@@ -309,30 +351,16 @@
     scrollbar-color:#2a2a2a transparent;
 }
 
-.azw-ep-list::-webkit-scrollbar{
-    width:5px;
-}
-
-.azw-ep-list::-webkit-scrollbar-track{
-    background:transparent;
-}
-
-.azw-ep-list::-webkit-scrollbar-thumb{
-    background:#2a2a2a;
-    border-radius:3px;
-}
-
-.azw-ep-list::-webkit-scrollbar-thumb:hover{
-    background:#3a3a3a;
-}
-
-/* Episode item */
+.azw-ep-list::-webkit-scrollbar{width:5px;}
+.azw-ep-list::-webkit-scrollbar-track{background:transparent;}
+.azw-ep-list::-webkit-scrollbar-thumb{background:#2a2a2a;border-radius:3px;}
+.azw-ep-list::-webkit-scrollbar-thumb:hover{background:#3a3a3a;}
 
 .azw-ep-item{
     display:flex;
     align-items:center;
     gap:10px;
-    padding:11px 11px;
+    padding:11px;
     border-radius:8px;
     text-decoration:none;
     color:#b0b0b0;
@@ -356,8 +384,6 @@
     border-left-color:#ff3c3c;
 }
 
-/* Episode number */
-
 .azw-ep-num{
     min-width:22px;
     text-align:right;
@@ -368,34 +394,21 @@
     transition:color .15s;
 }
 
-.azw-ep-item:hover .azw-ep-num{
-    color:#999;
-}
-
-.azw-ep-item.active .azw-ep-num{
-    color:#ff3c3c;
-}
-
-/* Episode title */
+.azw-ep-item:hover .azw-ep-num{color:#999;}
+.azw-ep-item.active .azw-ep-num{color:#ff3c3c;}
 
 .azw-ep-name{
     flex:1;
     white-space:nowrap;
     overflow:hidden;
     text-overflow:ellipsis;
-    font-size:12px;
-    color:#777;
+    font-size:13px;
+    font-weight:500;
+    color:#b8b8b8;
 }
 
-.azw-ep-item:hover .azw-ep-name{
-    color:#ccc;
-}
-
-.azw-ep-item.active .azw-ep-name{
-    color:#ffffff;
-}
-
-/* Empty search state */
+.azw-ep-item:hover .azw-ep-name{color:#ccc;}
+.azw-ep-item.active .azw-ep-name{color:#ffffff;}
 
 .azw-ep-empty{
     padding:24px 12px;
@@ -404,46 +417,17 @@
     font-size:13px;
 }
 
-/* Error fallback button */
-
-.azw-fallback-btn{
-    padding:10px 22px;
-    border-radius:8px;
-    background:#ff3c3c;
-    border:none;
-    color:#ffffff;
-    font-size:13px;
-    font-weight:600;
-    cursor:pointer;
-    font-family:inherit;
-    transition:background .2s, transform .15s;
-    min-height:44px;
-}
-
-.azw-fallback-btn:hover{
-    background:#e83535;
-    transform:translateY(-1px);
-}
-
 /* =========================================================
    TABLET (768px - 1023px)
    ========================================================= */
 
 @media (min-width:768px) and (max-width:1023px){
 
-.azw-container{
-    padding:76px 20px 60px;
-}
+.azw-container{padding:76px 20px 60px;}
 
-.azw-grid{
-    grid-template-columns:1fr 240px;
-    gap:16px;
-}
+.azw-grid{grid-template-columns:minmax(0,1fr) 240px;gap:16px;}
 
-.azw-sidebar{
-    top:72px;
-    max-height:calc(100vh - 92px);
-}
+.azw-sidebar{top:72px;max-height:calc(100vh - 92px);}
 
 }
 
@@ -453,34 +437,17 @@
 
 @media (max-width:767px){
 
-.azw-container{
-    padding:68px 12px 48px;
-}
+.azw-container{padding:68px 12px 48px;}
 
-.azw-header{
-    text-align:center;
-    margin-bottom:12px;
-}
+.azw-header{text-align:center;align-items:center;margin-bottom:12px;}
 
-.azw-title{
-    font-size:20px;
-}
-
-.azw-grid{
-    grid-template-columns:1fr;
-    gap:14px;
-}
-
-.azw-main{
-    order:-1;
-}
-
-/* Mobile sidebar */
+.azw-grid{grid-template-columns:minmax(0,1fr);gap:14px;}
 
 .azw-sidebar{
     position:static;
     max-height:none;
     padding:14px;
+    order:2;
 }
 
 .azw-ep-list{
@@ -490,29 +457,14 @@
     scrollbar-color:#2a2a2a transparent;
 }
 
-.azw-ep-list::-webkit-scrollbar{
-    width:4px;
-}
+.azw-ep-list::-webkit-scrollbar{width:4px;}
+.azw-ep-list::-webkit-scrollbar-thumb{background:#2a2a2a;border-radius:2px;}
 
-.azw-ep-list::-webkit-scrollbar-thumb{
-    background:#2a2a2a;
-    border-radius:2px;
-}
+.azw-controls-nav{gap:8px;}
 
-/* Mobile controls */
+.azw-controls-picker{gap:16px;}
 
-.azw-controls-main{
-    gap:8px;
-}
-
-.azw-controls-secondary{
-    gap:16px;
-}
-
-.azw-nav-btn{
-    padding:9px 14px;
-    font-size:12.5px;
-}
+.azw-nav-btn{padding:9px 14px;font-size:12.5px;}
 
 }
 
@@ -522,34 +474,19 @@
 
 @media (max-width:400px){
 
-.azw-controls-secondary{
-    flex-direction:column;
-    gap:10px;
-}
+.azw-controls-picker{flex-direction:column;gap:10px;}
 
-.azw-btn-group{
-    width:100%;
-    justify-content:center;
-}
+.azw-picker-group{width:100%;justify-content:center;}
 
-.azw-nav-btn{
-    padding:8px 12px;
-    font-size:12px;
-}
+.azw-nav-btn{padding:8px 12px;font-size:12px;}
 
-.azw-ep-badge{
-    padding:7px 14px;
-    font-size:12px;
-}
+.azw-ep-badge{padding:7px 14px;font-size:12px;}
 
-.azw-btn{
-    padding:7px 14px;
-    font-size:12px;
-}
+.azw-btn{padding:7px 14px;font-size:12px;}
 
 }
 
-/* Focus-visible styles for keyboard navigation */
+/* Focus-visible for keyboard navigation */
 .azw-nav-btn:focus-visible,.azw-btn:focus-visible,.azw-fallback-btn:focus-visible{outline:2px solid #ff3c3c;outline-offset:2px}
 .azw-ep-item:focus-visible{outline:2px solid #ff3c3c;outline-offset:1px}
 .azw-search:focus-visible{outline:none;border-color:#ff3c3c;box-shadow:0 0 0 3px rgba(255,60,60,.2)}
