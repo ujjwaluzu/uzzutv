@@ -97,6 +97,7 @@
             button.setAttribute("aria-pressed", String(selected));
         });
         if (label) label.textContent = "Episode " + state.episodeNumber;
+        if (player) player.title = (config.title || "Anime") + " Episode " + state.episodeNumber;
     }
 
     function updateAddress(replace) {
@@ -209,29 +210,42 @@
     }
 
     async function saveProgress(force) {
+        // Snapshot playback state before awaiting auth. Episode/server changes
+        // can happen while the session promise resolves; the write must belong
+        // to the episode that was actually playing when it was requested.
+        var snapshot = {
+            anilistId: state.anilistId,
+            episodeNumber: state.episodeNumber,
+            server: state.server,
+            variant: state.variant,
+            position: state.position,
+            duration: state.duration
+        };
         var user = await currentUser();
-        if (!user || state.position < MINIMUM_SAVE_SECONDS) return;
+        if (!user || snapshot.position < MINIMUM_SAVE_SECONDS) return;
         var now = Date.now();
-        if (!force && now - lastSaveAt < SAVE_INTERVAL_MS && Math.abs(state.position - lastSavedPosition) < POSITION_DELTA_SECONDS) return;
-        if (isComplete()) {
-            await supabaseClient.from("aniuzu_continue_watching").delete().eq("user_id", user.id).eq("anilist_id", state.anilistId).eq("episode_number", state.episodeNumber);
+        if (!force && now - lastSaveAt < SAVE_INTERVAL_MS && Math.abs(snapshot.position - lastSavedPosition) < POSITION_DELTA_SECONDS) return;
+        var snapshotPercent = snapshot.duration > 0 ? Math.min(100, Math.max(0, (snapshot.position / snapshot.duration) * 100)) : null;
+        var snapshotComplete = snapshotPercent !== null && (snapshotPercent >= COMPLETION_PERCENT || (snapshotPercent >= COMPLETION_NEAR_END_PERCENT && snapshot.duration - snapshot.position <= COMPLETION_REMAINING_SECONDS));
+        if (snapshotComplete) {
+            await supabaseClient.from("aniuzu_continue_watching").delete().eq("user_id", user.id).eq("anilist_id", snapshot.anilistId).eq("episode_number", snapshot.episodeNumber);
             lastSaveAt = now;
             return;
         }
         var payload = {
             user_id: user.id,
-            anilist_id: state.anilistId,
-            episode_number: state.episodeNumber,
-            variant: state.variant,
-            server: state.server,
-            position: Math.round(state.position * 1000) / 1000,
-            duration: state.duration > 0 ? Math.round(state.duration * 1000) / 1000 : null,
-            progress_percent: progressPercent() === null ? null : Math.round(progressPercent() * 100) / 100,
+            anilist_id: snapshot.anilistId,
+            episode_number: snapshot.episodeNumber,
+            variant: snapshot.variant,
+            server: snapshot.server,
+            position: Math.round(snapshot.position * 1000) / 1000,
+            duration: snapshot.duration > 0 ? Math.round(snapshot.duration * 1000) / 1000 : null,
+            progress_percent: snapshotPercent === null ? null : Math.round(snapshotPercent * 100) / 100,
             updated_at: new Date().toISOString()
         };
         var result = await supabaseClient.from("aniuzu_continue_watching").upsert(payload, { onConflict: "user_id,anilist_id,episode_number" });
         if (!result.error) {
-            lastSavedPosition = state.position;
+            lastSavedPosition = snapshot.position;
             lastSaveAt = now;
         } else {
             console.error("Aniuzu Continue Watching save failed:", result.error);
@@ -253,6 +267,19 @@
         return event.origin === expectedOrigin;
     }
 
+    function episodeFromPayload(payload) {
+        if (!payload || typeof payload !== "object") return null;
+        // Providers use slightly different names for the episode-change value.
+        // Accept only numeric values that are present in AniList's playable list.
+        var candidates = [payload.episodeNumber, payload.episode_number, payload.episode,
+            payload.toEpisode, payload.nextEpisode, payload.number];
+        for (var i = 0; i < candidates.length; i += 1) {
+            var value = finiteNumber(candidates[i]);
+            if (value !== null && Number.isInteger(value) && validEpisodes.indexOf(value) !== -1) return value;
+        }
+        return null;
+    }
+
     function handleAniLinkMessage(event) {
         if (!validPlayerOrigin(event, ANILINK_ORIGIN) || !event.data || typeof event.data !== "object") return;
         var type = event.data.type || event.data.event;
@@ -260,6 +287,10 @@
         var payload = event.data.data && typeof event.data.data === "object" ? event.data.data :
             (event.data.payload && typeof event.data.payload === "object" ? event.data.payload : event.data);
         if (type === "anilink-player:error") { showError(); return; }
+        if (type === "anilink-player:episodechange") {
+            var changedEpisode = episodeFromPayload(payload);
+            if (changedEpisode !== null && changedEpisode !== state.episodeNumber) changeEpisode(changedEpisode);
+        }
         if (type === "anilink-player:ended") { state.position = state.duration || state.position; saveProgress(true); return; }
         var position = finiteNumber(payload.position !== undefined ? payload.position : payload.currentTime);
         var duration = finiteNumber(payload.duration);
@@ -268,9 +299,24 @@
     }
 
     function handleTryEmbedMessage(event) {
-        if (!validPlayerOrigin(event, TRYEMBED_ORIGIN) || !event.data || typeof event.data !== "object" || event.data.type !== "PLAYER_EVENT") return;
+        if (!validPlayerOrigin(event, TRYEMBED_ORIGIN) || !event.data || typeof event.data !== "object") return;
+        // Some TryEmbed builds expose the next button as a dedicated message.
+        if (event.data.type === "PLAYER_NEXT_EPISODE") {
+            var nextPayload = event.data.detail && typeof event.data.detail === "object" ? event.data.detail : event.data.data;
+            var nextEpisode = episodeFromPayload(nextPayload);
+            if (nextEpisode !== null && nextEpisode !== state.episodeNumber) changeEpisode(nextEpisode);
+            return;
+        }
+        if (event.data.type !== "PLAYER_EVENT") return;
         var payload = event.data.data;
-        if (!payload || typeof payload !== "object" || !/^(timeupdate|pause|ended|seeked|play|loadedmetadata)$/.test(payload.event || "")) return;
+        if (!payload || typeof payload !== "object") return;
+        var eventName = String(payload.event || "").toLowerCase();
+        if (!/^(timeupdate|pause|ended|seeked|play|loadedmetadata|episodechange|episode_change|episodechanged|next|next_episode)$/.test(eventName)) return;
+        if (eventName === "episodechange" || eventName === "episode_change" || eventName === "episodechanged" || eventName === "next" || eventName === "next_episode") {
+            var changedEpisode = episodeFromPayload(payload);
+            if (changedEpisode !== null && changedEpisode !== state.episodeNumber) changeEpisode(changedEpisode);
+            return;
+        }
         var position = finiteNumber(payload.currentTime);
         var duration = finiteNumber(payload.duration);
         if (!validPosition(position, duration)) return;
