@@ -91,7 +91,7 @@
         <button class="uzz-search-btn az-search-btn" type="submit">Search</button>
       </form>
       <div class="uzz-auth" id="auth-nav">
-        <a href="/auth/" id="login-nav" class="btn">Login</a>
+        <a href="{% url 'auth' %}?next={% url 'aniuzu' %}" id="login-nav" class="btn">Login</a>
         <div id="account-nav" class="d-none d-flex align-items-center gap-2">
           <span class="navbar-text text-white" id="user-username">Loading...</span>
           <button type="button" class="btn" id="logout-btn">Logout</button>
@@ -131,7 +131,7 @@
 
         <!-- Logged out -->
         <a
-            href="/auth/"
+            href="{% url 'auth' %}?next={% url 'home' %}"
             id="login-nav"
             class="btn"
         >
@@ -213,11 +213,13 @@
       </ul>
     </div>
 
-    <div class="footer-top-col">
-      <button type="button" class="back-to-top" id="back-to-top" aria-label="Back to top">
-        <span class="material-icons">arrow_upward</span>
-      </button>
-    </div>
+    {% if request.path|slice:":7" != "/aniuzu" %}
+      <div class="footer-top-col">
+        <button type="button" class="back-to-top" id="back-to-top" aria-label="Back to top">
+          <span class="material-icons">arrow_upward</span>
+        </button>
+      </div>
+    {% endif %}
 
   </div>
 
@@ -239,11 +241,13 @@
 
 
 
-<script src="{% static 'uzzutv/auth.js' %}"></script>
+<script src="{% static 'uzzutv/auth.js' %}?v=3"></script>
 <script src="{% static 'uzzutv/continue_watching.js' %}"></script>
 <script src="{% static 'uzzutv/watchlist.js' %}"></script>
 <script src="{% static 'uzzutv/aniuzu_watchlist.js' %}"></script>
 {% block extra_js %}{% endblock %}
+{% if request.path|slice:":7" == "/aniuzu" %}
 <button id="az-back-to-top" class="az-back-to-top" aria-label="Back to top"><span class="material-icons">keyboard_arrow_up</span></button>
+{% endif %}
 </body>
 </html>

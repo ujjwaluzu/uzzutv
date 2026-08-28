@@ -2,8 +2,8 @@
 {% load static %}
 
 {% block css %}
-<link rel="stylesheet" href="{% static 'uzzutv/aniuzu.css' %}">
-<link rel="stylesheet" href="{% static 'uzzutv/aniuzu_watch.css' %}?v=3">
+<link rel="stylesheet" href="{% static 'uzzutv/aniuzu.css' %}?v=2">
+<link rel="stylesheet" href="{% static 'uzzutv/aniuzu_watch.css' %}?v=4">
 {% endblock %}
 
 {% block title %}Watch {{ title }} | Aniuzu{% endblock %}
@@ -72,4 +72,4 @@
 {{ watch_config|json_script:"aniuzu-watch-config" }}
 {% endblock %}
 
-{% block extra_js %}<script src="{% static 'uzzutv/aniuzu_watch.js' %}?v=3"></script>{% endblock %}
+{% block extra_js %}<script src="{% static 'uzzutv/aniuzu_watch.js' %}?v=4"></script>{% endblock %}

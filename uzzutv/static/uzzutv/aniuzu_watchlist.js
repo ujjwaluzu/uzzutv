@@ -16,7 +16,7 @@ async function addAniuzuWatchlist(anilistId, title, poster) {
     try {
         var user = await getCurrentUser();
         if (!user) {
-            window.location.href = "/auth/";
+            window.location.href = "/auth/?next=/aniuzu/";
             return false;
         }
 
@@ -121,7 +121,7 @@ async function toggleAniuzuWatchlist(anilistId, title, poster, button) {
     try {
         var user = await getCurrentUser();
         if (!user) {
-            window.location.href = "/auth/";
+            window.location.href = "/auth/?next=/aniuzu/";
             return;
         }
 
@@ -187,7 +187,7 @@ async function loadAniuzuWatchlist(containerId) {
         if (!user) {
             container.innerHTML = '<div style="text-align:center;margin-top:50px;color:white;">'
                 + '<h3>Please log in to view your watchlist.</h3>'
-                + '<a href="/auth/" class="btn btn-outline-light mt-3">Login</a>'
+                + '<a href="/auth/?next=/aniuzu/" class="btn btn-outline-light mt-3">Login</a>'
                 + '</div>';
             return;
         }

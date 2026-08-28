@@ -126,6 +126,32 @@ body:has(.auth-page) .site-footer{ display:none !important; }
     color:#6b7280;
 }
 
+.password-toggle{
+    position:absolute;
+    right:10px;
+    top:50%;
+    transform:translateY(-50%);
+    border:0;
+    background:transparent;
+    color:#9ca3af;
+    padding:6px;
+    cursor:pointer;
+    line-height:1;
+    z-index:2;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+}
+.password-toggle .material-icons{
+    position:static;
+    left:auto;
+    top:auto;
+    transform:none;
+    pointer-events:none;
+}
+.password-toggle:hover{ color:#fff; }
+.auth-input.has-password-toggle{ padding-right:48px !important; }
+
 .auth-submit{
     width:100%;
     padding:13px;
@@ -261,7 +287,7 @@ body:has(.auth-page) .site-footer{ display:none !important; }
 
         <div id="auth-message" class="alert d-none auth-message"></div>
 
-        <form id="auth-form" class="mt-4" novalidate>
+        <form id="auth-form" class="mt-4" autocomplete="off" novalidate>
 
             <div class="mb-3 d-none" id="username-field">
 
@@ -303,6 +329,7 @@ body:has(.auth-page) .site-footer{ display:none !important; }
                         id="auth-email"
                         class="form-control auth-input"
                         placeholder="you@example.com"
+                        autocomplete="off"
                         required
                     >
 
@@ -325,11 +352,12 @@ body:has(.auth-page) .site-footer{ display:none !important; }
                     <input
                         type="password"
                         id="auth-password"
-                        class="form-control auth-input"
+                        class="form-control auth-input has-password-toggle"
                         placeholder="••••••••"
-                        minlength="6"
+                        autocomplete="new-password"
                         required
                     >
+                    <button type="button" class="password-toggle" data-password-target="auth-password" aria-label="Show password"><span class="material-icons">visibility</span></button>
 
                 </div>
 
@@ -347,6 +375,10 @@ body:has(.auth-page) .site-footer{ display:none !important; }
             </button>
 
         </form>
+
+        <div class="text-center mt-3" id="forgot-password-wrap">
+            <a class="auth-toggle" href="{% url 'forgot_password' %}?next={{ auth_next|urlencode }}">Forgot password?</a>
+        </div>
 
         <div class="text-center mt-4">
 
@@ -377,6 +409,7 @@ body:has(.auth-page) .site-footer{ display:none !important; }
 <script>
 
 let isSignup = false;
+const AUTH_NEXT = "{{ auth_next|escapejs }}";
 
 const authForm = document.getElementById("auth-form");
 const emailInput = document.getElementById("auth-email");
@@ -396,6 +429,44 @@ const authMessage = document.getElementById("auth-message");
 
 const emailFeedback = document.getElementById("email-feedback");
 const passwordFeedback = document.getElementById("password-feedback");
+let passwordRevealTimer = null;
+
+function clearAuthFields() {
+    [emailInput, passwordInput, usernameInput].forEach((input) => {
+        if (input) input.value = "";
+    });
+    authForm.reset();
+    document.querySelectorAll(".password-toggle").forEach((button) => {
+        const target = document.getElementById(button.dataset.passwordTarget);
+        if (target) target.type = "password";
+        button.setAttribute("aria-label", "Show password");
+        const icon = button.querySelector(".material-icons");
+        if (icon) icon.textContent = "visibility";
+    });
+}
+
+document.querySelectorAll(".password-toggle").forEach((button) => {
+    button.addEventListener("click", () => {
+        const target = document.getElementById(button.dataset.passwordTarget);
+        if (!target) return;
+        window.clearTimeout(passwordRevealTimer);
+        target.type = "text";
+        button.setAttribute("aria-label", "Password visible for 2 seconds");
+        const icon = button.querySelector(".material-icons");
+        if (icon) icon.textContent = "visibility_off";
+        passwordRevealTimer = window.setTimeout(() => {
+            target.type = "password";
+            button.setAttribute("aria-label", "Show password");
+            if (icon) icon.textContent = "visibility";
+        }, 2000);
+    });
+});
+
+window.addEventListener("pageshow", clearAuthFields);
+window.addEventListener("load", () => {
+    clearAuthFields();
+    window.setTimeout(clearAuthFields, 100);
+});
 
 
 function showAuthMessage(message, type = "danger") {
@@ -767,6 +838,7 @@ usernameInput.addEventListener("input", () => {
 authToggle.addEventListener("click", () => {
 
     isSignup = !isSignup;
+    clearAuthFields();
 
     authMessage.className = "alert d-none";
 
@@ -791,6 +863,7 @@ authToggle.addEventListener("click", () => {
 
         usernameField.classList.remove("d-none");
         usernameInput.required = true;
+        document.getElementById("forgot-password-wrap").classList.add("d-none");
 
     } else {
 
@@ -808,6 +881,7 @@ authToggle.addEventListener("click", () => {
 
         usernameField.classList.add("d-none");
         usernameInput.required = false;
+        document.getElementById("forgot-password-wrap").classList.remove("d-none");
 
     }
 
@@ -911,8 +985,8 @@ authForm.addEventListener("submit", async (event) => {
             const redirectUrl =
                 window.location.hostname === "127.0.0.1" ||
                 window.location.hostname === "localhost"
-                    ? `${window.location.origin}/home/`
-                    : "{{ request.scheme }}://{{ request.get_host }}/home/";
+                    ? `${window.location.origin}${AUTH_NEXT}`
+                    : `${window.location.origin}${AUTH_NEXT}`;
 
 
             const { data, error } =
@@ -932,6 +1006,8 @@ authForm.addEventListener("submit", async (event) => {
             }
 
             if (data.session) {
+
+                clearAuthFields();
 
                 /* Create the profiles row (id = auth user id) */
 
@@ -958,7 +1034,8 @@ authForm.addEventListener("submit", async (event) => {
                 }
 
                 setTimeout(() => {
-                    window.location.href = "/home/";
+                    clearAuthFields();
+                    window.location.href = AUTH_NEXT;
                 }, 1000);
 
             } else {
@@ -972,6 +1049,8 @@ authForm.addEventListener("submit", async (event) => {
                     );
 
                 } else {
+
+                    clearAuthFields();
 
                     showAuthMessage(
                         "Account created. Please check your email to confirm your account.",
@@ -996,13 +1075,15 @@ authForm.addEventListener("submit", async (event) => {
                 throw error;
             }
 
-            showAuthMessage(
-                "Signed in successfully!",
-                "success"
-            );
+                showAuthMessage(
+                    "Signed in successfully!",
+                    "success"
+                );
+
+                clearAuthFields();
 
             setTimeout(() => {
-                window.location.href = "/home/";
+                window.location.href = AUTH_NEXT;
             }, 500);
 
         }
@@ -1012,6 +1093,11 @@ authForm.addEventListener("submit", async (event) => {
         console.error(error);
 
         showAuthMessage(friendlyAuthError(error));
+
+        // Clear credentials after a completed submission attempt as well as
+        // after success, so a refresh or switching auth mode never carries
+        // values into the next form.
+        clearAuthFields();
 
         authSubmit.disabled = false;
 
@@ -1023,6 +1109,16 @@ authForm.addEventListener("submit", async (event) => {
 
 
 updateSubmitState();
+
+/* A Supabase session may already exist when /auth/ is opened directly. */
+window.addEventListener("load", async () => {
+    try {
+        const { data } = await supabaseClient.auth.getUser();
+        if (data && data.user) window.location.replace(AUTH_NEXT);
+    } catch (error) {
+        console.warn("Unable to restore the existing auth session.");
+    }
+});
 
 </script>
 

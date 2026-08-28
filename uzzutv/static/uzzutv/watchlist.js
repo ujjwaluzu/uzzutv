@@ -7,7 +7,7 @@ async function addToWatchlist(id, type, title, poster) {
     const user = await getCurrentUser();
 
     if (!user) {
-        window.location.href = "/auth/";
+        window.location.href = "/auth/?next=/home/";
         return false;
     }
 
@@ -93,7 +93,7 @@ async function toggleWatchlist(id, type, title, poster, button) {
     const user = await getCurrentUser();
 
     if (!user) {
-        window.location.href = "/auth/";
+        window.location.href = "/auth/?next=/home/";
         return;
     }
 

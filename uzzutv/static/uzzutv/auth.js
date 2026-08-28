@@ -132,6 +132,19 @@ window.addEventListener("DOMContentLoaded", () => {
 
     }
 
+    // Keep the landing-page keyboard shortcut available on the regular
+    // UzzUTV layout too. Do not hijack ArrowUp while a user is typing.
+    document.addEventListener("keydown", (event) => {
+        const target = event.target;
+        const typing = target && typeof target.matches === "function" && target.matches(
+            "input, textarea, select, [contenteditable=\"true\"]"
+        );
+        if (event.key === "ArrowUp" && !typing && window.scrollY > 0) {
+            event.preventDefault();
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+    });
+
 });
 
 
@@ -166,6 +179,22 @@ document.addEventListener("click", async (event) => {
 
 supabaseClient.auth.onAuthStateChange(
     (event, session) => {
+
+        if (event === "PASSWORD_RECOVERY" && session) {
+            try {
+                sessionStorage.setItem("uzzutv_password_recovery", "1");
+                sessionStorage.setItem("uzzutv_password_recovery_at", String(Date.now()));
+            } catch (error) {
+                console.warn("Unable to retain password recovery state.");
+            }
+        }
+
+        if (event === "SIGNED_OUT") {
+            try {
+                sessionStorage.removeItem("uzzutv_password_recovery");
+                sessionStorage.removeItem("uzzutv_password_recovery_at");
+            } catch (error) {}
+        }
 
         _clearUserCache();
         updateAuthNavbar();

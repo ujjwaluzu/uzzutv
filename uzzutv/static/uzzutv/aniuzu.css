@@ -112,3 +112,19 @@ button:focus-visible,a:focus-visible{outline:2px solid #ff3c3c;outline-offset:2p
   }
 }
 
+/* Keep the long Aniuzu navigation usable on landscape tablets as well as
+   narrow desktops. Bootstrap handles the toggle; this supplies the expanded
+   panel layout for the 768–991px range. */
+@media (min-width:768px) and (max-width:991px){
+  .az-navbar .navbar-collapse{flex-basis:100%;background:#141414;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px;margin-top:10px;max-height:calc(100svh - 80px);overflow-y:auto}
+  .az-navbar .navbar-collapse.show{display:block!important}
+  .az-navbar .navbar-nav{display:flex;flex-direction:column;align-items:stretch;gap:2px;white-space:normal}
+  .az-navbar .navbar-nav .nav-link{padding:.65rem .8rem}
+  .az-navbar .navbar-collapse .az-search,.az-navbar .navbar-collapse .uzz-auth{width:100%;margin-top:12px}
+  .az-navbar .navbar-collapse .az-search{display:flex}
+  .az-navbar .navbar-collapse .az-search-input{min-width:0;width:100%}
+  .az-navbar .navbar-collapse .uzz-auth{display:flex;align-items:stretch;gap:8px}
+  .az-navbar .navbar-collapse .uzz-auth .btn{width:100%;text-align:center}
+  .az-navbar .az-back-uzzutv{margin:12px 0 0}
+}
+

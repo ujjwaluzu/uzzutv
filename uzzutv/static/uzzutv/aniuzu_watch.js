@@ -128,7 +128,7 @@
         var source = filteredEpisodes();
         var currentIndex = source.indexOf(state.episodeNumber);
         if (currentIndex >= 0 && (episodeOffset > currentIndex || episodeOffset + EPISODE_WINDOW <= currentIndex)) {
-            episodeOffset = Math.max(0, currentIndex - Math.floor(EPISODE_WINDOW / 2));
+            episodeOffset = Math.max(0, currentIndex);
         }
     }
 
@@ -161,6 +161,8 @@
             fragment.appendChild(button);
         });
         list.appendChild(fragment);
+        var activeButton = list.querySelector(".az-episode-button.is-active");
+        if (activeButton) activeButton.scrollIntoView({ block: "start", behavior: "auto" });
         if (source.length > EPISODE_WINDOW) {
             var previous = document.createElement("button");
             previous.type = "button";

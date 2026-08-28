@@ -1084,7 +1084,7 @@ setupSave.addEventListener("click", async () => {
 
     if (!user) {
 
-        window.location.href = "/auth/";
+        window.location.href = "/auth/?next=/home/";
         return;
 
     }
@@ -1699,7 +1699,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             <div class="profile-login-prompt">
                 <span class="material-icons" style="font-size:52px;color:#ff3c3c;display:block;margin-bottom:14px;" aria-hidden="true">lock_person</span>
                 <h2>Please log in to view your profile</h2>
-                <a href="/auth/" class="profile-login-btn">
+                <a href="/auth/?next=/home/" class="profile-login-btn">
                     Login
                 </a>
             </div>

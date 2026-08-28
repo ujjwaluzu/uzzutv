@@ -28,12 +28,24 @@ UzzUTV is a Netflix-style streaming platform built with Django that lets you dis
 - Movie playback pages
 - Works on mobile and desktop
 
+### Aniuzu Anime
+- AniList-powered anime discovery, metadata, detail pages, watchlist, and episode navigation
+- Anime watch route: `/aniuzu/anime/<anilist_id>/watch/<episode>/`
+- Playback is limited to the documented AniLink and TryEmbed iframe providers
+- SUB/DUB audio selection and AniLink/TryEmbed server switching preserve the current episode
+- Responsive desktop two-column player/episode layout with independently scrollable episode lists
+- Episode search/windowing keeps long-running anime usable
+- Authenticated Continue Watching cards show anime, season, episode, progress, server, and variant
+
 ### Search
 - Instant search across movies and TV shows
 
 ### Accounts (Supabase)
 - Sign up / sign in with client-side field validation, live username availability checks, and friendly API error messages
 - Watchlist, Continue Watching, ratings, and comments synced across devices
+- UzzUTV and Aniuzu share one Supabase Auth session
+- Context-aware login redirects preserve the originating application
+- Forgot-password and password-reset flows use Supabase Auth recovery sessions
 
 ### Ratings & Reviews
 - Star-rate any movie or TV show on its detail page
@@ -57,6 +69,10 @@ UzzUTV is a Netflix-style streaming platform built with Django that lets you dis
 
 ### Continue Watching
 - Picks up where you left off in movies and TV episodes, across devices
+- Aniuzu history is stored separately in `aniuzu_continue_watching`
+- Aniuzu playback state stores AniList ID, episode, server, variant, position, duration, and progress percentage
+- Progress writes are debounced/upserted and completed episodes are removed
+- Row Level Security restricts Aniuzu history to the owning authenticated user
 
 ### SEO
 - Dynamic `robots.txt` and `sitemap.xml`
@@ -131,6 +147,12 @@ SESSION_COOKIE_SECURE=False
 CSRF_COOKIE_SECURE=False
 ```
 
+### Supabase setup
+
+Run [`sql/aniuzu_tables.sql`](sql/aniuzu_tables.sql) in the Supabase SQL editor. It creates the Aniuzu watchlist and `aniuzu_continue_watching` tables, indexes, constraints, and Row Level Security policies. The Continue Watching policies allow each authenticated user to select, insert, update, and delete only their own rows.
+
+Add the reset callback URL for every environment to Supabase Auth URL Configuration. The application builds this from the current origin as `/auth/reset-password/`, for example `http://127.0.0.1:8000/auth/reset-password/` during local development.
+
 ---
 
 ## Project Structure
@@ -164,12 +186,20 @@ uzzutv/
 | `/<type>/<id>/`           | Detail page (cast, recommendations, rate & comment) |
 | `/movie/<id>/watch/`      | Movie player                         |
 | `/tv/<id>/watch/`         | TV player (season/episode select)    |
+| `/aniuzu/`                 | AniList anime home                   |
+| `/aniuzu/anime/<id>/`      | Anime detail page                    |
+| `/aniuzu/anime/<id>/watch/<episode>/` | Aniuzu anime player       |
+| `/aniuzu/watchlist/`       | Aniuzu watchlist                     |
+| `/aniuzu/search/`          | AniList anime search                 |
+| `/aniuzu/continue-metadata/` | Metadata for Continue Watching cards |
 | `/search/`                | Search                               |
 | `/watchlist/`             | Your saved titles                    |
 | `/rated/`                 | Your ratings (with `/rated/<user_id>/` public view) |
 | `/party/`                 | Watch Party dashboard (create/join)  |
 | `/party/<room_code>/`     | Watch Party room with synchronized playback and video-call controls |
 | `/auth/`                  | Sign in / sign up                    |
+| `/auth/forgot-password/`  | Request a Supabase password reset    |
+| `/auth/reset-password/`   | Complete a Supabase password reset  |
 | `/profile/`               | Your profile (ratings, watchlist, comments) |
 | `/profile/<user_id>/`     | Public profile                       |
 | `/media-info/<type>/<id>/`| Media metadata JSON (used by profile pages) |

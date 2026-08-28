@@ -3,8 +3,8 @@
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'uzzutv/home.css' %}">
-<link rel="stylesheet" href="{% static 'uzzutv/aniuzu.css' %}">
-<link rel="stylesheet" href="{% static 'uzzutv/aniuzu_continue.css' %}">
+<link rel="stylesheet" href="{% static 'uzzutv/aniuzu.css' %}?v=2">
+<link rel="stylesheet" href="{% static 'uzzutv/aniuzu_continue.css' %}?v=2">
 {% endblock %}
 
 {% block title %}Aniuzu - Watch Anime Online{% endblock %}
@@ -171,4 +171,4 @@
 {% endif %}
 
 {% endblock %}
-{% block extra_js %}<script src="{% static 'uzzutv/aniuzu.js' %}"></script><script src="{% static 'uzzutv/aniuzu_continue.js' %}"></script>{% endblock %}
+{% block extra_js %}<script src="{% static 'uzzutv/aniuzu.js' %}"></script><script src="{% static 'uzzutv/aniuzu_continue.js' %}?v=2"></script>{% endblock %}

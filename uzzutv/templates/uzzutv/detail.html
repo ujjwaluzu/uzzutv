@@ -1418,7 +1418,7 @@ async function saveRating(rating) {
 
     if (!user) {
 
-        window.location.href = "/auth/";
+        window.location.href = "/auth/?next=/home/";
         return;
 
     }
@@ -1578,7 +1578,7 @@ async function setupCommentForm() {
 
         commentFormContainer.innerHTML = `
             <div class="login-prompt">
-                <a href="/auth/">Log in</a>
+                <a href="/auth/?next=/home/">Log in</a>
                 to leave a comment.
             </div>
         `;
@@ -1666,7 +1666,7 @@ async function setupCommentForm() {
 
         if (!currentUser) {
 
-            window.location.href = "/auth/";
+            window.location.href = "/auth/?next=/home/";
             return;
 
         }

@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse, Http404
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.core.cache import cache
 from concurrent.futures import ThreadPoolExecutor
 import copy
@@ -15,8 +16,34 @@ load_dotenv()
 API_KEY = os.getenv("TMDB_KEY")
 BASE_URL = "https://api.themoviedb.org/3"
 
+def _safe_auth_next(request, candidate):
+    """Allow only local application paths for auth redirects."""
+    fallback = "/home/"
+    value = (candidate or "").strip()
+    if not value or not value.startswith("/") or value.startswith("//") or "\\" in value:
+        return fallback
+    allowed_hosts = {request.get_host()}
+    if url_has_allowed_host_and_scheme(value, allowed_hosts=allowed_hosts, require_https=request.is_secure()):
+        return value
+    return fallback
+
+
 def auth(request):
-    return render(request, "uzzutv/auth.html")
+    return render(request, "uzzutv/auth.html", {
+        "auth_next": _safe_auth_next(request, request.GET.get("next")),
+    })
+
+
+def forgot_password(request):
+    return render(request, "uzzutv/forgot_password.html", {
+        "auth_next": _safe_auth_next(request, request.GET.get("next")),
+    })
+
+
+def reset_password(request):
+    return render(request, "uzzutv/reset_password.html", {
+        "auth_next": _safe_auth_next(request, request.GET.get("next")),
+    })
 
 
 def profile(request):
