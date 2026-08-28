@@ -48,7 +48,7 @@
 <p class="az-hero-desc">{{ description|striptags|truncatewords:40 }}</p>
 {% endif %}
 <div class="az-actions">
-<a href="{% url 'aniuzu_watch' anilist_id 1 %}" class="az-watch-btn"><span class="material-icons">play_arrow</span> Watch</a>
+<a id="az-detail-watch" data-anilist-id="{{ anilist_id }}" href="{% url 'aniuzu_watch' anilist_id 1 %}" class="az-watch-btn"><span class="material-icons">play_arrow</span> <span class="az-detail-watch-label">Watch</span></a>
 <button class="az-watchlist-btn" data-id="{{ anilist_id }}" data-type="anime" data-title="{{ title|default:romaji }}" data-poster="{{ anime.coverImage.large }}">&#65291; Add to Watchlist</button>
 </div>
 </div>
@@ -163,4 +163,4 @@
 {% endif %}
 
 {% endblock %}
-{% block extra_js %}<script src="{% static 'uzzutv/aniuzu.js' %}"></script>{% endblock %}
+{% block extra_js %}<script src="{% static 'uzzutv/aniuzu.js' %}"></script><script src="{% static 'uzzutv/aniuzu_detail.js' %}?v=1"></script>{% endblock %}
