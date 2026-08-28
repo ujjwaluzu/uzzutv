@@ -36,6 +36,9 @@ UzzUTV is a Netflix-style streaming platform built with Django that lets you dis
 - Responsive desktop two-column player/episode layout with independently scrollable episode lists
 - Episode search/windowing keeps long-running anime usable
 - Authenticated Continue Watching cards show anime, season, episode, progress, server, and variant
+- Detail pages switch the Watch action to Resume when anime progress exists
+- Aniuzu navigation includes Home, Genres, Seasons, Studios, Collections, Watchlist, and Search; Schedule, Top, and Upcoming pages are not part of the current product
+- Responsive Aniuzu navigation collapses into an accessible menu across desktop, tablet, and mobile viewports
 
 ### Search
 - Instant search across movies and TV shows
@@ -70,6 +73,7 @@ UzzUTV is a Netflix-style streaming platform built with Django that lets you dis
 ### Continue Watching
 - Picks up where you left off in movies and TV episodes, across devices
 - Aniuzu history is stored separately in `aniuzu_continue_watching`
+- One Continue Watching row/card is maintained per user and anime; it is updated with the latest episode watched
 - Aniuzu playback state stores AniList ID, episode, server, variant, position, duration, and progress percentage
 - Progress writes are debounced/upserted and completed episodes are removed
 - Row Level Security restricts Aniuzu history to the owning authenticated user
@@ -149,7 +153,7 @@ CSRF_COOKIE_SECURE=False
 
 ### Supabase setup
 
-Run [`sql/aniuzu_tables.sql`](sql/aniuzu_tables.sql) in the Supabase SQL editor. It creates the Aniuzu watchlist and `aniuzu_continue_watching` tables, indexes, constraints, and Row Level Security policies. The Continue Watching policies allow each authenticated user to select, insert, update, and delete only their own rows.
+Run [`sql/aniuzu_tables.sql`](sql/aniuzu_tables.sql) in the Supabase SQL editor. It creates the Aniuzu watchlist and `aniuzu_continue_watching` tables, indexes, constraints, and Row Level Security policies. Continue Watching uses one row per authenticated user/anime and updates that row with the latest episode, server, variant, and position. The SQL also migrates older per-episode data by retaining the most recently updated row for each user/anime. Policies allow each authenticated user to select, insert, update, and delete only their own rows.
 
 Add the reset callback URL for every environment to Supabase Auth URL Configuration. The application builds this from the current origin as `/auth/reset-password/`, for example `http://127.0.0.1:8000/auth/reset-password/` during local development.
 

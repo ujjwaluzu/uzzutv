@@ -1,0 +1,39 @@
+/* Responsive Aniuzu navigation: compact desktop, collapsible tablet/mobile. */
+.az-navbar .container-fluid { min-width: 0; flex-wrap: wrap; }
+.az-navbar .navbar-brand { flex: 0 0 auto; }
+.az-navbar .navbar-toggler { margin-left: auto; }
+.az-navbar .navbar-collapse { min-width: 0; }
+
+@media (min-width: 992px) and (max-width: 1399px) {
+  .az-navbar.navbar-expand-lg .navbar-toggler { display: block; }
+  .az-navbar.navbar-expand-lg .navbar-collapse { display: none !important; flex-basis: 100%; }
+  .az-navbar.navbar-expand-lg .navbar-collapse.show { display: block !important; }
+}
+
+@media (max-width: 1399px) {
+  .az-navbar .navbar-collapse {
+    margin-top: 10px;
+    padding: 12px;
+    background: #141414;
+    border: 1px solid rgba(255,255,255,.09);
+    border-radius: 12px;
+    max-height: calc(100svh - 78px);
+    overflow-y: auto;
+  }
+  .az-navbar .navbar-nav { display: flex; flex-direction: column; gap: 2px; white-space: normal; }
+  .az-navbar .nav-link { display: block; padding: .65rem .8rem; }
+  .az-navbar .az-search,
+  .az-navbar .uzz-auth { width: 100%; margin-top: 10px; }
+  .az-navbar .az-search { display: flex; }
+  .az-navbar .az-search-input { min-width: 0; width: 100%; }
+  .az-navbar .uzz-auth { display: flex; align-items: stretch; gap: 8px; }
+  .az-navbar .uzz-auth .btn { width: 100%; text-align: center; }
+  .az-navbar .az-back-uzzutv { margin: 10px 0 0; }
+}
+
+@media (max-width: 575.98px) {
+  .az-navbar { padding-left: 8px; padding-right: 8px; }
+  .az-navbar .navbar-brand { font-size: 22px; margin-right: .5rem; }
+  .az-navbar .navbar-collapse { padding: 10px; }
+  .az-navbar .uzz-auth { flex-direction: column; }
+}

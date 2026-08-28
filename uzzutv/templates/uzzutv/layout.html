@@ -45,6 +45,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="{% static 'uzzutv/layout.css' %}">
+{% if request.path|slice:":7" == "/aniuzu" %}<link rel="stylesheet" href="{% static 'uzzutv/aniuzu_nav.css' %}">{% endif %}
 {% block head %}{% endblock %}
 </head>
 <body>
@@ -62,9 +63,6 @@
           <a class="nav-link {% if request.resolver_match.url_name == 'aniuzu' %}active{% endif %}" href="{% url 'aniuzu'%}">Home</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link {% if request.resolver_match.url_name == 'aniuzu_schedule' %}active{% endif %}" href="{% url 'aniuzu_schedule'%}">Schedule</a>
-        </li>
-        <li class="nav-item">
           <a class="nav-link {% if request.resolver_match.url_name == 'aniuzu_genre_list' or request.resolver_match.url_name == 'aniuzu_genre' %}active{% endif %}" href="{% url 'aniuzu_genre_list'%}">Genres</a>
         </li>
         <li class="nav-item">
@@ -72,12 +70,6 @@
         </li>
         <li class="nav-item">
           <a class="nav-link {% if request.resolver_match.url_name == 'aniuzu_studios' or request.resolver_match.url_name == 'aniuzu_studio' %}active{% endif %}" href="{% url 'aniuzu_studios'%}">Studios</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link {% if request.resolver_match.url_name == 'aniuzu_top' %}active{% endif %}" href="{% url 'aniuzu_top'%}">Top</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link {% if request.resolver_match.url_name == 'aniuzu_upcoming' %}active{% endif %}" href="{% url 'aniuzu_upcoming'%}">Upcoming</a>
         </li>
         <li class="nav-item">
           <a class="nav-link {% if request.resolver_match.url_name == 'aniuzu_collections' or request.resolver_match.url_name == 'aniuzu_collection' %}active{% endif %}" href="{% url 'aniuzu_collections'%}">Collections</a>
