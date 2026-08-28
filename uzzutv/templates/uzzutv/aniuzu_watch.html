@@ -1,0 +1,75 @@
+{% extends 'uzzutv/layout.html' %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'uzzutv/aniuzu.css' %}">
+<link rel="stylesheet" href="{% static 'uzzutv/aniuzu_watch.css' %}?v=3">
+{% endblock %}
+
+{% block title %}Watch {{ title }} | Aniuzu{% endblock %}
+{% block meta_description %}Watch {{ title }} episode {{ episode }} on Aniuzu.{% endblock %}
+{% block robots %}noindex, nofollow{% endblock %}
+{% block canonical %}<link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}/aniuzu/anime/{{ anilist_id }}/watch/{{ episode }}/">{% endblock %}
+
+{% block body %}
+<main class="az-watch-page">
+  <div class="az-watch-heading">
+    <a href="{% url 'aniuzu_detail' anilist_id %}" class="az-watch-back"><span class="material-icons">arrow_back</span> Details</a>
+    <div>
+      <p class="az-watch-kicker">Now watching</p>
+      <h1>{{ title }}</h1>
+      <p id="az-watch-episode-label">Episode {{ episode }}</p>
+    </div>
+  </div>
+
+  <div class="az-watch-layout">
+    <section class="az-player-column" aria-label="Anime player">
+      <div class="az-player-shell" id="az-player-shell">
+        <iframe id="az-player" title="{{ title }} Episode {{ episode }}" allow="autoplay; fullscreen; picture-in-picture; presentation" allowfullscreen referrerpolicy="origin" frameborder="0"></iframe>
+        <div id="az-player-loading" class="az-player-overlay"><div class="az-player-spinner"></div><p>Loading player…</p></div>
+        <div id="az-player-error" class="az-player-overlay az-player-error" hidden>
+          <span class="material-icons">error_outline</span>
+          <h2 id="az-player-error-title">This server couldn’t load the episode.</h2>
+          <p>Try again or switch servers. Your episode and audio selection will stay unchanged.</p>
+          <div class="az-error-actions">
+            <button type="button" id="az-retry-player">Try again</button>
+            <button type="button" id="az-switch-server">Try the other server</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="az-playback-controls" aria-label="Playback settings">
+        <div class="az-control-group">
+          <span class="az-control-label">Audio</span>
+          <div class="az-control-buttons" role="group" aria-label="Audio variant">
+            <button type="button" data-variant="sub">SUB</button>
+            <button type="button" data-variant="dub">DUB</button>
+          </div>
+        </div>
+        <div class="az-control-group">
+          <span class="az-control-label">Server</span>
+          <div class="az-control-buttons" role="group" aria-label="Playback server">
+            <button type="button" data-server="anilink">AniLink</button>
+            <button type="button" data-server="tryembed">TryEmbed</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="az-episode-sidebar" aria-label="Episodes">
+      <div class="az-episode-sidebar-head">
+        <div><p class="az-watch-kicker">Episodes</p><h2>Choose episode</h2></div>
+        <span id="az-episode-count" class="az-episode-count"></span>
+      </div>
+      <label class="az-episode-search-label" for="az-episode-search">Search episodes</label>
+      <input id="az-episode-search" type="search" inputmode="numeric" placeholder="Search episode..." autocomplete="off">
+      <div id="az-episode-range" class="az-episode-range"></div>
+      <div id="az-episode-list" class="az-episode-list" role="list"></div>
+      <div id="az-episode-pager" class="az-episode-pager"></div>
+    </aside>
+  </div>
+</main>
+{{ watch_config|json_script:"aniuzu-watch-config" }}
+{% endblock %}
+
+{% block extra_js %}<script src="{% static 'uzzutv/aniuzu_watch.js' %}?v=3"></script>{% endblock %}

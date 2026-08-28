@@ -1448,6 +1448,20 @@ query ($id: Int) {
 
 """
 
+ANIME_CONTINUE_METADATA_QUERY = """
+query ($ids: [Int]) {
+  Page(page: 1, perPage: 24) {
+    media(id_in: $ids, type: ANIME) {
+      id
+      title { romaji english }
+      coverImage { large extraLarge }
+      season
+      seasonYear
+    }
+  }
+}
+"""
+
 
 AIRING_SCHEDULE_QUERY = """
 query ($start: Int, $end: Int, $page: Int, $perPage: Int) {
@@ -2111,6 +2125,83 @@ def aniuzu_detail(request, anilist_id):
     ctx["site_url"] = site_url
 
     return render(request, "uzzutv/aniuzu_detail.html", ctx)
+
+
+def _aniuzu_playable_episodes(media):
+    """Return the numbered episodes that Aniuzu can safely send to its providers.
+
+    AniList exposes an episode count, but not a complete canonical episode list.
+    Its optional streaming entries are used only as a fallback when no count is
+    known; this avoids turning episode titles into provider-specific state.
+    """
+    count = _safe_int((media or {}).get("episodes"), 0)
+    if count > 0:
+        return list(range(1, count + 1))
+
+    numbered = set()
+    for item in (media or {}).get("streamingEpisodes") or []:
+        match = re.search(r"(?:episode|ep\.?)[\s#-]*(\d+)", item.get("title") or "", re.I)
+        if match:
+            numbered.add(int(match.group(1)))
+    return sorted(numbered)
+
+
+def aniuzu_watch(request, anilist_id, episode):
+    """Aniuzu watch shell. Playback and authenticated progress stay client-side."""
+    ctx = anilist_anime_detail(anilist_id)
+    if ctx is None:
+        return render(request, "uzzutv/aniuzu_404.html", status=404)
+
+    anime = ctx.get("anime") or {}
+    playable_episodes = _aniuzu_playable_episodes(anime)
+    if not playable_episodes or episode not in playable_episodes:
+        raise Http404("Episode not available")
+
+    title = ctx.get("title") or ctx.get("romaji") or "Anime"
+    watch_config = {
+        "anilistId": anilist_id,
+        "episodeNumber": episode,
+        "episodes": playable_episodes,
+        "title": title,
+        "poster": (anime.get("coverImage") or {}).get("extraLarge") or (anime.get("coverImage") or {}).get("large") or "",
+        "season": anime.get("season") or "",
+        "seasonYear": anime.get("seasonYear") or "",
+    }
+    return render(request, "uzzutv/aniuzu_watch.html", {
+        "anime": anime,
+        "title": title,
+        "anilist_id": anilist_id,
+        "episode": episode,
+        "watch_config": watch_config,
+    })
+
+
+def aniuzu_continue_metadata(request):
+    """Small batched AniList lookup for authenticated Aniuzu history cards."""
+    raw_ids = (request.GET.get("ids") or "").split(",")
+    ids = []
+    for raw_id in raw_ids[:12]:
+        value = _safe_int(raw_id, 0)
+        if value > 0 and value not in ids:
+            ids.append(value)
+    if not ids:
+        return JsonResponse({"items": []})
+
+    cache_key = "aniuzu_continue_metadata_" + "_".join(map(str, sorted(ids)))
+    items = cache.get(cache_key)
+    if items is None:
+        data = anilist_query(ANIME_CONTINUE_METADATA_QUERY, {"ids": ids})
+        items = []
+        for media in (data or {}).get("Page", {}).get("media", []):
+            items.append({
+                "id": media.get("id"),
+                "title": (media.get("title") or {}).get("english") or (media.get("title") or {}).get("romaji") or "Anime",
+                "poster": (media.get("coverImage") or {}).get("extraLarge") or (media.get("coverImage") or {}).get("large") or "",
+                "season": media.get("season") or "",
+                "seasonYear": media.get("seasonYear") or "",
+            })
+        cache.set(cache_key, items, 21600)
+    return JsonResponse({"items": items})
 
 
 def aniuzu_watchlist(request):

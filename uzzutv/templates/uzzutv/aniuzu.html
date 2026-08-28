@@ -4,6 +4,7 @@
 {% block css %}
 <link rel="stylesheet" href="{% static 'uzzutv/home.css' %}">
 <link rel="stylesheet" href="{% static 'uzzutv/aniuzu.css' %}">
+<link rel="stylesheet" href="{% static 'uzzutv/aniuzu_continue.css' %}">
 {% endblock %}
 
 {% block title %}Aniuzu - Watch Anime Online{% endblock %}
@@ -56,6 +57,8 @@
 <div class="hero-dots" id="az-hero-dots"></div>
 </div>
 {% endif %}
+
+<section id="az-continue-watching" class="az-continue-watching" aria-live="polite"></section>
 
 {% if trending %}
 <div class="az-content-section">
@@ -168,4 +171,4 @@
 {% endif %}
 
 {% endblock %}
-{% block extra_js %}<script src="{% static 'uzzutv/aniuzu.js' %}"></script>{% endblock %}
+{% block extra_js %}<script src="{% static 'uzzutv/aniuzu.js' %}"></script><script src="{% static 'uzzutv/aniuzu_continue.js' %}"></script>{% endblock %}
