@@ -3,7 +3,7 @@
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'uzzutv/aniuzu.css' %}?v=2">
-<link rel="stylesheet" href="{% static 'uzzutv/aniuzu_watch.css' %}?v=4">
+<link rel="stylesheet" href="{% static 'uzzutv/aniuzu_watch.css' %}?v=15">
 {% endblock %}
 
 {% block title %}Watch {{ title }} | Aniuzu{% endblock %}
@@ -14,12 +14,11 @@
 {% block body %}
 <main class="az-watch-page">
   <div class="az-watch-heading">
-    <a href="{% url 'aniuzu_detail' anilist_id %}" class="az-watch-back"><span class="material-icons">arrow_back</span> Details</a>
-    <div>
+    <div class="az-watch-heading-left">
       <p class="az-watch-kicker">Now watching</p>
-      <h1>{{ title }}</h1>
-      <p id="az-watch-episode-label">Episode {{ episode }}</p>
     </div>
+    <h1 class="az-watch-heading-title">{{ title }}</h1>
+    <p id="az-watch-episode-label" class="az-watch-heading-episode">Episode {{ episode }}</p>
   </div>
 
   <div class="az-watch-layout">
@@ -38,19 +37,25 @@
         </div>
       </div>
 
-      <div class="az-playback-controls" aria-label="Playback settings">
-        <div class="az-control-group">
-          <span class="az-control-label">Audio</span>
-          <div class="az-control-buttons" role="group" aria-label="Audio variant">
-            <button type="button" data-variant="sub">SUB</button>
-            <button type="button" data-variant="dub">DUB</button>
+      <div class="az-playback-card" aria-label="Playback settings">
+        <div class="az-playback-controls">
+          <div class="az-playback-card-title">Playback</div>
+          <div class="az-control-group">
+            <span class="az-control-label">Audio</span>
+            <div class="az-control-buttons" role="group" aria-label="Audio variant">
+              <button type="button" data-variant="sub">SUB</button>
+              <button type="button" data-variant="dub">DUB</button>
+            </div>
           </div>
-        </div>
-        <div class="az-control-group">
-          <span class="az-control-label">Server</span>
-          <div class="az-control-buttons" role="group" aria-label="Playback server">
-            <button type="button" data-server="anilink">AniLink</button>
-            <button type="button" data-server="tryembed">TryEmbed</button>
+          <div class="az-control-group">
+            <span class="az-control-label">Server</span>
+            <div class="az-control-buttons" role="group" aria-label="Playback server">
+              <button type="button" data-server="anilink">AniLink</button>
+              <button type="button" data-server="tryembed">TryEmbed</button>
+            </div>
+          </div>
+          <div class="az-playback-back">
+            <a href="{% url 'aniuzu_detail' anilist_id %}" class="az-watch-back"><span class="material-icons">arrow_back</span> Details</a>
           </div>
         </div>
       </div>
@@ -72,4 +77,4 @@
 {{ watch_config|json_script:"aniuzu-watch-config" }}
 {% endblock %}
 
-{% block extra_js %}<script src="{% static 'uzzutv/aniuzu_watch.js' %}?v=4"></script>{% endblock %}
+{% block extra_js %}<script src="{% static 'uzzutv/aniuzu_watch.js' %}?v=5"></script>{% endblock %}

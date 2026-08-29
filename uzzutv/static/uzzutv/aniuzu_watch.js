@@ -398,6 +398,23 @@
     window.addEventListener("pagehide", function () { saveProgress(true); });
     window.addEventListener("popstate", function () { window.location.reload(); });
 
+    var sidebarEl = document.querySelector(".az-episode-sidebar");
+    var playerColumnEl = document.querySelector(".az-player-column");
+    function sizeSidebar() {
+        if (!sidebarEl || !playerColumnEl) return;
+        if (window.matchMedia("(max-width:900px)").matches) return;
+        sidebarEl.style.height = playerColumnEl.offsetHeight + "px";
+        sidebarEl.style.maxHeight = playerColumnEl.offsetHeight + "px";
+    }
+    if (sidebarEl && playerColumnEl) {
+        sizeSidebar();
+        window.addEventListener("resize", sizeSidebar);
+        var sidebarObserver = new MutationObserver(sizeSidebar);
+        if (window.ResizeObserver) {
+            new ResizeObserver(sizeSidebar).observe(playerColumnEl);
+        }
+    }
+
     (async function initialise() {
         await restoreExplicitResume();
         updateAddress(true);
