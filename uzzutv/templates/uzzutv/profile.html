@@ -8,6 +8,16 @@
 
 {% block css %}
 <style>
+.profile-nav-brand{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.profile-nav-brand .navbar-brand{
+    margin-right: 0;
+}
+
 .profile-page{
     position: relative;
     min-height: calc(100vh - 160px);
@@ -686,6 +696,14 @@
 
 }
 </style>
+{% endblock %}
+
+{% block navbar_brand %}
+<div class="profile-nav-brand">
+    <a class="navbar-brand" href="{% url 'index'%}">UzzU<span class="brand-red">TV</span></a>
+    <span style="color:#6b7280;">/</span>
+    <a class="navbar-brand" href="{% url 'aniuzu'%}">Ani<span class="brand-red">uzu</span></a>
+</div>
 {% endblock %}
 
 {% block body %}
