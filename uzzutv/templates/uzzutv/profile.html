@@ -821,6 +821,22 @@
                     </div>
                 </div>
 
+                <div class="profile-stat">
+                    <div class="profile-stat-value" id="stat-anime-ratings">0</div>
+                    <div class="profile-stat-label">
+                        <span class="material-icons" aria-hidden="true">auto_awesome</span>
+                        Anime Rated
+                    </div>
+                </div>
+
+                <div class="profile-stat">
+                    <div class="profile-stat-value" id="stat-anime-comments">0</div>
+                    <div class="profile-stat-label">
+                        <span class="material-icons" aria-hidden="true">forum</span>
+                        Anime Comments
+                    </div>
+                </div>
+
             </div>
 
         </div>
@@ -845,6 +861,27 @@
             </div>
 
             <div id="rated-slider" class="profile-slider"></div>
+
+        </div>
+
+        <div class="profile-section">
+
+            <div class="profile-section-header">
+
+                <h2 class="profile-section-title">Aniuzu Rated</h2>
+
+                <div class="profile-slider-controls">
+                    <button type="button" onclick="profileSlideLeft('anime-rated-slider')" aria-label="Scroll left">
+                        <span class="material-icons" aria-hidden="true">chevron_left</span>
+                    </button>
+                    <button type="button" onclick="profileSlideRight('anime-rated-slider')" aria-label="Scroll right">
+                        <span class="material-icons" aria-hidden="true">chevron_right</span>
+                    </button>
+                </div>
+
+            </div>
+
+            <div id="anime-rated-slider" class="profile-slider"></div>
 
         </div>
 
@@ -888,6 +925,30 @@
                 </button>
                 <span class="profile-comment-page-info" id="profile-comment-page-info">Page 1 of 1</span>
                 <button type="button" id="profile-comment-next">
+                    Next
+                    <span class="material-icons" style="font-size:16px;vertical-align:-3px;" aria-hidden="true">arrow_forward</span>
+                </button>
+            </div>
+
+        </div>
+
+        <div class="profile-section">
+
+            <h2 class="profile-section-title">Aniuzu Recent Comments</h2>
+
+            <div id="anime-recent-comments"></div>
+
+            <div
+                class="profile-comment-pagination"
+                id="anime-comment-pagination"
+                style="display:none;"
+            >
+                <button type="button" id="anime-comment-prev">
+                    <span class="material-icons" style="font-size:16px;vertical-align:-3px;" aria-hidden="true">arrow_back</span>
+                    Previous
+                </button>
+                <span class="profile-comment-page-info" id="anime-comment-page-info">Page 1 of 1</span>
+                <button type="button" id="anime-comment-next">
                     Next
                     <span class="material-icons" style="font-size:16px;vertical-align:-3px;" aria-hidden="true">arrow_forward</span>
                 </button>
@@ -991,6 +1052,47 @@ async function loadMediaInfos(items, existingMap) {
         map[`${entry.type}_${entry.id}`] = results[index];
 
     });
+
+    return map;
+
+}
+
+
+async function loadAnimeInfos(ids) {
+
+    const unique = [...new Set(ids.filter(Boolean))];
+
+    if (unique.length === 0) return {};
+
+    const map = {};
+
+    const CHUNK = 12;
+
+    for (let i = 0; i < unique.length; i += CHUNK) {
+
+        const chunk = unique.slice(i, i + CHUNK);
+
+        try {
+
+            const response = await fetch(
+                `/aniuzu/continue-metadata/?ids=${chunk.join(",")}`
+            );
+
+            if (!response.ok) continue;
+
+            const payload = await response.json();
+
+            (payload.items || []).forEach((item) => {
+                map[item.id] = item;
+            });
+
+        } catch (err) {
+
+            console.error("Error loading anime info:", err);
+
+        }
+
+    }
 
     return map;
 
@@ -1186,13 +1288,24 @@ let profileCommentRatings = [];
 const profileMediaMap = {};
 
 
+const ANIME_COMMENTS_PER_PAGE = 4;
+
+let animeCommentPage = 1;
+
+let animeTotalComments = 0;
+
+let animeCommentRatings = [];
+
+const animeMediaMap = {};
+
+
 /* =========================================================
    LOAD PROFILE CONTENT
 ========================================================= */
 
 async function loadProfileContent(user) {
 
-    const [ratingsResult, commentsResult, watchlistResult] =
+    const [ratingsResult, commentsResult, watchlistResult, animeRatingsResult, animeCommentsResult] =
         await Promise.all([
             supabaseClient
                 .from("ratings")
@@ -1223,12 +1336,34 @@ async function loadProfileContent(user) {
                 .order("created_at", {
                     ascending: false
                 })
-                .limit(12)
+                .limit(12),
+            supabaseClient
+                .from("aniuzu_ratings")
+                .select("anilist_id,rating,updated_at", {
+                    count: "exact"
+                })
+                .eq("user_id", user.id)
+                .order("updated_at", {
+                    ascending: false
+                })
+                .limit(12),
+            supabaseClient
+                .from("aniuzu_comments")
+                .select("id,anilist_id,content,created_at", {
+                    count: "exact"
+                })
+                .eq("user_id", user.id)
+                .order("created_at", {
+                    ascending: false
+                })
+                .range(0, ANIME_COMMENTS_PER_PAGE - 1)
         ]);
 
     const ratings = ratingsResult.data || [];
     const comments = commentsResult.data || [];
     const watchlist = watchlistResult.data || [];
+    const animeRatings = animeRatingsResult.data || [];
+    const animeComments = animeCommentsResult.data || [];
 
     const ratingsCount =
         ratingsResult.count != null
@@ -1245,6 +1380,16 @@ async function loadProfileContent(user) {
             ? watchlistResult.count
             : watchlist.length;
 
+    const animeRatingsCount =
+        animeRatingsResult.count != null
+            ? animeRatingsResult.count
+            : animeRatings.length;
+
+    const animeCommentsCount =
+        animeCommentsResult.count != null
+            ? animeCommentsResult.count
+            : animeComments.length;
+
     document.getElementById("stat-ratings").textContent =
         ratingsCount;
 
@@ -1253,6 +1398,12 @@ async function loadProfileContent(user) {
 
     document.getElementById("stat-watchlist").textContent =
         watchlistCount;
+
+    document.getElementById("stat-anime-ratings").textContent =
+        animeRatingsCount;
+
+    document.getElementById("stat-anime-comments").textContent =
+        animeCommentsCount;
 
     document.getElementById("rated-view-all").style.display =
         ratingsCount > 12 ? "inline-block" : "none";
@@ -1266,11 +1417,21 @@ async function loadProfileContent(user) {
 
     profileCommentRatings = ratings;
 
+    animeCommentPage = 1;
+
+    animeTotalComments = animeCommentsCount;
+
+    animeCommentRatings = animeRatings;
+
     renderRatings(ratings);
 
     renderComments(comments);
 
     renderWatchlist(watchlist);
+
+    renderAnimeRatings(animeRatings);
+
+    renderAnimeComments(animeComments);
 
 }
 
@@ -1319,6 +1480,54 @@ async function loadProfileCommentsPage(page) {
         count != null ? count : (data || []).length;
 
     renderComments(data || []);
+
+}
+
+
+/* =========================================================
+   LOAD ANIME COMMENT PAGE
+========================================================= */
+
+async function loadAnimeCommentsPage(page) {
+
+    const user = await getCurrentUser();
+
+    if (!user) return;
+
+    const from = (page - 1) * ANIME_COMMENTS_PER_PAGE;
+    const to = from + ANIME_COMMENTS_PER_PAGE - 1;
+
+    const container = document.getElementById("anime-recent-comments");
+
+    container.innerHTML =
+        '<div class="profile-empty">Loading...</div>';
+
+    const { data, error, count } = await supabaseClient
+        .from("aniuzu_comments")
+        .select("id,anilist_id,content,created_at", {
+            count: "exact"
+        })
+        .eq("user_id", user.id)
+        .order("created_at", {
+            ascending: false
+        })
+        .range(from, to);
+
+    if (error) {
+
+        console.error("Error loading anime comments:", error);
+
+        container.innerHTML =
+            '<div class="profile-empty">Unable to load comments.</div>';
+
+        return;
+
+    }
+
+    animeTotalComments =
+        count != null ? count : (data || []).length;
+
+    renderAnimeComments(data || []);
 
 }
 
@@ -1411,6 +1620,93 @@ document.getElementById("profile-comment-next").addEventListener(
 
 
 /* =========================================================
+   ANIME COMMENT PAGINATION
+========================================================= */
+
+function updateAnimeCommentPagination() {
+
+    const controls =
+        document.getElementById("anime-comment-pagination");
+
+    if (!controls) return;
+
+    const totalPages = Math.max(
+        1,
+        Math.ceil(animeTotalComments / ANIME_COMMENTS_PER_PAGE)
+    );
+
+    if (totalPages <= 1) {
+
+        hideAnimeCommentPagination();
+
+        return;
+
+    }
+
+    controls.style.display = "flex";
+
+    document.getElementById("anime-comment-page-info").textContent =
+        `Page ${animeCommentPage} of ${totalPages}`;
+
+    document.getElementById("anime-comment-prev").disabled =
+        animeCommentPage <= 1;
+
+    document.getElementById("anime-comment-next").disabled =
+        animeCommentPage >= totalPages;
+
+}
+
+
+function hideAnimeCommentPagination() {
+
+    const controls =
+        document.getElementById("anime-comment-pagination");
+
+    if (controls) {
+        controls.style.display = "none";
+    }
+
+}
+
+
+document.getElementById("anime-comment-prev").addEventListener(
+    "click",
+    () => {
+
+        if (animeCommentPage > 1) {
+
+            animeCommentPage--;
+
+            loadAnimeCommentsPage(animeCommentPage);
+
+        }
+
+    }
+);
+
+
+document.getElementById("anime-comment-next").addEventListener(
+    "click",
+    () => {
+
+        const totalPages = Math.max(
+            1,
+            Math.ceil(animeTotalComments / ANIME_COMMENTS_PER_PAGE)
+        );
+
+        if (animeCommentPage < totalPages) {
+
+            animeCommentPage++;
+
+            loadAnimeCommentsPage(animeCommentPage);
+
+        }
+
+    }
+);
+
+
+/* =========================================================
    RATINGS
 ========================================================= */
 
@@ -1463,6 +1759,84 @@ async function renderRatings(ratings) {
             img.loading = "lazy";
             img.alt = `${title} poster`;
 
+            img.src = poster;
+
+            card.appendChild(img);
+
+        }
+
+        const titleEl = document.createElement("div");
+
+        titleEl.className = "profile-card-title";
+
+        titleEl.textContent = title;
+
+        card.appendChild(titleEl);
+
+        const stars = document.createElement("div");
+
+        stars.className = "profile-card-stars";
+
+        stars.innerHTML = starRow(rating.rating);
+
+        card.appendChild(stars);
+
+        container.appendChild(card);
+
+    });
+
+}
+
+
+/* =========================================================
+   ANIME RATINGS
+========================================================= */
+
+async function renderAnimeRatings(ratings) {
+
+    const container = document.getElementById("anime-rated-slider");
+
+    if (!ratings || ratings.length === 0) {
+
+        container.innerHTML = `
+            <div class="profile-empty">
+                <span class="material-icons" aria-hidden="true">star_outline</span>
+                No anime rated yet. Rate anime on Aniuzu to see them here.
+            </div>
+        `;
+
+        return;
+    }
+
+    container.innerHTML =
+        '<div class="profile-empty">Loading...</div>';
+
+    const ids = ratings.map((r) => r.anilist_id);
+
+    const animeMap = await loadAnimeInfos(ids);
+
+    container.innerHTML = "";
+
+    ratings.forEach((rating) => {
+
+        const info = animeMap[rating.anilist_id];
+
+        const title = (info && info.title) || "Unknown anime";
+
+        const poster = info && info.poster ? info.poster : "";
+
+        const card = document.createElement("a");
+
+        card.href = `/aniuzu/anime/${rating.anilist_id}/`;
+        card.className = "profile-card";
+        card.style.textDecoration = "none";
+
+        if (poster) {
+
+            const img = document.createElement("img");
+
+            img.loading = "lazy";
+            img.alt = `${title} poster`;
             img.src = poster;
 
             card.appendChild(img);
@@ -1606,6 +1980,122 @@ async function renderComments(comments) {
     });
 
     updateCommentPagination();
+
+}
+
+
+/* =========================================================
+   ANIME COMMENTS
+========================================================= */
+
+async function renderAnimeComments(comments) {
+
+    const container = document.getElementById("anime-recent-comments");
+
+    if (!comments || comments.length === 0) {
+
+        container.innerHTML = `
+            <div class="profile-empty">
+                <span class="material-icons" aria-hidden="true">chat_bubble_outline</span>
+                No anime comments yet.
+            </div>
+        `;
+
+        hideAnimeCommentPagination();
+
+        return;
+    }
+
+    container.innerHTML =
+        '<div class="profile-empty">Loading...</div>';
+
+    const ids = comments.map((c) => c.anilist_id);
+
+    const animeMap = await loadAnimeInfos(ids);
+
+    const ratingByAnime = {};
+
+    (animeCommentRatings || []).forEach((rating) => {
+
+        ratingByAnime[rating.anilist_id] = rating.rating;
+
+    });
+
+    container.innerHTML = "";
+
+    comments.forEach((comment) => {
+
+        const info = animeMap[comment.anilist_id];
+
+        const title = (info && info.title) || "Unknown anime";
+
+        const row = document.createElement("div");
+
+        row.className = "profile-comment";
+
+        const mediaLine = document.createElement("div");
+
+        mediaLine.className = "profile-comment-media";
+
+        const link = document.createElement("a");
+
+        link.href = `/aniuzu/anime/${comment.anilist_id}/`;
+        link.textContent = title;
+
+        mediaLine.appendChild(link);
+
+        const meta = document.createElement("div");
+
+        meta.className = "profile-comment-meta";
+
+        const date = document.createElement("span");
+
+        date.className = "profile-comment-date";
+
+        date.textContent =
+            formatProfileDate(comment.created_at);
+
+        meta.appendChild(date);
+
+        const arrow = document.createElement("span");
+
+        arrow.className = "profile-comment-arrow";
+
+        arrow.textContent = "›";
+
+        meta.appendChild(arrow);
+
+        mediaLine.appendChild(meta);
+
+        row.appendChild(mediaLine);
+
+        const userRating = ratingByAnime[comment.anilist_id];
+
+        if (userRating) {
+
+            const stars = document.createElement("div");
+
+            stars.className = "profile-comment-stars";
+
+            stars.innerHTML = starRow(userRating);
+
+            row.appendChild(stars);
+
+        }
+
+        const content = document.createElement("div");
+
+        content.className = "profile-comment-content";
+
+        content.textContent = comment.content;
+
+        row.appendChild(content);
+
+        container.appendChild(row);
+
+    });
+
+    updateAnimeCommentPagination();
 
 }
 
