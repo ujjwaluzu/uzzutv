@@ -95,3 +95,70 @@ CREATE POLICY "Users can update own Aniuzu continue watching"
 CREATE POLICY "Users can delete own Aniuzu continue watching"
     ON aniuzu_continue_watching FOR DELETE
     USING (auth.uid() = user_id);
+
+-- 3. RATINGS / REVIEWS (anime-specific)
+-- One row = one user's star rating for one anime.
+-- =============================================================
+
+CREATE TABLE IF NOT EXISTS aniuzu_ratings (
+    id          uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+    user_id     uuid REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+    anilist_id  bigint NOT NULL CHECK (anilist_id > 0),
+    rating      integer NOT NULL CHECK (rating >= 1 AND rating <= 5),
+    updated_at  timestamptz DEFAULT now() NOT NULL,
+    UNIQUE(user_id, anilist_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_aniuzu_ratings_anilist ON aniuzu_ratings(anilist_id);
+CREATE INDEX IF NOT EXISTS idx_aniuzu_ratings_user ON aniuzu_ratings(user_id);
+
+ALTER TABLE aniuzu_ratings ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Anyone can read Aniuzu ratings"
+    ON aniuzu_ratings FOR SELECT
+    USING (true);
+
+CREATE POLICY "Users can insert own Aniuzu rating"
+    ON aniuzu_ratings FOR INSERT
+    WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update own Aniuzu rating"
+    ON aniuzu_ratings FOR UPDATE
+    USING (auth.uid() = user_id)
+    WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete own Aniuzu rating"
+    ON aniuzu_ratings FOR DELETE
+    USING (auth.uid() = user_id);
+
+-- 4. COMMENTS (anime-specific)
+-- One row = one user comment on an anime.
+-- =============================================================
+
+CREATE TABLE IF NOT EXISTS aniuzu_comments (
+    id          uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+    user_id     uuid REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+    user_email  text,
+    anilist_id  bigint NOT NULL CHECK (anilist_id > 0),
+    content     text NOT NULL CHECK (char_length(content) BETWEEN 1 AND 2000),
+    created_at  timestamptz DEFAULT now() NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_aniuzu_comments_anilist
+    ON aniuzu_comments(anilist_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_aniuzu_comments_user
+    ON aniuzu_comments(user_id);
+
+ALTER TABLE aniuzu_comments ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Anyone can read Aniuzu comments"
+    ON aniuzu_comments FOR SELECT
+    USING (true);
+
+CREATE POLICY "Users can insert own Aniuzu comment"
+    ON aniuzu_comments FOR INSERT
+    WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete own Aniuzu comment"
+    ON aniuzu_comments FOR DELETE
+    USING (auth.uid() = user_id);

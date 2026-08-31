@@ -17,6 +17,96 @@
 
 {% block body %}
 
+<style>
+.ratings-comments{
+    max-width:1600px;
+    margin:28px auto 44px;
+    padding:0 24px;
+}
+.ratings-comments .section-title{
+    margin-left:0;
+    margin-top:0;
+    margin-bottom:16px;
+}
+.rating-summary{
+    display:grid;
+    grid-template-columns:190px 1fr 210px;
+    gap:24px;
+    background:rgba(255,255,255,.03);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:14px;
+    padding:24px 28px;
+}
+.rating-score{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;}
+.rating-average{font-size:46px;font-weight:700;line-height:1;color:white;letter-spacing:-.5px;}
+.rating-stars{display:flex;align-items:center;gap:5px;}
+#average-stars{gap:3px;margin-top:10px;}
+#average-stars span{font-size:22px;line-height:1;letter-spacing:1px;}
+.rating-count{color:#9ca3af;font-size:13px;margin-top:8px;}
+.rating-distribution{display:flex;flex-direction:column;justify-content:center;border-left:1px solid rgba(255,255,255,.07);border-right:1px solid rgba(255,255,255,.07);padding:4px 22px;}
+.distribution-row{display:flex;align-items:center;gap:10px;margin-bottom:7px;}
+.distribution-row:last-child{margin-bottom:0;}
+.dist-label{width:26px;flex-shrink:0;color:#9ca3af;font-size:12px;font-weight:600;text-align:right;}
+.dist-track{flex:1;min-width:0;height:8px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden;}
+.dist-fill{height:100%;width:0%;background:#ff3c3c;border-radius:99px;transition:width .4s ease;}
+.dist-count{width:30px;flex-shrink:0;text-align:right;color:#9ca3af;font-size:12px;}
+.user-rating{display:flex;flex-direction:column;justify-content:center;}
+.user-rating-label{display:flex;align-items:center;gap:8px;color:#b9bec7;font-size:13px;font-weight:500;letter-spacing:.2px;margin-bottom:12px;}
+.user-rating-label::before{content:"";width:3px;height:14px;border-radius:2px;background:#ff3c3c;}
+#user-rating-stars{gap:4px;}
+.rating-star{background:none;border:none;color:rgba(255,255,255,.2);font-size:30px;line-height:1;padding:0 2px;cursor:pointer;transition:color .15s ease, transform .15s ease;}
+.rating-star.active{color:#ff3c3c;}
+.rating-star:hover{color:#ff3c3c;transform:scale(1.12);}
+.rating-star:focus-visible{outline:2px solid rgba(255,60,60,.5);outline-offset:2px;}
+.login-hint{font-style:italic;color:#7c838f;font-size:13px;}
+.user-rating-remove{margin-top:10px;}
+.rating-remove-btn{background:none;border:none;color:#6b7280;cursor:pointer;font-size:12px;padding:10px 12px;margin-left:-8px;border-radius:6px;transition:color .15s ease, background .15s ease;min-height:44px;}
+.rating-remove-btn:hover{color:#ff3c3c;background:rgba(255,60,60,.08);}
+.comment-section{margin-top:38px;}
+.comment-count{margin-left:6px;font-size:16px;font-weight:500;color:#9ca3af;}
+.login-prompt{display:flex;align-items:center;gap:6px;flex-wrap:wrap;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:14px 16px;color:#b6bcc6;font-size:14px;margin-bottom:20px;}
+.login-prompt a{color:#ff3c3c;font-weight:600;text-decoration:none;}
+.login-prompt a:hover{text-decoration:underline;}
+.comment-form{display:flex;gap:14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:14px 16px;margin-bottom:18px;}
+.comment-form-avatar{width:38px;height:38px;flex-shrink:0;border-radius:50%;background:rgba(255,60,60,.12);color:#ff3c3c;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;}
+.comment-form-main{flex:1;min-width:0;}
+.comment-input{width:100%;min-height:84px;resize:vertical;background:#16181d;border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:10px 12px;color:white;font-family:inherit;font-size:14px;line-height:1.5;outline:none;transition:border-color .2s ease, box-shadow .2s ease;}
+.comment-input:focus{border-color:#ff3c3c;box-shadow:0 0 0 3px rgba(255,60,60,.12);}
+.comment-input::placeholder{color:#6b7280;}
+.comment-form-footer{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:8px;}
+.comment-char-counter{color:#6b7280;font-size:12px;font-variant-numeric:tabular-nums;}
+.comment-submit{background:#ff3c3c;color:white;border:none;padding:10px 22px;border-radius:8px;cursor:pointer;font-weight:600;font-size:14px;font-family:inherit;transition:background .2s ease, transform .15s ease;}
+.comment-submit:hover{background:#e83232;}
+.comment-submit:active{transform:scale(.97);}
+.comment-submit:focus-visible{outline:2px solid rgba(255,60,60,.5);outline-offset:2px;}
+.comment-submit:disabled{opacity:.6;cursor:not-allowed;}
+.comment-card{display:flex;gap:14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:14px 16px;margin-bottom:10px;transition:background .2s ease, border-color .2s ease;}
+.comment-card:hover{background:rgba(255,255,255,.045);border-color:rgba(255,255,255,.12);}
+.comment-avatar{width:38px;height:38px;flex-shrink:0;border-radius:50%;background:rgba(255,60,60,.12);color:#ff3c3c;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;}
+.comment-body{flex:1;min-width:0;}
+.comment-header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:2px;}
+.comment-email{font-weight:600;color:rgba(255,255,255,.75);font-size:13.5px;letter-spacing:.2px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.comment-author-link{color:rgba(255,255,255,.9);text-decoration:none;transition:color .15s ease;}
+.comment-author-link:hover{color:#ff3c3c;text-decoration:underline;}
+.comment-date{color:#5f6670;font-size:12px;flex-shrink:0;}
+.comment-rating{font-size:13px;letter-spacing:1px;margin:3px 0 6px;}
+.comment-rating .filled{color:#ff3c3c;}
+.comment-rating .empty{color:rgba(255,255,255,.2);}
+.comment-content{color:#d8dce2;font-size:14.5px;line-height:1.6;white-space:pre-wrap;word-break:break-word;}
+.comment-actions{margin-top:8px;text-align:right;}
+.comment-delete{background:none;border:none;color:#6b7280;cursor:pointer;font-size:12px;padding:10px 14px;border-radius:6px;transition:color .15s ease, background .15s ease;min-height:44px;}
+.comment-delete:hover{color:#ff3c3c;background:rgba(255,60,60,.08);}
+.no-comments{text-align:center;color:#8b909a;font-size:14px;padding:28px 14px;background:rgba(255,255,255,.02);border:1px dashed rgba(255,255,255,.12);border-radius:12px;}
+.pagination-controls{display:flex;align-items:center;justify-content:center;gap:16px;padding:14px 0 4px;}
+.pagination-btn{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);color:#d1d5db;font-size:13px;font-weight:500;font-family:inherit;padding:10px 18px;border-radius:8px;cursor:pointer;transition:background .15s ease, border-color .15s ease, color .15s ease;min-height:44px;}
+.pagination-btn:hover:not(:disabled){background:rgba(255,60,60,.12);border-color:#ff3c3c;color:#ff3c3c;}
+.pagination-btn:disabled{opacity:.4;cursor:not-allowed;}
+@media (max-width:900px){
+    .rating-summary{grid-template-columns:1fr;gap:16px;}
+    .rating-distribution{border-left:none;border-right:none;border-top:1px solid rgba(255,255,255,.07);border-bottom:1px solid rgba(255,255,255,.07);padding:12px 4px;}
+}
+</style>
+
 {% if anime %}
 <script type="application/ld+json">
 {{ jsonld_json|safe }}
@@ -77,11 +167,60 @@
 </div>
 {% endif %}
 
+<!-- RATINGS & REVIEWS -->
+<section class="ratings-comments">
+    <div class="rating-section">
+        <h2 class="section-title">Ratings & Reviews</h2>
+        <div class="rating-summary">
+            <div class="rating-score">
+                <div class="rating-average" id="rating-average">0.0</div>
+                <div class="rating-stars" id="average-stars">
+                    <span>☆</span><span>☆</span><span>☆</span><span>☆</span><span>☆</span>
+                </div>
+                <div class="rating-count" id="rating-count">0 ratings</div>
+            </div>
+            <div class="rating-distribution" id="rating-distribution">
+                <div class="distribution-row" data-stars="5"><span class="dist-label">5★</span><div class="dist-track"><div class="dist-fill"></div></div><span class="dist-count">0</span></div>
+                <div class="distribution-row" data-stars="4"><span class="dist-label">4★</span><div class="dist-track"><div class="dist-fill"></div></div><span class="dist-count">0</span></div>
+                <div class="distribution-row" data-stars="3"><span class="dist-label">3★</span><div class="dist-track"><div class="dist-fill"></div></div><span class="dist-count">0</span></div>
+                <div class="distribution-row" data-stars="2"><span class="dist-label">2★</span><div class="dist-track"><div class="dist-fill"></div></div><span class="dist-count">0</span></div>
+                <div class="distribution-row" data-stars="1"><span class="dist-label">1★</span><div class="dist-track"><div class="dist-fill"></div></div><span class="dist-count">0</span></div>
+            </div>
+            <div id="user-rating-section" class="user-rating">
+                <div class="user-rating-label">Your rating</div>
+                <div class="rating-stars" id="user-rating-stars">
+                    <button class="rating-star" data-rating="1">☆</button>
+                    <button class="rating-star" data-rating="2">☆</button>
+                    <button class="rating-star" data-rating="3">☆</button>
+                    <button class="rating-star" data-rating="4">☆</button>
+                    <button class="rating-star" data-rating="5">☆</button>
+                </div>
+                <div class="user-rating-remove" id="user-rating-remove" style="display:none;">
+                    <button type="button" class="rating-remove-btn" id="rating-remove-btn">Remove rating</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="comment-section">
+        <h2 class="section-title">Comments <span class="comment-count" id="comment-count">(0)</span></h2>
+        <div id="comment-area">
+            <div id="comment-form-container"></div>
+            <div id="comments-list"><div class="no-comments">Loading comments...</div></div>
+            <div class="pagination-controls" id="pagination-controls" style="display:none;">
+                <button type="button" class="pagination-btn" id="pagination-prev">← Previous</button>
+                <span class="pagination-info" id="pagination-info">Page 1 of 1</span>
+                <button type="button" class="pagination-btn" id="pagination-next">Next →</button>
+            </div>
+        </div>
+    </div>
+</section>
+
 {% if characters %}
 <div class="az-content-section">
 <div class="az-slider-header">
 <h2 class="section-title">Characters</h2>
 </div>
+
 <div class="az-char-row">
 {% for char in characters|slice:":20" %}
 <div class="az-char-card">
@@ -163,4 +302,415 @@
 {% endif %}
 
 {% endblock %}
-{% block extra_js %}<script src="{% static 'uzzutv/aniuzu.js' %}"></script><script src="{% static 'uzzutv/aniuzu_detail.js' %}?v=1"></script>{% endblock %}
+{% block extra_js %}<script src="{% static 'uzzutv/aniuzu.js' %}"></script><script src="{% static 'uzzutv/aniuzu_detail.js' %}?v=1"></script>
+
+{% if anime %}
+<script>
+(function () {
+    "use strict";
+
+    if (typeof supabaseClient === "undefined" || typeof getCurrentUser !== "function") return;
+
+    var anilistId = Number("{{ anilist_id }}");
+    var siteUrl = "{{ site_url|default:'/' }}";
+
+    var ratingAverage = document.getElementById("rating-average");
+    var ratingCount = document.getElementById("rating-count");
+    var averageStars = document.getElementById("average-stars");
+    var userRatingStars = document.getElementById("user-rating-stars");
+    var ratingRemoveContainer = document.getElementById("user-rating-remove");
+    var ratingDistribution = document.getElementById("rating-distribution");
+    var ratingRemoveBtn = document.getElementById("rating-remove-btn");
+    var commentFormContainer = document.getElementById("comment-form-container");
+    var commentsList = document.getElementById("comments-list");
+    var commentCountEl = document.getElementById("comment-count");
+    var paginationControls = document.getElementById("pagination-controls");
+    var paginationPrev = document.getElementById("pagination-prev");
+    var paginationNext = document.getElementById("pagination-next");
+    var paginationInfo = document.getElementById("pagination-info");
+
+    var COMMENTS_PER_PAGE = 4;
+    var currentCommentPage = 1;
+    var totalComments = 0;
+
+    function updateAverageStars(average) {
+        if (!averageStars) return;
+        var stars = averageStars.querySelectorAll("span");
+        stars.forEach(function (star, index) {
+            star.textContent = index < Math.round(average) ? "★" : "☆";
+            star.style.color = index < Math.round(average) ? "#ff3c3c" : "rgba(255,255,255,.2)";
+        });
+    }
+
+    function updateRatingDistribution(ratings) {
+        if (!ratingDistribution) return;
+        var counts = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0};
+        (ratings || []).forEach(function (item) {
+            var value = Math.round(item.rating);
+            if (counts[value] !== undefined) counts[value]++;
+        });
+        var total = (ratings || []).length || 1;
+        ratingDistribution.querySelectorAll(".distribution-row").forEach(function (row) {
+            var stars = Number(row.dataset.stars);
+            var count = counts[stars] || 0;
+            row.querySelector(".dist-count").textContent = count;
+            row.querySelector(".dist-fill").style.width = ((count / total) * 100) + "%";
+        });
+    }
+
+    async function loadRatingSummary() {
+        if (!ratingAverage || !ratingCount) return;
+        var result = await supabaseClient
+            .from("aniuzu_ratings")
+            .select("rating")
+            .eq("anilist_id", anilistId);
+        if (result.error) { console.error("Error loading ratings:", result.error); return; }
+        var data = result.data || [];
+        if (data.length === 0) {
+            ratingAverage.textContent = "0.0";
+            ratingCount.textContent = "0 ratings";
+            updateAverageStars(0);
+            updateRatingDistribution([]);
+            return;
+        }
+        var total = data.reduce(function (sum, item) { return sum + item.rating; }, 0);
+        var average = total / data.length;
+        ratingAverage.textContent = average.toFixed(1);
+        ratingCount.textContent = data.length + (data.length === 1 ? " rating" : " ratings");
+        updateAverageStars(average);
+        updateRatingDistribution(data);
+    }
+
+    function updateUserStars(rating) {
+        if (!userRatingStars) return;
+        var stars = userRatingStars.querySelectorAll(".rating-star");
+        stars.forEach(function (star) {
+            var value = Number(star.dataset.rating);
+            star.textContent = value <= rating ? "★" : "☆";
+            star.classList.toggle("active", value <= rating);
+        });
+        if (ratingRemoveContainer) {
+            ratingRemoveContainer.style.display = rating > 0 ? "block" : "none";
+        }
+    }
+
+    async function loadUserRating() {
+        if (!userRatingStars) return;
+        var user = await getCurrentUser();
+        if (!user) {
+            userRatingStars.innerHTML = '<span class="login-hint">Log in to rate this</span>';
+            return;
+        }
+        var result = await supabaseClient
+            .from("aniuzu_ratings")
+            .select("rating")
+            .eq("user_id", user.id)
+            .eq("anilist_id", anilistId)
+            .maybeSingle();
+        if (result.error) { console.error("Error loading your rating:", result.error); return; }
+        if (result.data) updateUserStars(result.data.rating);
+    }
+
+    async function saveRating(rating) {
+        var user = await getCurrentUser();
+        if (!user) { window.location.href = siteUrl + "auth/?next=" + encodeURIComponent(siteUrl + "home/"); return; }
+        var result = await supabaseClient
+            .from("aniuzu_ratings")
+            .upsert({
+                user_id: user.id,
+                anilist_id: anilistId,
+                rating: rating,
+                updated_at: new Date().toISOString()
+            }, { onConflict: "user_id,anilist_id" });
+        if (result.error) { console.error("Error saving rating:", result.error); return; }
+        updateUserStars(rating);
+        await loadRatingSummary();
+    }
+
+    async function deleteRating() {
+        var user = await getCurrentUser();
+        if (!user) return;
+        var result = await supabaseClient
+            .from("aniuzu_ratings")
+            .delete()
+            .eq("user_id", user.id)
+            .eq("anilist_id", anilistId);
+        if (result.error) { console.error("Error deleting rating:", result.error); return; }
+        updateUserStars(0);
+        await loadRatingSummary();
+    }
+
+    if (userRatingStars) {
+        userRatingStars.querySelectorAll(".rating-star").forEach(function (star) {
+            star.addEventListener("mouseenter", function () {
+                var rating = Number(star.dataset.rating);
+                userRatingStars.querySelectorAll(".rating-star").forEach(function (item) {
+                    item.textContent = Number(item.dataset.rating) <= rating ? "★" : "☆";
+                });
+            });
+            star.addEventListener("click", function () {
+                saveRating(Number(star.dataset.rating));
+            });
+        });
+        userRatingStars.addEventListener("mouseleave", async function () {
+            var user = await getCurrentUser();
+            if (!user) return;
+            var result = await supabaseClient
+                .from("aniuzu_ratings")
+                .select("rating")
+                .eq("user_id", user.id)
+                .eq("anilist_id", anilistId)
+                .maybeSingle();
+            updateUserStars(result.data ? result.data.rating : 0);
+        });
+    }
+
+    if (ratingRemoveBtn) {
+        ratingRemoveBtn.addEventListener("click", deleteRating);
+    }
+
+    function formatCommentDate(dateString) {
+        var date = new Date(dateString);
+        var now = new Date();
+        var seconds = Math.floor((now - date) / 1000);
+        if (seconds < 60) return "Just now";
+        if (seconds < 3600) return Math.floor(seconds / 60) + " min ago";
+        if (seconds < 86400) return Math.floor(seconds / 3600) + " hr ago";
+        if (seconds < 604800) return Math.floor(seconds / 86400) + " days ago";
+        return date.toLocaleDateString();
+    }
+
+    async function setupCommentForm() {
+        if (!commentFormContainer) return;
+        var user = await getCurrentUser();
+        if (!user) {
+            commentFormContainer.innerHTML =
+                '<div class="login-prompt"><a href="' + siteUrl + 'auth/?next=' + encodeURIComponent(siteUrl + "home/") + '">Log in</a> to leave a comment.</div>';
+            return;
+        }
+        var profile = await ensureUserProfile(user);
+        commentFormContainer.innerHTML =
+            '<div class="comment-form">' +
+                '<div class="comment-form-avatar">' + (profile && profile.username || user.email || "?").charAt(0).toUpperCase() + '</div>' +
+                '<div class="comment-form-main">' +
+                    '<textarea id="comment-input" class="comment-input" maxlength="2000" placeholder="Write a comment..."></textarea>' +
+                    '<div class="comment-form-footer">' +
+                        '<span id="comment-char-counter" class="comment-char-counter">0/2000</span>' +
+                        '<button id="comment-submit" class="comment-submit">Post Comment</button>' +
+                    '</div>' +
+                '</div>' +
+            '</div>';
+
+        var commentInput = document.getElementById("comment-input");
+        var commentSubmit = document.getElementById("comment-submit");
+        var charCounter = document.getElementById("comment-char-counter");
+
+        commentInput.addEventListener("input", function () {
+            charCounter.textContent = commentInput.value.length + "/2000";
+        });
+
+        commentSubmit.addEventListener("click", async function () {
+            var content = commentInput.value.trim();
+            if (!content) return;
+            commentSubmit.disabled = true;
+            commentSubmit.textContent = "Posting...";
+            var currentUser = await getCurrentUser();
+            if (!currentUser) { window.location.href = siteUrl + "auth/"; return; }
+            var result = await supabaseClient
+                .from("aniuzu_comments")
+                .insert({
+                    user_id: currentUser.id,
+                    user_email: currentUser.email,
+                    anilist_id: anilistId,
+                    content: content
+                });
+            if (result.error) {
+                console.error("Error posting comment:", result.error);
+                commentSubmit.disabled = false;
+                commentSubmit.textContent = "Post Comment";
+                return;
+            }
+            commentInput.value = "";
+            charCounter.textContent = "0/2000";
+            commentSubmit.disabled = false;
+            commentSubmit.textContent = "Post Comment";
+            await loadComments(1);
+        });
+    }
+
+    async function loadCommentAuthorRatings(comments) {
+        var userIds = Array.from(new Set((comments || []).map(function (c) { return c.user_id; }).filter(Boolean)));
+        if (userIds.length === 0) return {};
+        var ratingsByUser = {};
+        try {
+            for (var i = 0; i < userIds.length; i += 100) {
+                var batch = userIds.slice(i, i + 100);
+                var result = await supabaseClient
+                    .from("aniuzu_ratings")
+                    .select("user_id,rating")
+                    .eq("anilist_id", anilistId)
+                    .in("user_id", batch);
+                if (result.error) { console.error("Error loading comment ratings:", result.error); return {}; }
+                if (result.data) result.data.forEach(function (row) { ratingsByUser[row.user_id] = row.rating; });
+            }
+        } catch (err) {
+            console.error("Error loading comment ratings:", err);
+            return {};
+        }
+        return ratingsByUser;
+    }
+
+    async function loadCommentUsernames(comments) {
+        var userIds = Array.from(new Set((comments || []).map(function (c) { return c.user_id; }).filter(Boolean)));
+        if (userIds.length === 0) return {};
+        var usernamesByUser = {};
+        try {
+            for (var i = 0; i < userIds.length; i += 100) {
+                var batch = userIds.slice(i, i + 100);
+                var result = await supabaseClient
+                    .from("profiles")
+                    .select("id,username")
+                    .in("id", batch);
+                if (result.error) { console.error("Error loading comment usernames:", result.error); return {}; }
+                if (result.data) result.data.forEach(function (row) { usernamesByUser[row.id] = row.username; });
+            }
+        } catch (err) {
+            console.error("Error loading comment usernames:", err);
+            return {};
+        }
+        return usernamesByUser;
+    }
+
+    function updatePagination() {
+        if (!paginationControls) return;
+        var totalPages = Math.max(1, Math.ceil(totalComments / COMMENTS_PER_PAGE));
+        if (totalPages <= 1) { paginationControls.style.display = "none"; return; }
+        paginationControls.style.display = "flex";
+        paginationInfo.textContent = "Page " + currentCommentPage + " of " + totalPages;
+        paginationPrev.disabled = currentCommentPage <= 1;
+        paginationNext.disabled = currentCommentPage >= totalPages;
+    }
+
+    async function loadComments(page) {
+        page = page || currentCommentPage;
+        currentCommentPage = page;
+        var from = (page - 1) * COMMENTS_PER_PAGE;
+        var to = from + COMMENTS_PER_PAGE - 1;
+        var result = await supabaseClient
+            .from("aniuzu_comments")
+            .select("id,user_id,user_email,content,created_at", { count: "exact" })
+            .eq("anilist_id", anilistId)
+            .order("created_at", { ascending: false })
+            .range(from, to);
+        if (result.error) {
+            console.error("Error loading comments:", result.error);
+            if (commentCountEl) commentCountEl.textContent = "(0)";
+            paginationControls.style.display = "none";
+            commentsList.innerHTML = '<div class="no-comments">Unable to load comments.</div>';
+            return;
+        }
+        totalComments = result.count || 0;
+        var data = result.data || [];
+        if (totalComments === 0) {
+            if (commentCountEl) commentCountEl.textContent = "(0)";
+            paginationControls.style.display = "none";
+            commentsList.innerHTML = '<div class="no-comments">No comments yet. Be the first to share your thoughts.</div>';
+            return;
+        }
+        if (data.length === 0 && page > 1) { loadComments(page - 1); return; }
+        if (commentCountEl) commentCountEl.textContent = "(" + totalComments + ")";
+        var currentUser = await getCurrentUser();
+        var ratingsByUser = await loadCommentAuthorRatings(data);
+        var usernamesByUser = await loadCommentUsernames(data);
+        commentsList.innerHTML = "";
+        data.forEach(function (comment) {
+            var profileName = usernamesByUser[comment.user_id];
+            var authorName = profileName || comment.user_email;
+            var avatarName = authorName || "?";
+            var card = document.createElement("div");
+            card.className = "comment-card";
+            var avatar = document.createElement("div");
+            avatar.className = "comment-avatar";
+            avatar.textContent = avatarName.charAt(0).toUpperCase();
+            var body = document.createElement("div");
+            body.className = "comment-body";
+            var header = document.createElement("div");
+            header.className = "comment-header";
+            var author = document.createElement(profileName ? "a" : "span");
+            author.className = "comment-email";
+            if (profileName) {
+                author.href = "/profile/" + comment.user_id + "/";
+                author.classList.add("comment-author-link");
+            }
+            author.textContent = authorName || comment.user_email;
+            var date = document.createElement("span");
+            date.className = "comment-date";
+            date.textContent = formatCommentDate(comment.created_at);
+            header.appendChild(author);
+            header.appendChild(date);
+            body.appendChild(header);
+            var authorRating = ratingsByUser[comment.user_id];
+            if (authorRating) {
+                var ratingRow = document.createElement("div");
+                ratingRow.className = "comment-rating";
+                for (var k = 1; k <= 5; k++) {
+                    var star = document.createElement("span");
+                    star.className = k <= authorRating ? "filled" : "empty";
+                    star.textContent = k <= authorRating ? "★" : "☆";
+                    ratingRow.appendChild(star);
+                }
+                body.appendChild(ratingRow);
+            }
+            var content = document.createElement("div");
+            content.className = "comment-content";
+            content.textContent = comment.content;
+            body.appendChild(content);
+            if (currentUser && currentUser.id === comment.user_id) {
+                var actions = document.createElement("div");
+                actions.className = "comment-actions";
+                var del = document.createElement("button");
+                del.className = "comment-delete";
+                del.textContent = "Delete";
+                del.addEventListener("click", function () { deleteComment(comment.id); });
+                actions.appendChild(del);
+                body.appendChild(actions);
+            }
+            card.appendChild(avatar);
+            card.appendChild(body);
+            commentsList.appendChild(card);
+        });
+        updatePagination();
+    }
+
+    async function deleteComment(commentId) {
+        var user = await getCurrentUser();
+        if (!user) return;
+        if (!confirm("Delete this comment?")) return;
+        var result = await supabaseClient
+            .from("aniuzu_comments")
+            .delete()
+            .eq("id", commentId)
+            .eq("user_id", user.id);
+        if (result.error) { console.error("Error deleting comment:", result.error); return; }
+        await loadComments();
+    }
+
+    if (paginationPrev) {
+        paginationPrev.addEventListener("click", function () {
+            if (currentCommentPage > 1) loadComments(currentCommentPage - 1);
+        });
+    }
+    if (paginationNext) {
+        paginationNext.addEventListener("click", function () {
+            var totalPages = Math.max(1, Math.ceil(totalComments / COMMENTS_PER_PAGE));
+            if (currentCommentPage < totalPages) loadComments(currentCommentPage + 1);
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        Promise.all([loadRatingSummary(), loadUserRating(), setupCommentForm(), loadComments()]);
+    });
+}());
+</script>
+{% endif %}
+{% endblock %}
