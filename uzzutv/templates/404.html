@@ -81,7 +81,7 @@
     <div class="error-code">404</div>
     <h1 class="error-title">Page Not Found</h1>
     <p class="error-text">The page you're looking for doesn't exist or has been moved. Let's get you back to watching.</p>
-    <a class="error-btn" href="{% url 'home' %}">Back to Home</a>
+    <a class="error-btn" href="{% if request.path|slice:':8' == '/aniuzu' %}{% url 'aniuzu' %}{% else %}{% url 'home' %}{% endif %}">Back to Home</a>
 </div>
 
 {% endblock %}
