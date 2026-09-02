@@ -46,6 +46,11 @@
     var lastSavedPosition = 0;
     var lastSaveAt = 0;
     var playerTimer = null;
+    var preWatchUrl = (function () {
+        var fallback = "/aniuzu/anime/" + state.anilistId + "/";
+        var referrer = document.referrer || "";
+        return referrer && referrer.indexOf(window.location.host) !== -1 ? referrer : fallback;
+    }());
     var episodeOffset = 0;
     var activeUser = null;
 
@@ -102,7 +107,11 @@
 
     function updateAddress(replace) {
         var url = "/aniuzu/anime/" + state.anilistId + "/watch/" + state.episodeNumber + "/?server=" + encodeURIComponent(state.server) + "&variant=" + encodeURIComponent(state.variant);
-        window.history[replace ? "replaceState" : "pushState"]({}, "", url);
+        // Keep the watch-page marker and the preserved pre-watch page on every
+        // entry this script writes, so a refresh can recognise the watch entry
+        // and Back can always leave the watch experience in one step.
+        var entry = { aniuzuWatchEntry: true, preWatchUrl: preWatchUrl };
+        window.history[replace ? "replaceState" : "pushState"](entry, "", url);
     }
 
     function showError() {
@@ -362,7 +371,7 @@
         state.duration = 0;
         state.resumePosition = 0;
         lastSavedPosition = 0;
-        updateAddress(false);
+        updateAddress(true);
         updateControls();
         renderEpisodes(false);
         loadPlayer();
@@ -396,7 +405,15 @@
     document.getElementById("az-switch-server").addEventListener("click", function () { document.querySelector('[data-server="' + otherServer() + '"]').click(); });
     document.addEventListener("visibilitychange", function () { if (document.visibilityState === "hidden") saveProgress(true); });
     window.addEventListener("pagehide", function () { saveProgress(true); });
-    window.addEventListener("popstate", function () { window.location.reload(); });
+    window.addEventListener("popstate", function () {
+        // Back actions that stay inside the watch document can only be the
+        // companion entry pushed for direct visits. Leave the watch experience
+        // to the saved pre-watch page (or the detail fallback) and replace the
+        // current entry so a second Back never re-enters the watch page.
+        var url = (window.history.state && window.history.state.preWatchUrl) || preWatchUrl;
+        if (url) window.location.replace(url);
+        else window.location.reload();
+    });
 
     var sidebarEl = document.querySelector(".az-episode-sidebar");
     var playerColumnEl = document.querySelector(".az-player-column");
@@ -417,6 +434,19 @@
 
     (async function initialise() {
         await restoreExplicitResume();
+
+        // Direct visits (new tab, bookmark, typed URL) have nothing underneath
+        // the watch page in history. Push a companion entry so Back can return
+        // to a sensible Aniuzu page instead of dead-ending. When the user
+        // arrived from another page, that page is already the previous history
+        // entry and pushing would only add an unwanted intermediate stop.
+        if (window.history.length === 1) {
+            window.history.pushState({ aniuzuWatchEntry: true, preWatchUrl: preWatchUrl }, "", window.location.href);
+        }
+
+        var backLink = document.querySelector(".az-watch-back");
+        if (backLink) backLink.href = preWatchUrl;
+
         updateAddress(true);
         updateControls();
         renderEpisodes(true);
