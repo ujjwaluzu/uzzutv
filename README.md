@@ -92,7 +92,7 @@ UzzUTV is a Netflix-style streaming platform built with Django that lets you dis
 
 | Layer      | Technology                          |
 |------------|-------------------------------------|
-| Backend    | Python, Django 5.2                  |
+| Backend    | Python, Django 5.2.16              |
 | Frontend   | HTML5, CSS3, Bootstrap 5, JavaScript |
 | Data       | TMDB API (movies/TV metadata)       |
 | Auth/Data  | Supabase (auth, watchlist, ratings, comments, profiles, realtime) |
@@ -155,6 +155,8 @@ CSRF_COOKIE_SECURE=False
 
 Run [`sql/aniuzu_tables.sql`](sql/aniuzu_tables.sql) in the Supabase SQL editor. It creates the Aniuzu watchlist and `aniuzu_continue_watching` tables, indexes, constraints, and Row Level Security policies. Continue Watching uses one row per authenticated user/anime and updates that row with the latest episode, server, variant, and position. The SQL also migrates older per-episode data by retaining the most recently updated row for each user/anime. Policies allow each authenticated user to select, insert, update, and delete only their own rows.
 
+Run [`sql/watch_parties.sql`](sql/watch_parties.sql) to create the Watch Party tables, indexes, and Row Level Security policies for synchronized playback rooms.
+
 Add the reset callback URL for every environment to Supabase Auth URL Configuration. The application builds this from the current origin as `/auth/reset-password/`, for example `http://127.0.0.1:8000/auth/reset-password/` during local development.
 
 ---
@@ -167,6 +169,9 @@ uzzutv/
 ├── requirements.txt
 ├── db.sqlite3
 ├── .env
+├── sql/                   # Supabase SQL setup scripts
+│   ├── aniuzu_tables.sql  # Aniuzu tables, indexes, RLS
+│   └── watch_parties.sql  # Watch Party tables, indexes, RLS
 ├── stream/                # Django project settings
 │   ├── settings.py        # env-based config, caching, gzip
 │   ├── urls.py
@@ -196,6 +201,13 @@ uzzutv/
 | `/aniuzu/watchlist/`       | Aniuzu watchlist                     |
 | `/aniuzu/search/`          | AniList anime search                 |
 | `/aniuzu/continue-metadata/` | Metadata for Continue Watching cards |
+| `/aniuzu/genres/`          | Anime genre list                     |
+| `/aniuzu/genres/<genre>/`  | Anime genre browse page              |
+| `/aniuzu/seasons/`         | Anime seasons browse page            |
+| `/aniuzu/studios/`         | Anime studios list                   |
+| `/aniuzu/studios/<name>/`  | Anime studio browse page             |
+| `/aniuzu/collections/`     | Anime collections list               |
+| `/aniuzu/collections/<slug>/` | Anime collection browse page       |
 | `/search/`                | Search                               |
 | `/watchlist/`             | Your saved titles                    |
 | `/rated/`                 | Your ratings (with `/rated/<user_id>/` public view) |
