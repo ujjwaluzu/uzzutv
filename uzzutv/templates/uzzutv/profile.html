@@ -658,6 +658,304 @@
     to{ transform: rotate(360deg); }
 }
 
+/* ---------- DANGER ZONE ---------- */
+
+.profile-danger-zone{
+    margin-top: 56px;
+    padding-top: 34px;
+    border-top: 1px solid rgba(255,60,60,0.18);
+}
+
+.profile-danger-zone .profile-section-title{
+    color: #ff5c5c;
+}
+
+.profile-danger-zone .profile-section-title::before{
+    background: linear-gradient(180deg, #ff3c3c, #7f1818);
+    box-shadow: 0 0 10px rgba(255,60,60,.4);
+}
+
+.profile-danger-card{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+    background: rgba(255,45,45,0.045);
+    border: 1px solid rgba(255,60,60,0.28);
+    border-radius: 16px;
+    padding: 24px 26px;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.2);
+}
+
+.profile-danger-info{
+    flex: 1 1 260px;
+    min-width: 0;
+}
+
+.profile-danger-title{
+    font-size: 18px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 6px;
+}
+
+.profile-danger-text{
+    font-size: 14px;
+    color: #9ca3af;
+    max-width: 560px;
+}
+
+.profile-danger-btn{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: rgba(255,45,45,0.10);
+    border: 1px solid rgba(255,60,60,0.55);
+    color: #ff6b6b;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 11px 26px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background .15s ease, border-color .15s ease, transform .15s ease, box-shadow .2s ease;
+    flex-shrink: 0;
+}
+
+.profile-danger-btn:hover{
+    background: rgba(255,45,45,0.18);
+    border-color: #ff3c3c;
+    color: #ff8080;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(255,45,45,0.22);
+}
+
+.profile-danger-btn:disabled{
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* ---------- DELETE ACCOUNT MODAL ---------- */
+
+.danger-modal-content{
+    background:
+        radial-gradient(circle at top, rgba(255,60,60,0.10), transparent 52%),
+        linear-gradient(180deg, #181b21 0%, #14161b 100%);
+    border: 1px solid rgba(255,60,60,0.40);
+    border-radius: 22px;
+    color: #ffffff;
+    box-shadow: 0 28px 90px rgba(0,0,0,0.78);
+    overflow: hidden;
+}
+
+.delete-account-dialog{
+    width: min(94vw, 680px);
+}
+
+.danger-modal-content .modal-header{
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    padding: 20px 24px 18px;
+    background: linear-gradient(180deg, rgba(255,60,60,0.08), rgba(255,60,60,0.02));
+}
+
+.danger-modal-content .modal-title{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 20px;
+    font-weight: 800;
+    color: #ff8080;
+}
+
+.danger-modal-content .modal-title .material-icons{
+    font-size: 22px;
+    color: #ff3c3c;
+}
+
+.danger-modal-content .modal-body{
+    padding: 22px 24px 18px;
+    color: #d1d5db;
+    font-size: 14.5px;
+}
+
+.danger-modal-hero{
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    background: rgba(255,60,60,0.08);
+    border: 1px solid rgba(255,60,60,0.22);
+    border-radius: 16px;
+    padding: 16px 16px 14px;
+    margin-bottom: 18px;
+}
+
+.danger-modal-hero-icon{
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(255,60,60,0.28), rgba(200,30,30,0.16));
+    border: 1px solid rgba(255,60,60,0.35);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: #ff8080;
+}
+
+.danger-modal-hero-icon .material-icons{
+    font-size: 22px;
+}
+
+.danger-modal-hero-title{
+    font-size: 16px;
+    font-weight: 800;
+    color: #ffffff;
+    margin-bottom: 4px;
+}
+
+.danger-modal-hero-text{
+    color: #d1d5db;
+    font-size: 14px;
+    line-height: 1.55;
+}
+
+.danger-modal-list{
+    list-style: none;
+    margin: 0 0 18px;
+    padding: 0;
+    display: grid;
+    gap: 10px;
+}
+
+.danger-modal-list li{
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    color: #e5e7eb;
+    line-height: 1.45;
+}
+
+.danger-modal-list .material-icons{
+    font-size: 18px;
+    color: #ff5c5c;
+    margin-top: 1px;
+    flex-shrink: 0;
+}
+
+.danger-modal-confirm-label{
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: #ff8080;
+    margin: 2px 0 8px;
+}
+
+.danger-modal-confirm-label .material-icons{
+    font-size: 16px;
+}
+
+.danger-modal-content .modal-footer{
+    border-top: 1px solid rgba(255,255,255,0.08);
+    padding: 18px 24px 20px;
+    background: rgba(255,255,255,0.015);
+}
+
+.danger-modal-content .modal-footer .btn{
+    border-radius: 9px;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 9px 20px;
+}
+
+.danger-modal-content .btn-cancel{
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.14);
+    color: #d1d5db;
+}
+
+.danger-modal-content .btn-cancel:hover{
+    background: rgba(255,255,255,0.12);
+    color: #ffffff;
+}
+
+.danger-confirm-input{
+    width: 100%;
+    margin-top: 0;
+    padding: 13px 14px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 12px;
+    color: #ffffff;
+    font-size: 15px;
+    letter-spacing: 1px;
+    font-weight: 700;
+    transition: border-color .2s ease, box-shadow .2s ease, background .2s ease, transform .2s ease;
+}
+
+.danger-confirm-input:focus{
+    outline: none;
+    border-color: rgba(255,60,60,0.6);
+    background: rgba(255,255,255,0.075);
+    box-shadow: 0 0 0 3px rgba(255,60,60,0.15);
+}
+
+.danger-confirm-input::placeholder{
+    color: #6b7280;
+    font-weight: 400;
+    letter-spacing: 0;
+}
+
+.danger-btn-delete{
+    background: linear-gradient(135deg, #ff3c3c, #b91c1c);
+    border: none;
+    color: #ffffff;
+    box-shadow: 0 10px 24px rgba(255,60,60,0.28);
+}
+
+.danger-btn-delete:hover:not(:disabled){
+    background: linear-gradient(135deg, #ff5252, #c81e1e);
+    color: #ffffff;
+    box-shadow: 0 14px 28px rgba(255,60,60,0.38);
+}
+
+.danger-btn-delete:disabled{
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.danger-modal-feedback{
+    margin-top: 12px;
+    margin-bottom: 0;
+    padding: 11px 12px;
+    border-radius: 10px;
+    font-size: 13.5px;
+}
+
+.danger-modal-feedback.danger{
+    background: rgba(255,45,45,0.10);
+    border: 1px solid rgba(255,60,60,0.35);
+    color: #ff8a8a;
+}
+
+.danger-modal-feedback.success{
+    background: rgba(45,255,120,0.08);
+    border: 1px solid rgba(45,255,120,0.35);
+    color: #8affc0;
+}
+
+.danger-modal-footnote{
+    margin-top: 10px;
+    font-size: 12.5px;
+    color: #9ca3af;
+}
+
 /* ---------- RESPONSIVE ---------- */
 
 @media (max-width: 768px){
@@ -679,6 +977,26 @@
 
     .profile-username{
         font-size: 26px;
+    }
+
+    .profile-danger-card{
+        padding: 20px 18px;
+        align-items: stretch;
+    }
+
+    .profile-danger-btn{
+        width: 100%;
+    }
+
+    .danger-modal-content .modal-header,
+    .danger-modal-content .modal-body,
+    .danger-modal-content .modal-footer{
+        padding-left: 18px;
+        padding-right: 18px;
+    }
+
+    .danger-modal-hero{
+        padding: 14px;
     }
 
 }
@@ -956,8 +1274,125 @@
 
         </div>
 
+        <div class="profile-section profile-danger-zone">
+
+            <div class="profile-section-header">
+                <h2 class="profile-section-title">Danger Zone</h2>
+            </div>
+
+            <div class="profile-danger-card">
+
+                <div class="profile-danger-info">
+
+                    <div class="profile-danger-title">Delete your account</div>
+
+                    <div class="profile-danger-text">
+                        Your account and associated data will be permanently deleted.
+                        This action cannot be undone.
+                    </div>
+
+                </div>
+
+                <button
+                    type="button"
+                    id="delete-account-open"
+                    class="profile-danger-btn"
+                    data-bs-toggle="modal"
+                    data-bs-target="#deleteAccountModal"
+                    aria-controls="deleteAccountModal"
+                >
+                    Delete Account
+                </button>
+
+            </div>
+
+        </div>
+
     </div>
 
+</div>
+
+<!-- DELETE ACCOUNT CONFIRMATION MODAL -->
+<div class="modal fade" id="deleteAccountModal" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="deleteAccountModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered delete-account-dialog">
+        <div class="modal-content danger-modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteAccountModalLabel">
+                    <span class="material-icons" aria-hidden="true">warning</span>
+                    Delete your account?
+                </h5>
+                <button type="button" class="btn-close btn-close-white" id="delete-close-x" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <div class="danger-modal-hero">
+                    <div class="danger-modal-hero-icon" aria-hidden="true">
+                        <span class="material-icons">warning</span>
+                    </div>
+                    <div>
+                        <div class="danger-modal-hero-title">This action is permanent.</div>
+                        <div class="danger-modal-hero-text">
+                            Your account, profile data, watch history, ratings, comments and watchlists will be removed.
+                            You will be signed out immediately after deletion.
+                        </div>
+                    </div>
+                </div>
+
+                <ul class="danger-modal-list">
+                    <li>
+                        <span class="material-icons" aria-hidden="true">delete_forever</span>
+                        Your UzzUTV and Aniuzu data tied to this account will be deleted.
+                    </li>
+                    <li>
+                        <span class="material-icons" aria-hidden="true">logout</span>
+                        You’ll be signed out on completion and will need a new account to return.
+                    </li>
+                    <li>
+                        <span class="material-icons" aria-hidden="true">shield</span>
+                        For safety, you must type <strong style="color:#ff8080;">DELETE</strong> to continue.
+                    </li>
+                </ul>
+
+                <div class="danger-modal-confirm-label">
+                    <span class="material-icons" aria-hidden="true">keyboard</span>
+                    Confirmation
+                </div>
+                <input
+                    type="text"
+                    id="delete-confirm-input"
+                    class="danger-confirm-input"
+                    placeholder="Type DELETE to confirm"
+                    autocomplete="off"
+                    autocapitalize="off"
+                    spellcheck="false"
+                    maxlength="10"
+                >
+
+                <div id="delete-feedback" class="danger-modal-feedback d-none"></div>
+
+                <div class="danger-modal-footnote">
+                    This cannot be undone and may take a few moments to complete.
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button" class="btn btn-cancel" id="delete-cancel" data-bs-dismiss="modal">
+                    Cancel
+                </button>
+
+                <button type="button" class="btn danger-btn-delete" id="delete-confirm" disabled>
+                    <span class="material-icons" style="font-size:16px;vertical-align:-3px;" aria-hidden="true">delete_forever</span>
+                    Delete Account
+                </button>
+
+            </div>
+
+        </div>
+    </div>
 </div>
 
 
@@ -2187,6 +2622,272 @@ function profileSlideRight(id) {
     }
 
 }
+
+
+/* =========================================================
+   DANGER ZONE - DELETE ACCOUNT
+========================================================= */
+
+function getCookie(name) {
+
+    const match = document.cookie.match(
+        new RegExp("(?:^|; )" + encodeURIComponent(name).replace(/%3D/gi, "=") + "=([^;]*)")
+    );
+
+    return match ? decodeURIComponent(match[1]) : null;
+
+}
+
+const deleteAccountModal = document.getElementById("deleteAccountModal");
+const deleteConfirmInput = document.getElementById("delete-confirm-input");
+const deleteFeedback = document.getElementById("delete-feedback");
+const deleteConfirmBtn = document.getElementById("delete-confirm");
+const deleteCancelBtn = document.getElementById("delete-cancel");
+const deleteCloseBtn = document.getElementById("delete-close-x");
+
+let deleteInFlight = false;
+
+if (deleteAccountModal && deleteAccountModal.parentElement !== document.body) {
+    document.body.appendChild(deleteAccountModal);
+}
+
+
+function resetDeleteModal() {
+
+    if (deleteConfirmInput) {
+        deleteConfirmInput.value = "";
+        deleteConfirmInput.disabled = false;
+    }
+
+    if (deleteFeedback) {
+        deleteFeedback.textContent = "";
+        deleteFeedback.classList.add("d-none");
+    }
+
+    if (deleteConfirmBtn) {
+        deleteConfirmBtn.disabled = true;
+
+        deleteConfirmBtn.innerHTML =
+            '<span class="material-icons" style="font-size:16px;vertical-align:-3px;" aria-hidden="true">delete_forever</span>' +
+            " Delete Account";
+    }
+
+    if (deleteCancelBtn) {
+        deleteCancelBtn.disabled = false;
+    }
+
+    if (deleteCloseBtn) {
+        deleteCloseBtn.disabled = false;
+    }
+
+    deleteInFlight = false;
+
+}
+
+
+function showDeleteFeedback(message, type) {
+
+    if (!deleteFeedback) {
+        return;
+    }
+
+    deleteFeedback.textContent = message;
+    deleteFeedback.className = `danger-modal-feedback ${type}`;
+
+}
+
+if (deleteConfirmInput && deleteConfirmBtn) {
+
+    deleteConfirmInput.addEventListener("input", () => {
+
+        const matches = deleteConfirmInput.value.trim().toUpperCase() === "DELETE";
+
+        deleteConfirmBtn.disabled = !matches || deleteInFlight;
+
+    });
+
+}
+
+
+if (deleteAccountModal) {
+
+    deleteAccountModal.addEventListener("hidden.bs.modal", resetDeleteModal);
+
+    deleteAccountModal.addEventListener("shown.bs.modal", () => {
+        if (deleteConfirmInput) {
+            deleteConfirmInput.focus();
+            deleteConfirmInput.select();
+        }
+    });
+
+}
+
+
+async function submitAccountDeletion() {
+
+    if (deleteInFlight) {
+        return;
+    }
+
+    deleteInFlight = true;
+
+    deleteConfirmBtn.disabled = true;
+    deleteConfirmInput.disabled = true;
+    deleteCancelBtn.disabled = true;
+
+    if (deleteCloseBtn) {
+        deleteCloseBtn.disabled = true;
+    }
+
+    deleteConfirmBtn.innerHTML =
+        '<span class="material-icons" style="font-size:16px;vertical-align:-3px;" aria-hidden="true">sync</span>' +
+        " Deleting...";
+
+    showDeleteFeedback("Deleting your account...", "success");
+
+    try {
+
+        const { data: sessionData } = await supabaseClient.auth.getSession();
+
+        const accessToken =
+            sessionData && sessionData.session
+                ? sessionData.session.access_token
+                : null;
+
+        if (!accessToken) {
+
+            showDeleteFeedback(
+                "You appear to be signed out. Please sign in and try again.",
+                "danger"
+            );
+
+            deleteConfirmInput.disabled = false;
+            deleteCancelBtn.disabled = false;
+
+            if (deleteCloseBtn) {
+                deleteCloseBtn.disabled = false;
+            }
+
+            deleteInFlight = false;
+
+            deleteConfirmBtn.innerHTML =
+                '<span class="material-icons" style="font-size:16px;vertical-align:-3px;" aria-hidden="true">delete_forever</span>' +
+                " Delete Account";
+
+            return;
+        }
+
+        const csrfToken = getCookie("csrftoken");
+
+        const response = await fetch("{% url 'delete_account' %}", {
+            method: "POST",
+            credentials: "same-origin",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrfToken || ""
+            },
+            body: JSON.stringify({
+                access_token: accessToken,
+                confirmation: "DELETE"
+            })
+        });
+
+        let payload = {};
+
+        try {
+            payload = await response.json();
+        } catch (error) {}
+
+        if (response.ok && payload.success) {
+
+            showDeleteFeedback("Your account has been deleted. Redirecting to Home...", "success");
+
+            deleteConfirmInput.disabled = true;
+            deleteCancelBtn.disabled = true;
+
+            if (deleteCloseBtn) {
+                deleteCloseBtn.disabled = true;
+            }
+
+            deleteConfirmBtn.disabled = true;
+
+            setTimeout(async () => {
+
+                const { error: signOutError } = await supabaseClient.auth.signOut();
+
+                if (signOutError) {
+                    console.error("Sign out after deletion failed:", signOutError);
+                }
+
+                _clearUserCache();
+                try {
+                    sessionStorage.setItem(
+                        "uzzutv_account_deleted_notice",
+                        "Your account was deleted successfully."
+                    );
+                } catch (error) {}
+
+                window.location.href = "/home/";
+
+            }, 900);
+
+            return;
+
+        }
+
+        const message =
+            (payload.error) ||
+            "We could not delete your account right now. Please try again later.";
+
+        showDeleteFeedback(message, "danger");
+
+        deleteConfirmInput.disabled = false;
+        deleteCancelBtn.disabled = false;
+        deleteInFlight = false;
+
+        deleteConfirmBtn.innerHTML =
+            '<span class="material-icons" style="font-size:16px;vertical-align:-3px;" aria-hidden="true">delete_forever</span>' +
+            " Delete Account";
+
+        if (deleteConfirmInput.value.trim().toUpperCase() === "DELETE") {
+            deleteConfirmBtn.disabled = false;
+        }
+
+    } catch (networkError) {
+
+        console.error("Account deletion request failed:", networkError);
+
+        showDeleteFeedback(
+            "Network error. Please check your connection and try again.",
+            "danger"
+        );
+
+        deleteConfirmInput.disabled = false;
+        deleteCancelBtn.disabled = false;
+        deleteInFlight = false;
+
+        deleteConfirmBtn.innerHTML =
+            '<span class="material-icons" style="font-size:16px;vertical-align:-3px;" aria-hidden="true">delete_forever</span>' +
+            " Delete Account";
+
+        if (deleteConfirmInput.value.trim().toUpperCase() === "DELETE") {
+            deleteConfirmBtn.disabled = false;
+        }
+
+    }
+
+}
+
+
+document.addEventListener("click", (event) => {
+
+    if (event.target.closest("#delete-confirm")) {
+
+        submitAccountDeletion();
+
+    }
+
+});
 
 
 /* =========================================================

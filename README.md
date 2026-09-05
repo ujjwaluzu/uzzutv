@@ -49,6 +49,7 @@ UzzUTV is a Netflix-style streaming platform built with Django that lets you dis
 - UzzUTV and Aniuzu share one Supabase Auth session
 - Context-aware login redirects preserve the originating application
 - Forgot-password and password-reset flows use Supabase Auth recovery sessions
+- "Danger Zone" account deletion on your own profile (`/profile/`): a confirmation modal requires typing `DELETE`, then the server verifies your Supabase session and permanently deletes the shared Supabase Auth user. The service-role credential stays server-side only and is never shipped to the browser.
 
 ### Ratings & Reviews
 - Star-rate any movie or TV show on its detail page
@@ -141,6 +142,7 @@ Create a `.env` file in the project root:
 TMDB_KEY="your_tmdb_api_key"
 SUPABASE_URL="https://your-project.supabase.co"
 SUPABASE_KEY="your_supabase_key"
+SUPABASE_SERVICE_ROLE_KEY="your_supabase_service_role_key"
 
 DJANGO_SECRET_KEY="a_long_random_secret"
 DJANGO_DEBUG=True
@@ -151,11 +153,63 @@ SESSION_COOKIE_SECURE=False
 CSRF_COOKIE_SECURE=False
 ```
 
+> **`SUPABASE_SERVICE_ROLE_KEY` (server-only, required for account deletion):**
+> the Supabase **service_role** key from Project Settings → API → `service_role` secret.
+> It is used exclusively by the Django backend (`uzzutv/supabase_service.py`) to verify
+> the caller's Supabase session and to delete the shared Supabase Auth user via the
+> GoTrue admin API. Keep it in the server environment / `.env` only. It must **never**
+> be placed in JavaScript, HTML templates, static files, or client-side code.
+> Without it the delete-account endpoint cannot verify sessions or delete users; deletion
+> requests fail closed with a friendly error.
+
 ### Supabase setup
 
 Run [`sql/aniuzu_tables.sql`](sql/aniuzu_tables.sql) in the Supabase SQL editor. It creates the Aniuzu watchlist and `aniuzu_continue_watching` tables, indexes, constraints, and Row Level Security policies. Continue Watching uses one row per authenticated user/anime and updates that row with the latest episode, server, variant, and position. The SQL also migrates older per-episode data by retaining the most recently updated row for each user/anime. Policies allow each authenticated user to select, insert, update, and delete only their own rows.
 
 Run [`sql/watch_parties.sql`](sql/watch_parties.sql) to create the Watch Party tables, indexes, and Row Level Security policies for synchronized playback rooms.
+
+### Account deletion database setup (verify required)
+
+Deleting a Supabase Auth user removes its data only where the tables below reference `auth.users(id)`. Verify each foreign key exists with `ON DELETE CASCADE` so private user data is removed automatically when the auth user is deleted (this is what "Danger Zone" account deletion relies on):
+
+| Table | Owner column | Rule needed |
+|---|---|---|
+| `profiles` | `id` (references `auth.users(id)`) | `ON DELETE CASCADE` |
+| `watchlist` | `user_id` | `ON DELETE CASCADE` |
+| `continue_watching` | `user_id` | `ON DELETE CASCADE` |
+| `ratings` | `user_id` | `ON DELETE CASCADE` |
+| `comments` | `user_id` | `ON DELETE CASCADE` |
+| `aniuzu_watchlist` | `user_id` | `ON DELETE CASCADE` (present in `sql/aniuzu_tables.sql`) |
+| `aniuzu_continue_watching` | `user_id` | `ON DELETE CASCADE` (present in `sql/aniuzu_tables.sql`) |
+| `aniuzu_ratings` | `user_id` | `ON DELETE CASCADE` (present in `sql/aniuzu_tables.sql`) |
+| `aniuzu_comments` | `user_id` | `ON DELETE CASCADE` (present in `sql/aniuzu_tables.sql`) |
+| `watch_parties` | `host_user_id` | `ON DELETE CASCADE` (present in `sql/watch_parties.sql`) |
+| `watch_parties` | `guest_user_id` | `ON DELETE SET NULL` (present in `sql/watch_parties.sql`) |
+
+Example verification query (Supabase SQL Editor):
+
+```sql
+select tc.table_name, kcu.column_name, rc.delete_rule
+from information_schema.table_constraints tc
+join information_schema.foreign_keys fk
+     on fk.constraint_name = tc.constraint_name
+join information_schema.referential_constraints rc
+     on rc.constraint_name = tc.constraint_name
+join information_schema.key_column_usage kcu
+     on kcu.constraint_name = tc.constraint_name
+where tc.constraint_type = 'FOREIGN KEY'
+  and tc.table_schema = 'public'
+order by tc.table_name, kcu.column_name;
+```
+
+If any of the repository-managed tables are missing their cascade rule, re-run the corresponding script from `sql/`. For tables created directly in the dashboard (profiles, watchlist, continue_watching, ratings, comments), add the missing FK constraint, for example:
+
+```sql
+alter table "profiles"
+    drop constraint if exists profiles_id_auth_fkey,
+    add constraint profiles_id_auth_fkey foreign key (id)
+        references auth.users (id) on delete cascade;
+```
 
 Add the reset callback URL for every environment to Supabase Auth URL Configuration. The application builds this from the current origin as `/auth/reset-password/`, for example `http://127.0.0.1:8000/auth/reset-password/` during local development.
 
@@ -179,7 +233,8 @@ uzzutv/
 └── uzzutv/                # Main app
     ├── views.py           # All views + TMDB integration
     ├── urls.py            # Route table
-    ├── supabase_client.py # Supabase client
+    ├── supabase_client.py # Supabase client (client-side auth lives in static JS)
+    ├── supabase_service.py# Server-side Supabase helpers (session verify + admin delete)
     ├── templates/uzzutv/  # HTML templates
     └── static/            # CSS/JS assets
 ```
@@ -218,6 +273,7 @@ uzzutv/
 | `/auth/reset-password/`   | Complete a Supabase password reset  |
 | `/profile/`               | Your profile (ratings, watchlist, comments) |
 | `/profile/<user_id>/`     | Public profile                       |
+| `POST /delete-account/`   | Permanently delete your own Supabase Auth account (CSRF-protected; requires the Supabase session access token + `DELETE` confirmation) |
 | `/media-info/<type>/<id>/`| Media metadata JSON (used by profile pages) |
 | `/terms/` `/dmca/`        | Legal pages                          |
 | `/robots.txt` `/sitemap.xml` | SEO endpoints                     |

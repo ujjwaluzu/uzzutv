@@ -1,5 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse, Http404
+from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.core.cache import cache
 from concurrent.futures import ThreadPoolExecutor
@@ -10,7 +12,16 @@ import requests
 import os
 import datetime
 import time
+import logging
 from dotenv import load_dotenv
+
+from .supabase_service import (
+    get_user_from_access_token,
+    delete_auth_user,
+    delete_user_data,
+)
+
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 API_KEY = os.getenv("TMDB_KEY")
@@ -46,6 +57,7 @@ def reset_password(request):
     })
 
 
+@ensure_csrf_cookie
 def profile(request):
     return render(request, "uzzutv/profile.html")
 
@@ -54,6 +66,79 @@ def public_profile(request, user_id):
     """Public profile page for any user, identified by their auth UUID."""
 
     return render(request, "uzzutv/public_profile.html", {"user_id": user_id})
+
+
+@require_POST
+def delete_account(request):
+    """Permanently delete the authenticated user's shared Supabase Auth account.
+
+    The browser sends its own Supabase session access token and an explicit
+    confirmation. The user id is derived server-side by verifying that token
+    against GoTrue; a user id supplied by the browser is never trusted, so
+    another user's UUID cannot be deleted by sending it directly.
+
+    The endpoint is a POST-only, CSRF-protected state-changing action.
+    """
+    try:
+        payload = json.loads(request.body or b"{}")
+    except ValueError:
+        return JsonResponse({"error": "Invalid request."}, status=400)
+
+    if not isinstance(payload, dict):
+        return JsonResponse({"error": "Invalid request."}, status=400)
+
+    raw_token = payload.get("access_token")
+    raw_confirmation = payload.get("confirmation")
+
+    if not isinstance(raw_token, str) or not isinstance(raw_confirmation, str):
+        return JsonResponse({"error": "Invalid request."}, status=400)
+
+    access_token = raw_token.strip()
+    confirmation = raw_confirmation.strip()
+
+    if not access_token:
+        return JsonResponse(
+            {"error": "You must be signed in to delete your account."},
+            status=401,
+        )
+
+    if confirmation.upper() != "DELETE":
+        return JsonResponse(
+            {"error": "Confirmation is required to delete your account."},
+            status=400,
+        )
+
+    user = get_user_from_access_token(access_token)
+
+    if not user or not user.get("id"):
+        return JsonResponse(
+            {"error": "Your session is not valid. Please sign in again and retry."},
+            status=401,
+        )
+
+    user_id = user["id"]
+
+    cleanup_ok = delete_user_data(user_id)
+    if not cleanup_ok:
+        logger.warning("Best-effort cleanup had failures for user %s", user_id)
+
+    deleted = delete_auth_user(user_id)
+
+    if not deleted:
+        logger.error("Failed to delete Supabase auth user %s", user_id)
+        return JsonResponse(
+            {
+                "error": "We could not delete your account right now. Please try again later."
+            },
+            status=502,
+        )
+
+    return JsonResponse(
+        {
+            "success": True,
+            "message": "Your account has been deleted.",
+        }
+    )
 
 
 def media_info(request, type, id):

@@ -57,6 +57,46 @@ opacity:0;
 pointer-events:none;
 }
 
+.account-deleted-banner{
+  position:relative;
+  z-index:12;
+  max-width:1400px;
+  margin:16px auto 0;
+  padding:0 24px;
+}
+
+.account-deleted-banner .banner-inner{
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+  background:linear-gradient(135deg, rgba(45,255,120,.12), rgba(255,255,255,.04));
+  border:1px solid rgba(45,255,120,.26);
+  color:#d7ffe9;
+  border-radius:16px;
+  padding:14px 16px;
+  box-shadow:0 12px 30px rgba(0,0,0,.28);
+  backdrop-filter: blur(8px);
+}
+
+.account-deleted-banner .material-icons{
+  color:#8affc0;
+  font-size:22px;
+  line-height:1;
+  margin-top:1px;
+}
+
+.account-deleted-banner strong{
+  display:block;
+  font-size:14px;
+  margin-bottom:2px;
+}
+
+.account-deleted-banner span{
+  display:block;
+  font-size:13px;
+  color:#bcefd1;
+}
+
 </style>
 {% endblock %}
 
@@ -93,6 +133,15 @@ pointer-events:none;
   </div>
 </div>
 
+<div id="account-deleted-banner" class="account-deleted-banner d-none" role="status" aria-live="polite">
+  <div class="banner-inner">
+    <span class="material-icons" aria-hidden="true">check_circle</span>
+    <div>
+      <strong>Your account was deleted successfully.</strong>
+      <span>You are now signed out and can continue browsing UzzUTV.</span>
+    </div>
+  </div>
+</div>
 
 <div class="hero-wrapper">
 
@@ -498,6 +547,23 @@ setTimeout(() => {
 loader.style.display = "none";
 }, 1000);
 
+});
+
+window.addEventListener("DOMContentLoaded", () => {
+const banner = document.getElementById("account-deleted-banner");
+if(!banner) return;
+let deletedNotice = null;
+try {
+deletedNotice = sessionStorage.getItem("uzzutv_account_deleted_notice");
+if(deletedNotice) {
+sessionStorage.removeItem("uzzutv_account_deleted_notice");
+}
+} catch (error) {}
+if(!deletedNotice) return;
+banner.classList.remove("d-none");
+setTimeout(() => {
+banner.classList.add("d-none");
+}, 7000);
 });
 
 
