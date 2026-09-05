@@ -34,7 +34,9 @@ UzzUTV is a Netflix-style streaming platform built with Django that lets you dis
 - Playback is limited to the documented AniLink and TryEmbed iframe providers
 - SUB/DUB audio selection and AniLink/TryEmbed server switching preserve the current episode
 - Responsive desktop two-column player/episode layout with independently scrollable episode lists
-- Episode search/windowing keeps long-running anime usable
+- Episode search and 26-episode paging (with Previous/Next controls) keep long-running anime usable
+- Airing anime with an unconfirmed AniList episode count use `nextAiringEpisode` to list episodes available so far
+- Watch pages include a Related Anime row and playback guidance to retry before switching servers; Brave is recommended
 - Authenticated Continue Watching cards show anime, season, episode, progress, server, and variant
 - Detail pages switch the Watch action to Resume when anime progress exists
 - Aniuzu navigation includes Home, Genres, Seasons, Studios, Collections, Watchlist, and Search; Schedule, Top, and Upcoming pages are not part of the current product
