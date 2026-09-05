@@ -3,7 +3,7 @@
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'uzzutv/aniuzu.css' %}?v=2">
-<link rel="stylesheet" href="{% static 'uzzutv/aniuzu_watch.css' %}?v=15">
+<link rel="stylesheet" href="{% static 'uzzutv/aniuzu_watch.css' %}?v=16">
 {% endblock %}
 
 {% block title %}Watch {{ title }} | Aniuzu{% endblock %}
@@ -70,6 +70,11 @@
       <div id="az-episode-pager" class="az-episode-pager"></div>
     </aside>
   </div>
+
+  <aside class="az-watch-note" aria-label="Playback tip">
+    <span class="material-icons" aria-hidden="true">lightbulb</span>
+    <p><strong>Playback tip:</strong> If the player does not load, click <strong>Try again</strong> before switching to another server. It may work on the retry. For the best experience, use the <strong>Brave browser</strong>.</p>
+  </aside>
 </main>
 {{ watch_config|json_script:"aniuzu-watch-config" }}
 {% endblock %}
