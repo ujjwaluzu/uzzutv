@@ -18,6 +18,30 @@
     margin-right: 0;
 }
 
+/* The profile navbar is intentionally reduced to the two application brands. */
+nav:not(.az-navbar):has(.profile-nav-brand) .navbar-toggler,
+nav:not(.az-navbar):has(.profile-nav-brand) #navbarSupportedContent > .navbar-nav,
+nav:not(.az-navbar):has(.profile-nav-brand) #navbarSupportedContent > .uzz-search{
+    display: none !important;
+}
+
+nav:not(.az-navbar):has(.profile-nav-brand) .container-fluid{
+    position: relative;
+    justify-content: center;
+}
+
+nav:not(.az-navbar):has(.profile-nav-brand) .profile-nav-brand{
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+nav:not(.az-navbar):has(.profile-nav-brand) #navbarSupportedContent{
+    display: flex !important;
+    justify-content: flex-end;
+    flex: 1 1 auto;
+}
+
 .profile-page{
     position: relative;
     min-height: calc(100vh - 160px);
