@@ -2287,6 +2287,7 @@ def aniuzu_watch(request, anilist_id, episode):
         "title": title,
         "anilist_id": anilist_id,
         "episode": episode,
+        "related": ctx.get("related", []),
         "watch_config": watch_config,
     })
 

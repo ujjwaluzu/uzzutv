@@ -75,8 +75,37 @@
     <span class="material-icons" aria-hidden="true">lightbulb</span>
     <p><strong>Playback tip:</strong> If the player does not load, click <strong>Try again</strong> before switching to another server. It may work on the retry. For the best experience, use the <strong>Brave browser</strong>.</p>
   </aside>
+
+  {% if related %}
+  <section class="az-content-section az-related-section" aria-labelledby="az-related-title">
+    <div class="az-slider-header">
+      <h2 id="az-related-title" class="section-title">Related Anime</h2>
+      <div class="az-slider-controls">
+        <button type="button" aria-label="Scroll related anime left" onclick="azSlideLeft('az-watch-related-slider')"><span class="material-icons">chevron_left</span></button>
+        <button type="button" aria-label="Scroll related anime right" onclick="azSlideRight('az-watch-related-slider')"><span class="material-icons">chevron_right</span></button>
+      </div>
+    </div>
+    <div class="az-row" id="az-watch-related-slider">
+      {% for item in related|slice:":12" %}
+      <div class="az-card">
+        <a class="card-link" href="{% url 'aniuzu_detail' item.id %}">
+          <div class="card-poster">
+            <img loading="lazy" decoding="async" alt="{{ item.title }} poster" src="{% if item.cover %}{{ item.cover }}{% else %}{% static 'uzzutv/images/logo.png' %}{% endif %}">
+            <span class="card-gradient"></span>
+            {% if item.score %}<span class="card-rating">&#9733; {{ item.score }}</span>{% endif %}
+          </div>
+        </a>
+        <div class="card-info">
+          <div class="card-title">{{ item.title|truncatewords:4 }}</div>
+          <div class="card-meta">{% if item.format %}{{ item.format }}{% endif %}{% if item.episodes %} &bull; {{ item.episodes }} ep{% endif %}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
 </main>
 {{ watch_config|json_script:"aniuzu-watch-config" }}
 {% endblock %}
 
-{% block extra_js %}<script src="{% static 'uzzutv/aniuzu_watch.js' %}?v=6"></script>{% endblock %}
+{% block extra_js %}<script src="{% static 'uzzutv/aniuzu.js' %}?v=1"></script><script src="{% static 'uzzutv/aniuzu_watch.js' %}?v=6"></script>{% endblock %}
