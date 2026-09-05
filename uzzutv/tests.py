@@ -3,6 +3,8 @@ from unittest.mock import patch
 from django.test import TestCase
 from django.urls import reverse
 
+from .views import _aniuzu_playable_episodes
+
 
 class DeleteAccountTests(TestCase):
     def test_delete_account_requires_confirmation(self):
@@ -35,3 +37,23 @@ class DeleteAccountTests(TestCase):
         mock_get_user.assert_called_once_with("token")
         mock_delete_user_data.assert_called_once_with("123e4567-e89b-12d3-a456-426614174000")
         mock_delete_auth_user.assert_called_once_with("123e4567-e89b-12d3-a456-426614174000")
+
+
+class AniuzuPlayableEpisodesTests(TestCase):
+    def test_uses_confirmed_episode_count_over_airing_schedule(self):
+        episodes = _aniuzu_playable_episodes({
+            "episodes": 12,
+            "nextAiringEpisode": {"episode": 10},
+        })
+
+        self.assertEqual(episodes, list(range(1, 13)))
+
+    def test_uses_previous_episode_when_count_is_unknown(self):
+        episodes = _aniuzu_playable_episodes({
+            "episodes": None,
+            "nextAiringEpisode": {"episode": 1143},
+        })
+
+        self.assertEqual(episodes[0], 1)
+        self.assertEqual(episodes[-1], 1142)
+        self.assertEqual(len(episodes), 1142)

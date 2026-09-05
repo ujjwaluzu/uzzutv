@@ -1491,6 +1491,7 @@ query ($id: Int) {
     favourites
     format
     episodes
+    nextAiringEpisode { episode airingAt timeUntilAiring }
     duration
     status
     season
@@ -1908,7 +1909,7 @@ def _clean_trailer(trailer):
 
 
 def anilist_anime_detail(anilist_id):
-    cache_key = f"anilist_detail_{anilist_id}"
+    cache_key = f"anilist_detail_v2_{anilist_id}"
     context = cache.get(cache_key)
     if context:
         return context
@@ -2240,12 +2241,17 @@ def _aniuzu_playable_episodes(media):
     """Return the numbered episodes that Aniuzu can safely send to its providers.
 
     AniList exposes an episode count, but not a complete canonical episode list.
-    Its optional streaming entries are used only as a fallback when no count is
-    known; this avoids turning episode titles into provider-specific state.
+    When that count is unknown, the next scheduled airing episode establishes
+    the last episode already available. Streaming entries remain the fallback
+    when neither value is present.
     """
     count = _safe_int((media or {}).get("episodes"), 0)
     if count > 0:
         return list(range(1, count + 1))
+
+    next_airing_episode = _safe_int(((media or {}).get("nextAiringEpisode") or {}).get("episode"), 0)
+    if next_airing_episode > 1:
+        return list(range(1, next_airing_episode))
 
     numbered = set()
     for item in (media or {}).get("streamingEpisodes") or []:
