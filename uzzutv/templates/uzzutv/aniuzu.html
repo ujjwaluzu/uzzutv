@@ -153,22 +153,5 @@
 </div>
 {% endif %}
 
-{% if upcoming %}
-<div class="az-content-section">
-<div class="az-slider-header">
-<h2 class="section-title">Upcoming Anime</h2>
-<div class="az-slider-controls">
-<button aria-label="Scroll left" onclick="azSlideLeft('az-upcoming-slider')"><span class="material-icons">chevron_left</span></button>
-<button aria-label="Scroll right" onclick="azSlideRight('az-upcoming-slider')"><span class="material-icons">chevron_right</span></button>
-</div>
-</div>
-<div class="az-row" id="az-upcoming-slider">
-{% for anime in upcoming|slice:":12" %}
-{% include 'uzzutv/_aniuzu_card.html' %}
-{% endfor %}
-</div>
-</div>
-{% endif %}
-
 {% endblock %}
 {% block extra_js %}<script src="{% static 'uzzutv/aniuzu.js' %}"></script><script src="{% static 'uzzutv/aniuzu_continue.js' %}?v=2"></script>{% endblock %}

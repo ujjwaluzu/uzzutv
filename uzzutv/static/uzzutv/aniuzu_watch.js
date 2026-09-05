@@ -17,7 +17,7 @@
     var COMPLETION_PERCENT = 97;
     var COMPLETION_NEAR_END_PERCENT = 90;
     var COMPLETION_REMAINING_SECONDS = 120;
-    var EPISODE_WINDOW = 160;
+    var EPISODE_WINDOW = 26;
     var MAXIMUM_RESUME_SECONDS = 43200;
 
     var validEpisodes = (config.episodes || []).map(Number).filter(function (n) { return Number.isInteger(n) && n > 0; });
@@ -138,13 +138,15 @@
         var source = filteredEpisodes();
         var currentIndex = source.indexOf(state.episodeNumber);
         if (currentIndex >= 0 && (episodeOffset > currentIndex || episodeOffset + EPISODE_WINDOW <= currentIndex)) {
-            episodeOffset = Math.max(0, currentIndex);
+            episodeOffset = Math.floor(currentIndex / EPISODE_WINDOW) * EPISODE_WINDOW;
         }
     }
 
     function renderEpisodes(resetWindow) {
-        if (resetWindow) episodeOffset = 0;
-        ensureActiveWindow();
+        if (resetWindow) {
+            episodeOffset = 0;
+            ensureActiveWindow();
+        }
         var source = filteredEpisodes();
         count.textContent = validEpisodes.length + " total";
         list.textContent = "";
@@ -373,6 +375,7 @@
         lastSavedPosition = 0;
         updateAddress(true);
         updateControls();
+        ensureActiveWindow();
         renderEpisodes(false);
         loadPlayer();
     }

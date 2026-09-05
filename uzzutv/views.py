@@ -2146,10 +2146,9 @@ def aniuzu(request):
         "airing": anilist_airing,
         "seasonal": anilist_current_season,
         "top_rated": anilist_top_rated,
-        "upcoming": anilist_upcoming,
     }
     results = {}
-    with ThreadPoolExecutor(max_workers=6) as executor:
+    with ThreadPoolExecutor(max_workers=5) as executor:
         for key, fn in fetchers.items():
             results[key] = executor.submit(fn)
 
@@ -2164,7 +2163,6 @@ def aniuzu(request):
     airing = _safe_result(results["airing"])
     seasonal = _safe_result(results["seasonal"])
     top_rated = _safe_result(results["top_rated"])
-    upcoming = _safe_result(results["upcoming"])
 
     hero = trending[:5] if trending else []
 
@@ -2177,7 +2175,6 @@ def aniuzu(request):
         "airing": airing,
         "seasonal": seasonal,
         "top_rated": top_rated,
-        "upcoming": upcoming,
         "current_season": season,
         "current_season_label": season_label,
         "current_year": year,
