@@ -453,6 +453,56 @@ def get_tv_logo(tv_id):
         return None
 
 
+def get_anime_logo(anime):
+    """Find a matching TMDB TV logo for an AniList anime when available."""
+    anime_id = (anime or {}).get("id")
+    title_data = (anime or {}).get("title") or {}
+    title = title_data.get("english") or title_data.get("romaji") or title_data.get("native") or ""
+    if not anime_id or not title or not API_KEY:
+        return None
+
+    cache_key = f"anilist_tmdb_logo_{anime_id}"
+    cached = cache.get(cache_key)
+    if cached is not None:
+        return cached or None
+
+    logo_url = None
+    try:
+        response = requests.get(
+            f"{BASE_URL}/search/tv",
+            params={"api_key": API_KEY, "query": title, "include_adult": "false"},
+            timeout=10,
+        )
+        if response.status_code == 200:
+            results = response.json().get("results", [])
+            normalized_title = re.sub(r"[^a-z0-9]+", "", title.lower())
+
+            def match_score(result):
+                names = [result.get("name", ""), result.get("original_name", "")]
+                normalized_names = [re.sub(r"[^a-z0-9]+", "", name.lower()) for name in names if name]
+                score = 0
+                if normalized_title in normalized_names:
+                    score += 100
+                if "JP" in (result.get("origin_country") or []):
+                    score += 20
+                if 16 in (result.get("genre_ids") or []):
+                    score += 10
+                if result.get("first_air_date", "").startswith(str((anime or {}).get("seasonYear") or "")):
+                    score += 5
+                return score
+
+            match = max(results, key=match_score, default=None)
+            if match:
+                logo_path = get_tv_logo(match.get("id"))
+                if logo_path:
+                    logo_url = f"https://image.tmdb.org/t/p/original{logo_path}"
+    except (requests.RequestException, ValueError):
+        pass
+
+    cache.set(cache_key, logo_url or "", 21600)
+    return logo_url
+
+
 # ----------------------------
 # MOVIE LISTS (CACHED)
 # ----------------------------
@@ -2170,6 +2220,14 @@ def aniuzu(request):
     top_rated = _safe_result(results["top_rated"])
 
     hero = trending[:5] if trending else []
+    if hero:
+        with ThreadPoolExecutor(max_workers=5) as executor:
+            logo_futures = [executor.submit(get_anime_logo, item) for item in hero]
+            for item, future in zip(hero, logo_futures):
+                try:
+                    item["logo"] = future.result()
+                except Exception:
+                    item["logo"] = None
 
     season, season_label, year = _current_season()
 
@@ -2192,6 +2250,7 @@ def aniuzu_detail(request, anilist_id):
     if ctx is None:
         return render(request, "uzzutv/aniuzu_404.html", status=404)
 
+    ctx["logo"] = get_anime_logo(ctx.get("anime") or {})
     ctx["anilist_id"] = anilist_id
     ctx["meta_desc"] = sanitize_anilist_description(ctx["meta_desc"])
     ctx["description"] = sanitize_anilist_description(ctx["description"])

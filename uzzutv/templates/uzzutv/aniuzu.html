@@ -5,6 +5,20 @@
 <link rel="stylesheet" href="{% static 'uzzutv/home.css' %}">
 <link rel="stylesheet" href="{% static 'uzzutv/aniuzu.css' %}?v=2">
 <link rel="stylesheet" href="{% static 'uzzutv/aniuzu_continue.css' %}?v=2">
+<style>
+  .az-hero-title-logo{
+    display:block;
+    width:min(100%,440px);
+    max-height:132px;
+    object-fit:contain;
+    object-position:left center;
+    filter:drop-shadow(0 4px 18px rgba(0,0,0,.72));
+    margin:0 0 14px;
+  }
+  @media(max-width:767px){
+    .az-hero-title-logo{width:min(100%,290px);max-height:88px;margin-bottom:10px}
+  }
+</style>
 {% endblock %}
 
 {% block title %}Aniuzu - Watch Anime Online{% endblock %}
@@ -32,7 +46,11 @@
 <div class="az-hero-slide">
 <img class="az-hero-bg" alt="" {% if forloop.first %}fetchpriority="high" src="{{ item.bannerImage }}"{% else %}loading="lazy" decoding="async" src="{{ item.bannerImage }}"{% endif %}>
 <div class="az-hero-content">
+{% if item.logo %}
+<h2 class="az-hero-title" aria-label="{{ item.title.english|default:item.title.romaji }}"><img class="az-hero-title-logo" src="{{ item.logo }}" alt="{{ item.title.english|default:item.title.romaji }} logo"></h2>
+{% else %}
 <h2 class="az-hero-title">{{ item.title.english|default:item.title.romaji|truncatewords:4 }}</h2>
+{% endif %}
 <div class="az-hero-meta">
 {% if item.averageScore %}<span class="az-hero-rating">★ {{ item.averageScore }}</span>{% endif %}
 {% if item.format %}<span class="az-hero-type">{{ item.format }}</span>{% endif %}

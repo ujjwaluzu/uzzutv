@@ -4,6 +4,20 @@
 {% block css %}
 <link rel="stylesheet" href="{% static 'uzzutv/home.css' %}">
 <link rel="stylesheet" href="{% static 'uzzutv/aniuzu.css' %}?v=5">
+<style>
+  .az-dhero-title-logo{
+    display:block;
+    width:min(100%,440px);
+    max-height:132px;
+    object-fit:contain;
+    object-position:left center;
+    filter:drop-shadow(0 4px 18px rgba(0,0,0,.72));
+    margin:0 0 8px;
+  }
+  @media(max-width:767px){
+    .az-dhero-title-logo{width:min(100%,300px);max-height:92px;margin:0 auto 8px}
+  }
+</style>
 {% endblock %}
 
 {% block title %}Aniuzu - {{ title|default:romaji|default:"Anime" }}{% endblock %}
@@ -118,7 +132,11 @@
 <img loading="eager" alt="{{ title }} poster" src="{{ anime.coverImage.extraLarge|default:anime.coverImage.large }}">
 </div>
 <div class="az-dhero-info">
+{% if logo %}
+<h1 class="az-dhero-title" aria-label="{{ title|default:romaji }}"><img class="az-dhero-title-logo" src="{{ logo }}" alt="{{ title|default:romaji }} logo"></h1>
+{% else %}
 <h1 class="az-dhero-title">{{ title|default:romaji }}</h1>
+{% endif %}
 {% if romaji and title != romaji %}<p class="az-dhero-alt">{{ romaji }}</p>{% endif %}
 {% if native %}<p class="az-dhero-alt" style="font-size:13px;color:#6b7280;">{{ native }}</p>{% endif %}
 <div class="az-dhero-meta">

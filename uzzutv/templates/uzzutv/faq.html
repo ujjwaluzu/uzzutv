@@ -11,123 +11,135 @@
 
 {% block body %}
 <style>
-body:has(.faq-page){
-  background:
-    radial-gradient(circle at 8% 0%,rgba(229,9,20,.18),transparent 34rem),
-    radial-gradient(circle at 92% 18%,rgba(112,26,117,.12),transparent 30rem),
-    #0b0b0c!important;
-}
+body:has(.faq-page){background:#0b0c0f!important}
 .faq-page{
-  max-width:1180px;
+  max-width:1080px;
   margin:0 auto;
-  padding:clamp(70px,9vw,120px) 20px 90px;
-  color:#d9d8d2;
+  padding:76px 24px 96px;
+  color:#d8d9dc;
 }
 .faq-hero{
-  position:relative;
-  overflow:hidden;
-  padding:clamp(28px,5vw,58px);
-  margin-bottom:52px;
-  background:linear-gradient(135deg,rgba(31,31,34,.97),rgba(14,15,17,.97));
-  border:1px solid rgba(255,255,255,.11);
-  border-radius:24px;
-  box-shadow:0 24px 70px rgba(0,0,0,.36);
+  padding:0 0 38px;
+  border-bottom:1px solid rgba(255,255,255,.14);
 }
-.faq-hero::after{
-  content:"?";
-  position:absolute;
-  right:clamp(12px,5vw,70px);
-  bottom:-.24em;
-  color:rgba(229,9,20,.11);
-  font-family:"Anton","Inter",sans-serif;
-  font-size:clamp(12rem,28vw,25rem);
-  line-height:1;
-  pointer-events:none;
-}
-.faq-hero-content{position:relative;z-index:1;max-width:700px}
+.faq-hero-content{max-width:920px;margin:0 auto;text-align:center}
 .faq-kicker{
-  margin:0 0 14px;
-  color:#ff3c3c;
+  margin:0 0 16px;
+  color:#ff4b4b;
   font-size:11px;
   font-weight:800;
-  letter-spacing:2.4px;
+  letter-spacing:2.6px;
   text-transform:uppercase;
 }
 .faq-page h1{
   margin:0;
-  color:#f3f1e9;
-  font-size:clamp(42px,7vw,78px);
-  letter-spacing:-2.5px;
-  line-height:.96;
+  color:#f5f5f4;
+  font-size:clamp(42px,7vw,72px);
+  font-weight:800;
+  letter-spacing:-2.7px;
+  line-height:.98;
 }
 .faq-lead{
   max-width:650px;
-  margin:20px 0 0;
-  color:#b8b7b2;
-  font-size:clamp(15px,2vw,18px);
-  line-height:1.7;
+  margin:20px auto 0;
+  color:#aeb1b8;
+  font-size:16px;
+  line-height:1.75;
 }
-.faq-hero-links{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}
+.faq-hero-links{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin:40px auto 0;max-width:920px;text-align:left;border-top:1px solid rgba(255,255,255,.12)}
 .faq-hero-links a{
-  color:#eee; text-decoration:none; border:1px solid rgba(255,255,255,.14);
-  background:rgba(255,255,255,.045); border-radius:999px; padding:9px 14px;
-  font-size:13px; transition:background .2s ease,border-color .2s ease,transform .2s ease;
+  position:relative;padding:16px 20px 16px 0;color:#e6e7e9;text-decoration:none;font-size:14px;border-bottom:1px solid rgba(255,255,255,.12);transition:color .2s ease;
 }
-.faq-hero-links a:hover{color:#fff;background:rgba(229,9,20,.2);border-color:rgba(255,60,60,.65);transform:translateY(-1px)}
-.faq-tools{display:flex;align-items:center;gap:14px;margin:0 0 38px}
-.faq-search-wrap{position:relative;flex:1;max-width:620px}
-.faq-search-wrap .material-icons{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:#777b84;font-size:21px;pointer-events:none}
+.faq-hero-links a::after{content:"↗";position:absolute;right:14px;color:#777b85;transition:color .2s ease,transform .2s ease}
+.faq-hero-links a:hover{color:#ff5c5c}.faq-hero-links a:hover::after{color:#ff5c5c;transform:translate(2px,-2px)}
+.faq-tools{display:flex;align-items:center;gap:18px;margin:34px 0 14px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.14)}
+.faq-search-wrap{position:relative;flex:1;max-width:none}
+.faq-search-wrap .material-icons{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:#858a94;font-size:21px;pointer-events:none}
 .faq-search{
-  width:100%; min-height:50px; padding:12px 16px 12px 48px;
-  border:1px solid rgba(255,255,255,.12); border-radius:12px;
-  background:#151517; color:#fff; font:inherit; outline:none;
+  width:100%;min-height:52px;padding:13px 18px 13px 48px;border:1px solid rgba(255,255,255,.16);border-radius:8px;background:#17191d;color:#fff;font:inherit;outline:none;
 }
-.faq-search::placeholder{color:#777b84}
-.faq-search:focus{border-color:#ff3c3c;box-shadow:0 0 0 3px rgba(255,60,60,.13)}
-.faq-toggle{border:0;background:transparent;color:#a9a8a3;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;white-space:nowrap}
+.faq-search::placeholder{color:#777d88}
+.faq-search:focus{border-color:#ff4b4b;box-shadow:0 0 0 3px rgba(255,75,75,.13)}
+.faq-toggle{border:0;background:transparent;color:#aeb1b8;cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;white-space:nowrap}
 .faq-toggle:hover{color:#fff}
-.faq-section{scroll-margin-top:80px;margin-top:58px}
+.faq-section{scroll-margin-top:80px;margin-top:64px}
 .faq-section:first-of-type{margin-top:0}
-.faq-section-heading{display:flex;align-items:baseline;gap:14px;margin-bottom:16px}
-.faq-section-heading h2{margin:0;color:#f3f1e9;font-size:clamp(23px,3vw,32px);letter-spacing:-.7px}
-.faq-section-heading span{color:#ff3c3c;font:700 11px "Inter",sans-serif;letter-spacing:1.8px;text-transform:uppercase}
-.faq-list{border-top:1px solid rgba(255,255,255,.12)}
-.faq-item{border-bottom:1px solid rgba(255,255,255,.12)}
+.faq-section-heading{display:flex;align-items:baseline;gap:14px;margin-bottom:17px}
+.faq-section-heading h2{margin:0;color:#f3f3f2;font-size:clamp(22px,3vw,30px);letter-spacing:-.7px}
+.faq-section-heading span{color:#ff4b4b;font:700 10px "Inter",sans-serif;letter-spacing:1.8px;text-transform:uppercase}
+.faq-list{border-top:1px solid rgba(255,255,255,.18)}
+.faq-item{border-bottom:1px solid rgba(255,255,255,.14)}
 .faq-item summary{
-  position:relative;list-style:none;cursor:pointer;padding:21px 52px 21px 2px;
-  color:#eee;font-size:16px;font-weight:600;line-height:1.45;
+  position:relative;list-style:none;cursor:pointer;padding:20px 58px 20px 0;
+  color:#e7e8ea;font-size:16px;font-weight:600;line-height:1.5;
 }
 .faq-item summary::-webkit-details-marker{display:none}
 .faq-item summary::after{
-  content:"+";position:absolute;right:6px;top:16px;color:#ff3c3c;font-size:25px;font-weight:300;
+  content:"+";position:absolute;right:7px;top:14px;color:#ff4b4b;font-size:25px;font-weight:300;
 }
 .faq-item[open] summary::after{content:"−"}
 .faq-item summary:hover{color:#fff}
 .faq-item summary:focus-visible,.faq-hero-links a:focus-visible,.faq-toggle:focus-visible{
-  outline:2px solid #ff3c3c;outline-offset:3px;border-radius:5px;
+  outline:2px solid #ff4b4b;outline-offset:3px;border-radius:4px;
 }
-.faq-answer{max-width:900px;padding:0 52px 22px 2px;color:#a9a8a3;font-size:14px;line-height:1.75}
+.faq-answer{max-width:790px;padding:0 58px 23px 0;color:#aeb1b8;font-size:14px;line-height:1.8}
 .faq-answer p{margin:0 0 12px}.faq-answer p:last-child{margin-bottom:0}
-.faq-answer strong{color:#e9e7df}.faq-answer a{color:#ff6565;text-decoration:none}.faq-answer a:hover{text-decoration:underline}
+.faq-answer strong{color:#e9eaeb}.faq-answer a{color:#ff7070;text-decoration:none}.faq-answer a:hover{text-decoration:underline}
 .faq-answer ul{margin:8px 0 0;padding-left:21px}.faq-answer li{padding:3px 0}
-.faq-empty{display:none;padding:24px 2px;color:#a9a8a3;font-size:14px}
-.faq-contact{margin-top:64px;padding:26px 28px;border:1px solid rgba(255,60,60,.24);border-radius:16px;background:linear-gradient(135deg,rgba(229,9,20,.11),rgba(255,255,255,.025))}
-.faq-contact h2{margin:0 0 7px;color:#f3f1e9;font-size:20px}.faq-contact p{margin:0;color:#b7b6b0;font-size:14px;line-height:1.7}
+.faq-empty{display:none;padding:24px 0;color:#aeb1b8;font-size:14px}.faq-empty a{color:#ff7070}
+.faq-contact{margin-top:68px;padding:26px 0;border-top:1px solid rgba(255,255,255,.18)}
+.faq-contact h2{margin:0 0 7px;color:#f3f3f2;font-size:20px}.faq-contact p{max-width:700px;margin:0;color:#aeb1b8;font-size:14px;line-height:1.75}
 @media(max-width:650px){
-  .faq-page{padding:62px 14px 64px}.faq-hero{padding:25px 20px;border-radius:17px;margin-bottom:34px}
-  .faq-hero::after{right:-2px;font-size:12rem}.faq-tools{display:block;margin-bottom:28px}.faq-toggle{margin-top:13px;padding:0}
-  .faq-section{margin-top:42px}.faq-section-heading{display:block}.faq-section-heading span{display:block;margin-bottom:7px}
-  .faq-item summary{padding:18px 40px 18px 0;font-size:15px}.faq-item summary::after{right:2px;top:14px}.faq-answer{padding:0 26px 19px 0;font-size:13.5px}
-  .faq-contact{padding:22px 19px}
+  .faq-page{padding:58px 16px 70px}.faq-hero{padding-bottom:30px}.faq-hero-content{text-align:left}.faq-lead{margin-left:0}
+  .faq-hero-links{grid-template-columns:repeat(2,1fr);margin-top:30px}.faq-hero-links a{padding-right:24px}
+  .faq-tools{display:block;margin:25px 0 10px}.faq-toggle{display:block;margin-top:13px;padding:0}
+  .faq-section{margin-top:46px}.faq-section-heading{display:block}.faq-section-heading span{display:block;margin-bottom:8px}
+  .faq-item summary{padding:18px 42px 18px 0;font-size:15px}.faq-item summary::after{right:2px;top:12px}.faq-answer{padding:0 25px 19px 0;font-size:13.5px}.faq-contact{margin-top:50px}
 }
+@media(max-width:420px){.faq-hero-links{grid-template-columns:1fr}.faq-page h1{font-size:42px;letter-spacing:-1.8px}}
+/* Telegram-inspired FAQ document treatment */
+body:has(.faq-page){background:#0b0c0f!important}
+.faq-page{max-width:1080px;padding:76px 24px 96px;color:#d8d9dc}
+.faq-hero{padding:0 0 38px;margin-bottom:0;background:none;border:0;border-bottom:1px solid rgba(255,255,255,.14);border-radius:0;box-shadow:none}
+.faq-hero::after{display:none}
+.faq-hero-content{max-width:920px;margin:0 auto;text-align:center}
+.faq-kicker{margin:0 0 16px;color:#ff4b4b;letter-spacing:2.6px}
+.faq-page h1{color:#f5f5f4;font-size:clamp(42px,7vw,72px);font-weight:800;letter-spacing:-2.7px;line-height:.98}
+.faq-lead{max-width:650px;margin:20px auto 0;color:#aeb1b8;font-size:16px;line-height:1.75}
+.faq-note{max-width:650px;margin:22px auto 0;padding:13px 16px;border-left:2px solid #ff4b4b;background:rgba(255,255,255,.035);color:#959aa4;text-align:left;font-size:13px;line-height:1.65}.faq-note strong{color:#e7e8ea}
+.faq-hero-links{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin:40px auto 0;max-width:920px;text-align:left;border-top:1px solid rgba(255,255,255,.12)}
+.faq-hero-links a{position:relative;padding:16px 20px 16px 0;color:#e6e7e9;text-decoration:none;font-size:14px;border:0;border-bottom:1px solid rgba(255,255,255,.12);border-radius:0;background:none;transition:color .2s ease}
+.faq-hero-links a::after{content:"↗";position:absolute;right:14px;color:#777b85;transition:color .2s ease,transform .2s ease}
+.faq-hero-links a:hover{color:#ff5c5c;background:none;border-color:rgba(255,255,255,.12);transform:none}.faq-hero-links a:hover::after{color:#ff5c5c;transform:translate(2px,-2px)}
+.faq-tools{display:flex;align-items:center;gap:18px;margin:34px 0 14px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.14)}
+.faq-search-wrap{position:relative;flex:1;max-width:none}.faq-search-wrap .material-icons{left:16px;color:#858a94}
+.faq-search{min-height:52px;padding:13px 18px 13px 48px;border:1px solid rgba(255,255,255,.16);border-radius:8px;background:#17191d}
+.faq-search::placeholder{color:#777d88}.faq-search:focus{border-color:#ff4b4b;box-shadow:0 0 0 3px rgba(255,75,75,.13)}
+.faq-toggle{color:#aeb1b8;font-weight:700}.faq-toggle:hover{color:#fff}
+.faq-section{scroll-margin-top:80px;margin-top:64px}.faq-section:first-of-type{margin-top:0}
+.faq-section-heading{gap:14px;margin-bottom:17px}.faq-section-heading h2{color:#f3f3f2;font-size:clamp(22px,3vw,30px);letter-spacing:-.7px}.faq-section-heading span{color:#ff4b4b;font-size:10px}
+.faq-list{border-top-color:rgba(255,255,255,.18)}.faq-item{border-bottom-color:rgba(255,255,255,.14)}
+.faq-item summary{padding:20px 58px 20px 0;color:#e7e8ea;font-size:16px;line-height:1.5}.faq-item summary::after{right:7px;top:14px;color:#ff4b4b}.faq-item[open] summary::after{content:"-"}
+.faq-answer{max-width:790px;padding:0 58px 23px 0;color:#aeb1b8;font-size:14px;line-height:1.8}.faq-answer strong{color:#e9eaeb}.faq-answer a{color:#ff7070}
+.faq-empty{padding:24px 0;color:#aeb1b8}.faq-empty a{color:#ff7070}
+.faq-contact{margin-top:68px;padding:26px 0;border:0;border-top:1px solid rgba(255,255,255,.18);border-radius:0;background:none}.faq-contact h2{color:#f3f3f2}.faq-contact p{max-width:700px;color:#aeb1b8;line-height:1.75}
+@media(max-width:650px){
+  .faq-page{padding:58px 16px 70px}.faq-hero{padding:0 0 30px;margin-bottom:0}.faq-hero-content{text-align:left}.faq-lead{margin-left:0}
+  .faq-hero-links{grid-template-columns:repeat(2,1fr);margin-top:30px}.faq-hero-links a{padding-right:24px}
+  .faq-tools{display:block;margin:25px 0 10px}.faq-toggle{display:block;margin-top:13px;padding:0}
+  .faq-section{margin-top:46px}.faq-section-heading{display:block}.faq-section-heading span{display:block;margin-bottom:8px}
+  .faq-item summary{padding:18px 42px 18px 0;font-size:15px}.faq-item summary::after{right:2px;top:12px}.faq-answer{padding:0 25px 19px 0;font-size:13.5px}.faq-contact{margin-top:50px;padding:26px 0}
+}
+@media(max-width:420px){.faq-hero-links{grid-template-columns:1fr}.faq-page h1{font-size:42px;letter-spacing:-1.8px}}
 </style>
 
 <main class="faq-page">
   <header class="faq-hero">
     <div class="faq-hero-content">
       <p class="faq-kicker">UzzUTV help centre</p>
-      <h1>Questions?<br>We’ve got answers.</h1>
-      <p class="faq-lead">Everything you need to know about discovering and watching movies and series on UzzUTV, finding anime on Aniuzu, managing your account, and getting the most out of the site.</p>
+      <h1>UzzUTV FAQ</h1>
+      <p class="faq-lead">This FAQ provides answers to common questions about discovering and watching movies and series on UzzUTV, finding anime on Aniuzu, and managing your account.</p>
+      <p class="faq-note"><strong>Good to know:</strong> UzzUTV keeps evolving. Playback availability and some title information depend on external providers and may change over time.</p>
       <nav class="faq-hero-links" aria-label="FAQ sections">
         <a href="#getting-started">Getting started</a>
         <a href="#discovery">Discovery</a>
@@ -150,7 +162,7 @@ body:has(.faq-page){
     <button type="button" class="faq-toggle" id="faq-toggle">Expand all</button>
   </div>
 
-  <p class="faq-empty" id="faq-empty">No questions matched your search. Try a different word, or <a href="mailto:hello@uzzutv.pythonanywhere.com">contact us</a>.</p>
+  <p class="faq-empty" id="faq-empty">No questions matched your search. Try a different word, or <a href="mailto:baunthiyalujjwal52@gmail.com">contact us</a>.</p>
 
   <section class="faq-section" id="getting-started">
     <div class="faq-section-heading"><span>01 / Start here</span><h2>Getting started with UzzUTV</h2></div>
