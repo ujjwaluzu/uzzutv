@@ -60,6 +60,7 @@ UzzUTV is a Netflix-style streaming platform built with Django that lets you dis
 
 ### Watch Party
 - Create or join watch parties at `/party/`
+- Start a party from any movie or series detail page without copying an ID from the readable URL; the title slug is resolved server-side and the internal TMDB ID is prefilled
 - Synchronized playback rooms at `/party/<room_code>/` powered by Supabase Realtime
 - One-to-one host/guest video calling with Accept, Decline, Cancel, timeout, reconnect, camera, microphone, minimize, and End Call controls
 - Desktop Expand mode turns the call into a full-page view with the remote video as the main stage and a small self-preview in the bottom-right

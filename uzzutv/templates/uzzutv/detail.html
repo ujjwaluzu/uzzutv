@@ -892,6 +892,9 @@ class="watch-btn"><span class="material-icons">play_arrow</span> Watch Now</a>
 class="watch-btn"><span class="material-icons">play_arrow</span> Watch Now</a>
 {% endif %}
 
+<a href="{% url 'party' %}?type={{ type }}&title={{ title_slug|urlencode }}"
+class="info-btn"><span class="material-icons">groups</span> Start Watch Party</a>
+
 <button class="info-btn watchlist-btn"
 data-id="{{data.id}}"
 data-type="{{type}}"

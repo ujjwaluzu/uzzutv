@@ -974,7 +974,7 @@
                 <div id="create-movie-fields">
 
                     <label class="party-label" for="create-movie-id">
-                        Movie ID
+                        Movie TMDB ID
                     </label>
 
                     <input
@@ -993,7 +993,7 @@
                 <div id="create-tv-fields" class="party-tv-fields">
 
                     <label class="party-label" for="create-series-id">
-                        Series ID
+                        Series TMDB ID
                     </label>
 
                     <input
@@ -1117,10 +1117,9 @@
                 In a room, the host starts the one-to-one Video Call and the guest chooses Accept or Decline. For movie fullscreen with the call still visible, use the UzzUTV fullscreen icon in the Watch Party player, not VidFast's internal iframe fullscreen button.
             </div>
 
-            <figure class="party-id-guide">
-                <img src="{% static 'uzzutv/images/party-tmdb-id-guide.svg' %}" alt="Example UzzUTV detail page URL with the TMDB movie ID highlighted">
-                <figcaption>Finding the ID: open the movie or series detail page on UzzUTV and copy the TMDB ID shown in the title information or source details.</figcaption>
-            </figure>
+            <div class="party-note" style="margin-top:0;margin-bottom:18px;">
+                You no longer need to find a TMDB ID in the UzzUTV URL. Open a movie or series detail page and choose <b>Start Watch Party</b>; the correct ID will be filled automatically. If you start here instead, you can still enter the TMDB ID from the title’s TMDB page.
+            </div>
 
             <div class="party-steps">
 
@@ -1131,7 +1130,7 @@
                     <div class="party-step-title">Create a party</div>
 
                     <div class="party-step-text">
-                        Pick Movie or Series, enter the TMDB ID (plus season and episode for a series), then hit Create Watch Party. You'll get a 6-character room code and an invite link. The TMDB ID is the number in the title's URL on themoviedb.org. The same ID appears in the UzzUTV page URL too.
+                        Open a title detail page and choose Start Watch Party, or enter the TMDB ID manually (plus season and episode for a series), then hit Create Watch Party. You'll get a 6-character room code and an invite link.
                     </div>
 
                 </div>
@@ -1217,6 +1216,8 @@
 
 </div>
 
+
+{{ party_initial|json_script:"party-initial-data" }}
 
 <script>
 
@@ -1312,7 +1313,11 @@ function clearPartyError(boxId) {
    SEGMENTED CONTROL
 ========================================================= */
 
-let partyMode = "movie";
+const initialParty = JSON.parse(
+    document.getElementById("party-initial-data").textContent || "{}"
+);
+
+let partyMode = initialParty.type === "tv" ? "tv" : "movie";
 
 const segButtons = document.querySelectorAll(".party-seg-btn");
 
@@ -1340,6 +1345,43 @@ segButtons.forEach((button) => {
 
 });
 
+function syncPartyModeUI() {
+
+    segButtons.forEach((button) => {
+        button.classList.toggle("active", button.dataset.mode === partyMode);
+    });
+
+    document.getElementById("create-movie-fields").style.display =
+        partyMode === "movie" ? "block" : "none";
+
+    document.getElementById("create-tv-fields").classList.toggle(
+        "show",
+        partyMode === "tv"
+    );
+
+}
+
+
+function redirectToPartyLogin() {
+
+    const returnUrl = window.location.pathname + window.location.search;
+
+    window.location.href = "/auth/?next=" + encodeURIComponent(returnUrl);
+
+}
+
+syncPartyModeUI();
+
+if (isPositiveInteger(initialParty.media_id)) {
+
+    const target = partyMode === "tv"
+        ? document.getElementById("create-series-id")
+        : document.getElementById("create-movie-id");
+
+    if (target) target.value = initialParty.media_id;
+
+}
+
 
 /* =========================================================
    CREATE PARTY
@@ -1353,7 +1395,7 @@ createBtn.addEventListener("click", async () => {
 
     if (!user) {
 
-        window.location.href = "/auth/?next=/home/";
+        redirectToPartyLogin();
 
         return;
 
@@ -1863,7 +1905,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (!user) {
 
-        window.location.href = "/auth/?next=/home/";
+        redirectToPartyLogin();
 
         return;
     }

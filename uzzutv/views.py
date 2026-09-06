@@ -1445,7 +1445,21 @@ def watchlist(request):
 def party(request):
     """Watch Party dashboard (create / join / manage own parties)."""
 
-    return render(request, "uzzutv/party.html")
+    initial_party = {}
+    media_type = (request.GET.get("type") or "").strip().lower()
+    title_slug = (request.GET.get("title") or "").strip()
+    if media_type in ("movie", "tv") and title_slug:
+        media_id = _resolve_tmdb_id_from_slug(media_type, title_slug)
+        if media_id:
+            initial_party = {
+                "type": media_type,
+                "media_id": media_id,
+                "title_slug": title_slug,
+            }
+
+    return render(request, "uzzutv/party.html", {
+        "party_initial": initial_party,
+    })
 
 
 def party_room(request, room_code):
