@@ -30,7 +30,7 @@ UzzUTV is a Netflix-style streaming platform built with Django that lets you dis
 
 ### Aniuzu Anime
 - AniList-powered anime discovery, metadata, detail pages, watchlist, and episode navigation
-- Anime watch route: `/aniuzu/anime/<anilist_id>/watch/<episode>/`
+- Anime watch route: `/aniuzu/anime/<title-year>/watch/<episode>/` (legacy AniList-ID URLs remain supported)
 - Playback is limited to the documented AniLink and TryEmbed iframe providers
 - SUB/DUB audio selection and AniLink/TryEmbed server switching preserve the current episode
 - Responsive desktop two-column player/episode layout with independently scrollable episode lists
@@ -47,7 +47,7 @@ UzzUTV is a Netflix-style streaming platform built with Django that lets you dis
 
 ### Accounts (Supabase)
 - Sign up / sign in with client-side field validation, live username availability checks, and friendly API error messages
-- Watchlist, Continue Watching, ratings, and comments synced across devices
+- Watchlist, ratings, and comments sync across devices; UzzUTV exact Continue Watching resume depends on the playback provider, with Vidfast currently providing the best support
 - UzzUTV and Aniuzu share one Supabase Auth session
 - Context-aware login redirects preserve the originating application
 - Forgot-password and password-reset flows use Supabase Auth recovery sessions
@@ -74,7 +74,9 @@ UzzUTV is a Netflix-style streaming platform built with Django that lets you dis
 - Dedicated `/rated/` page listing all your ratings
 
 ### Continue Watching
-- Picks up where you left off in movies and TV episodes, across devices
+- UzzUTV movie and TV cards store the title, release year, selected server, TV season/episode, playback position, duration, and progress percentage when those values are available
+- Vidfast currently provides the most reliable exact playback position and duration; other external UzzUTV providers may only preserve the title, episode, and selected server because they do not expose player state
+- UzzUTV history is stored in `continue_watching` and is associated with the authenticated user
 - Aniuzu history is stored separately in `aniuzu_continue_watching`
 - One Continue Watching row/card is maintained per user and anime; it is updated with the latest episode watched
 - Aniuzu playback state stores AniList ID, episode, server, variant, position, duration, and progress percentage
@@ -168,7 +170,7 @@ CSRF_COOKIE_SECURE=False
 
 Run [`sql/aniuzu_tables.sql`](sql/aniuzu_tables.sql) in the Supabase SQL editor. It creates the Aniuzu watchlist and `aniuzu_continue_watching` tables, indexes, constraints, and Row Level Security policies. Continue Watching uses one row per authenticated user/anime and updates that row with the latest episode, server, variant, and position. The SQL also migrates older per-episode data by retaining the most recently updated row for each user/anime. Policies allow each authenticated user to select, insert, update, and delete only their own rows.
 
-Run [`sql/continue_watching_progress.sql`](sql/continue_watching_progress.sql) once for the UzzUTV Continue Watching table. It adds the selected server, playback position, duration, progress percentage, title and release year used by the resume cards.
+Run [`sql/continue_watching_progress.sql`](sql/continue_watching_progress.sql) once for the UzzUTV Continue Watching table. It adds the selected server, playback position, duration, progress percentage, title and release year used by the resume cards. Vidfast reports the most complete playback state; other providers can leave position or percentage unavailable.
 
 Run [`sql/watch_parties.sql`](sql/watch_parties.sql) to create the Watch Party tables, indexes, and Row Level Security policies for synchronized playback rooms.
 
@@ -229,6 +231,7 @@ uzzutv/
 ├── .env
 ├── sql/                   # Supabase SQL setup scripts
 │   ├── aniuzu_tables.sql  # Aniuzu tables, indexes, RLS
+│   ├── continue_watching_progress.sql # UzzUTV resume fields
 │   └── watch_parties.sql  # Watch Party tables, indexes, RLS
 ├── stream/                # Django project settings
 │   ├── settings.py        # env-based config, caching, gzip
@@ -251,12 +254,12 @@ uzzutv/
 | `/home/`                  | Main browse page (hero + genre rows) |
 | `/movie/` `/tv/`          | Movies / TV shows                    |
 | `/category/<slug>/`       | Category page (mixed movies + TV, paginated): `action`, `romance`, `comedy`, `animation`, `thriller`, `drama`, `horror`, `scifi`, `popular`, `top_rated` |
-| `/<type>/<id>/`           | Detail page (cast, recommendations, rate & comment) |
-| `/movie/<id>/watch/`      | Movie player                         |
-| `/tv/<id>/watch/`         | TV player (season/episode select)    |
+| `/<type>/<title-year>/`           | Detail page (cast, recommendations, rate & comment) |
+| `/movie/<title-year>/watch/`      | Movie player                         |
+| `/tv/<title-year>/watch/`         | TV player (season/episode select)    |
 | `/aniuzu/`                 | AniList anime home                   |
-| `/aniuzu/anime/<id>/`      | Anime detail page                    |
-| `/aniuzu/anime/<id>/watch/<episode>/` | Aniuzu anime player       |
+| `/aniuzu/anime/<title-year>/`      | Anime detail page                    |
+| `/aniuzu/anime/<title-year>/watch/<episode>/` | Aniuzu anime player       |
 | `/aniuzu/watchlist/`       | Aniuzu watchlist                     |
 | `/aniuzu/search/`          | AniList anime search                 |
 | `/aniuzu/continue-metadata/` | Metadata for Continue Watching cards |
@@ -273,6 +276,8 @@ uzzutv/
 | `/rated/`                 | Your ratings (with `/rated/<user_id>/` public view) |
 | `/party/`                 | Watch Party dashboard (create/join)  |
 | `/party/<room_code>/`     | Watch Party room with synchronized playback and video-call controls |
+
+Readable title-year URLs are preferred for detail and watch pages. Existing numeric-ID URLs remain supported for backwards compatibility.
 | `/auth/`                  | Sign in / sign up                    |
 | `/auth/forgot-password/`  | Request a Supabase password reset    |
 | `/auth/reset-password/`   | Complete a Supabase password reset  |
