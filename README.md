@@ -266,6 +266,7 @@ uzzutv/
 | `/aniuzu/collections/`     | Anime collections list               |
 | `/aniuzu/collections/<slug>/` | Anime collection browse page       |
 | `/search/`                | Search                               |
+| `/faq/`                  | FAQ and help centre                  |
 | `/watchlist/`             | Your saved titles                    |
 | `/rated/`                 | Your ratings (with `/rated/<user_id>/` public view) |
 | `/party/`                 | Watch Party dashboard (create/join)  |

@@ -202,9 +202,34 @@
     <div>
       <h4 class="footer-heading">Support</h4>
       <ul class="footer-list">
+        <li><a href="{% url 'faq' %}">FAQ</a></li>
         <li><a href="{% url 'terms' %}">Terms</a></li>
         <li><a href="{% url 'dmca' %}">DMCA</a></li>
       </ul>
+    </div>
+
+    <div class="footer-faq">
+      <h4 class="footer-heading">FAQ</h4>
+      <details>
+        <summary>What is UzzUTV?</summary>
+        <p>UzzUTV helps you discover and watch movies and TV series from the available streaming providers.</p>
+      </details>
+      <details>
+        <summary>Do I need an account?</summary>
+        <p>You can browse and watch without one. An account adds watchlists, Continue Watching, ratings, and comments.</p>
+      </details>
+      <details>
+        <summary>What is Aniuzu?</summary>
+        <p>Aniuzu is UzzUTV's anime area, with AniList-powered anime metadata and episode navigation.</p>
+      </details>
+      <details>
+        <summary>Why is an Aniuzu episode missing?</summary>
+        <p>For currently airing anime, episode totals may be unconfirmed. Aniuzu uses the next scheduled episode to show episodes available so far.</p>
+      </details>
+      <details>
+        <summary>What if the player does not load?</summary>
+        <p>Click Try again before switching servers. If it still fails, try the Brave browser.</p>
+      </details>
     </div>
 
     {% if request.path|slice:":7" != "/aniuzu" %}

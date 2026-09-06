@@ -1261,6 +1261,9 @@ def terms(request):
 def dmca(request):
     return render(request, "uzzutv/dmca.html")
 
+def faq(request):
+    return render(request, "uzzutv/faq.html")
+
 
 def robots_txt(request):
     site_url = request.build_absolute_uri('/').rstrip('/')
@@ -1283,7 +1286,7 @@ def sitemap_xml(request):
 
     site_url = request.build_absolute_uri('/').rstrip('/')
 
-    cache_key = "sitemap_urls_v2"
+    cache_key = "sitemap_urls_v3"
     urls = cache.get(cache_key)
 
     if urls is None:
@@ -1296,6 +1299,7 @@ def sitemap_xml(request):
             {"loc": f"{site_url}/search/", "priority": "0.5"},
             {"loc": f"{site_url}/terms/", "priority": "0.3"},
             {"loc": f"{site_url}/dmca/", "priority": "0.3"},
+            {"loc": f"{site_url}/faq/", "priority": "0.4"},
             {"loc": f"{site_url}/aniuzu/", "priority": "0.9"},
             {"loc": f"{site_url}/aniuzu/top/", "priority": "0.8"},
             {"loc": f"{site_url}/aniuzu/seasons/", "priority": "0.8"},

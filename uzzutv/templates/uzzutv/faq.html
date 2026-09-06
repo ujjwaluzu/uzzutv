@@ -1,0 +1,312 @@
+{% extends "uzzutv/layout.html" %}
+
+{% block title %}UzzUTV FAQ - Help with Movies, Series & Aniuzu{% endblock %}
+{% block meta_description %}Find answers about watching movies and series on UzzUTV, anime on Aniuzu, accounts, watchlists, playback, Watch Parties, ratings, copyright and more.{% endblock %}
+{% block canonical %}<link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}/faq/">{% endblock %}
+{% block og_url %}{{ request.scheme }}://{{ request.get_host }}/faq/{% endblock %}
+{% block og_title %}UzzUTV FAQ - Help with Movies, Series & Aniuzu{% endblock %}
+{% block og_description %}Everything you need to know about UzzUTV, Aniuzu, accounts, playback, watchlists, Watch Parties and more.{% endblock %}
+{% block twitter_title %}UzzUTV FAQ - Help with Movies, Series & Aniuzu{% endblock %}
+{% block twitter_description %}Everything you need to know about UzzUTV, Aniuzu, accounts, playback, watchlists, Watch Parties and more.{% endblock %}
+
+{% block body %}
+<style>
+body:has(.faq-page){
+  background:
+    radial-gradient(circle at 8% 0%,rgba(229,9,20,.18),transparent 34rem),
+    radial-gradient(circle at 92% 18%,rgba(112,26,117,.12),transparent 30rem),
+    #0b0b0c!important;
+}
+.faq-page{
+  max-width:1180px;
+  margin:0 auto;
+  padding:clamp(70px,9vw,120px) 20px 90px;
+  color:#d9d8d2;
+}
+.faq-hero{
+  position:relative;
+  overflow:hidden;
+  padding:clamp(28px,5vw,58px);
+  margin-bottom:52px;
+  background:linear-gradient(135deg,rgba(31,31,34,.97),rgba(14,15,17,.97));
+  border:1px solid rgba(255,255,255,.11);
+  border-radius:24px;
+  box-shadow:0 24px 70px rgba(0,0,0,.36);
+}
+.faq-hero::after{
+  content:"?";
+  position:absolute;
+  right:clamp(12px,5vw,70px);
+  bottom:-.24em;
+  color:rgba(229,9,20,.11);
+  font-family:"Anton","Inter",sans-serif;
+  font-size:clamp(12rem,28vw,25rem);
+  line-height:1;
+  pointer-events:none;
+}
+.faq-hero-content{position:relative;z-index:1;max-width:700px}
+.faq-kicker{
+  margin:0 0 14px;
+  color:#ff3c3c;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:2.4px;
+  text-transform:uppercase;
+}
+.faq-page h1{
+  margin:0;
+  color:#f3f1e9;
+  font-size:clamp(42px,7vw,78px);
+  letter-spacing:-2.5px;
+  line-height:.96;
+}
+.faq-lead{
+  max-width:650px;
+  margin:20px 0 0;
+  color:#b8b7b2;
+  font-size:clamp(15px,2vw,18px);
+  line-height:1.7;
+}
+.faq-hero-links{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}
+.faq-hero-links a{
+  color:#eee; text-decoration:none; border:1px solid rgba(255,255,255,.14);
+  background:rgba(255,255,255,.045); border-radius:999px; padding:9px 14px;
+  font-size:13px; transition:background .2s ease,border-color .2s ease,transform .2s ease;
+}
+.faq-hero-links a:hover{color:#fff;background:rgba(229,9,20,.2);border-color:rgba(255,60,60,.65);transform:translateY(-1px)}
+.faq-tools{display:flex;align-items:center;gap:14px;margin:0 0 38px}
+.faq-search-wrap{position:relative;flex:1;max-width:620px}
+.faq-search-wrap .material-icons{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:#777b84;font-size:21px;pointer-events:none}
+.faq-search{
+  width:100%; min-height:50px; padding:12px 16px 12px 48px;
+  border:1px solid rgba(255,255,255,.12); border-radius:12px;
+  background:#151517; color:#fff; font:inherit; outline:none;
+}
+.faq-search::placeholder{color:#777b84}
+.faq-search:focus{border-color:#ff3c3c;box-shadow:0 0 0 3px rgba(255,60,60,.13)}
+.faq-toggle{border:0;background:transparent;color:#a9a8a3;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;white-space:nowrap}
+.faq-toggle:hover{color:#fff}
+.faq-section{scroll-margin-top:80px;margin-top:58px}
+.faq-section:first-of-type{margin-top:0}
+.faq-section-heading{display:flex;align-items:baseline;gap:14px;margin-bottom:16px}
+.faq-section-heading h2{margin:0;color:#f3f1e9;font-size:clamp(23px,3vw,32px);letter-spacing:-.7px}
+.faq-section-heading span{color:#ff3c3c;font:700 11px "Inter",sans-serif;letter-spacing:1.8px;text-transform:uppercase}
+.faq-list{border-top:1px solid rgba(255,255,255,.12)}
+.faq-item{border-bottom:1px solid rgba(255,255,255,.12)}
+.faq-item summary{
+  position:relative;list-style:none;cursor:pointer;padding:21px 52px 21px 2px;
+  color:#eee;font-size:16px;font-weight:600;line-height:1.45;
+}
+.faq-item summary::-webkit-details-marker{display:none}
+.faq-item summary::after{
+  content:"+";position:absolute;right:6px;top:16px;color:#ff3c3c;font-size:25px;font-weight:300;
+}
+.faq-item[open] summary::after{content:"−"}
+.faq-item summary:hover{color:#fff}
+.faq-item summary:focus-visible,.faq-hero-links a:focus-visible,.faq-toggle:focus-visible{
+  outline:2px solid #ff3c3c;outline-offset:3px;border-radius:5px;
+}
+.faq-answer{max-width:900px;padding:0 52px 22px 2px;color:#a9a8a3;font-size:14px;line-height:1.75}
+.faq-answer p{margin:0 0 12px}.faq-answer p:last-child{margin-bottom:0}
+.faq-answer strong{color:#e9e7df}.faq-answer a{color:#ff6565;text-decoration:none}.faq-answer a:hover{text-decoration:underline}
+.faq-answer ul{margin:8px 0 0;padding-left:21px}.faq-answer li{padding:3px 0}
+.faq-empty{display:none;padding:24px 2px;color:#a9a8a3;font-size:14px}
+.faq-contact{margin-top:64px;padding:26px 28px;border:1px solid rgba(255,60,60,.24);border-radius:16px;background:linear-gradient(135deg,rgba(229,9,20,.11),rgba(255,255,255,.025))}
+.faq-contact h2{margin:0 0 7px;color:#f3f1e9;font-size:20px}.faq-contact p{margin:0;color:#b7b6b0;font-size:14px;line-height:1.7}
+@media(max-width:650px){
+  .faq-page{padding:62px 14px 64px}.faq-hero{padding:25px 20px;border-radius:17px;margin-bottom:34px}
+  .faq-hero::after{right:-2px;font-size:12rem}.faq-tools{display:block;margin-bottom:28px}.faq-toggle{margin-top:13px;padding:0}
+  .faq-section{margin-top:42px}.faq-section-heading{display:block}.faq-section-heading span{display:block;margin-bottom:7px}
+  .faq-item summary{padding:18px 40px 18px 0;font-size:15px}.faq-item summary::after{right:2px;top:14px}.faq-answer{padding:0 26px 19px 0;font-size:13.5px}
+  .faq-contact{padding:22px 19px}
+}
+</style>
+
+<main class="faq-page">
+  <header class="faq-hero">
+    <div class="faq-hero-content">
+      <p class="faq-kicker">UzzUTV help centre</p>
+      <h1>Questions?<br>We’ve got answers.</h1>
+      <p class="faq-lead">Everything you need to know about discovering and watching movies and series on UzzUTV, finding anime on Aniuzu, managing your account, and getting the most out of the site.</p>
+      <nav class="faq-hero-links" aria-label="FAQ sections">
+        <a href="#getting-started">Getting started</a>
+        <a href="#discovery">Discovery</a>
+        <a href="#watching">Watching</a>
+        <a href="#accounts">Accounts</a>
+        <a href="#aniuzu">Aniuzu</a>
+        <a href="#watch-party">Watch Party</a>
+        <a href="#more-help">More help</a>
+        <a href="#policies">Policies</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="faq-tools">
+    <div class="faq-search-wrap">
+      <span class="material-icons" aria-hidden="true">search</span>
+      <label class="visually-hidden" for="faq-search">Search frequently asked questions</label>
+      <input id="faq-search" class="faq-search" type="search" placeholder="Search the FAQ..." autocomplete="off">
+    </div>
+    <button type="button" class="faq-toggle" id="faq-toggle">Expand all</button>
+  </div>
+
+  <p class="faq-empty" id="faq-empty">No questions matched your search. Try a different word, or <a href="mailto:hello@uzzutv.pythonanywhere.com">contact us</a>.</p>
+
+  <section class="faq-section" id="getting-started">
+    <div class="faq-section-heading"><span>01 / Start here</span><h2>Getting started with UzzUTV</h2></div>
+    <div class="faq-list">
+      <details class="faq-item"><summary>What is UzzUTV?</summary><div class="faq-answer"><p>UzzUTV is a streaming discovery and playback website for movies and TV series. You can browse titles, search the catalogue, open a detail page, read metadata and recommendations, and start playback from the available player options.</p><p>Movie and series information is supplied by <strong>The Movie Database (TMDB)</strong>. Playback is provided through external embedded sources, so availability can vary by title, region and provider.</p></div></details>
+      <details class="faq-item"><summary>What is the difference between UzzUTV and Aniuzu?</summary><div class="faq-answer"><p><strong>UzzUTV</strong> is the movie and TV series side of the site. <strong>Aniuzu</strong> is the dedicated anime area, powered by AniList metadata and its own anime browsing, detail, episode, watchlist and playback experience.</p><p>Both areas use the same site account and sign-in session, but their watchlists and Continue Watching histories are kept as separate experiences.</p></div></details>
+      <details class="faq-item"><summary>Do I need an account to browse or watch?</summary><div class="faq-answer"><p>No. You can browse the home page, explore movies and series, search, open detail pages and use the available playback pages without signing in. An account is needed for personal features such as watchlists, Continue Watching, ratings, comments, profiles and Watch Parties.</p></div></details>
+      <details class="faq-item"><summary>How do I find a movie or series?</summary><div class="faq-answer"><p>Use the main navigation to open <strong>Movies</strong> or <strong>Series</strong>, browse the home page rows, explore a genre category, or use the search box. Each result opens a detail page with the title’s poster or backdrop, description, genres, cast, recommendations and watch action when playback is available.</p></div></details>
+      <details class="faq-item"><summary>Which sections are available on the site?</summary><div class="faq-answer"><p>UzzUTV includes the home discovery page, Movies, Series, genre categories, search, watchlists, ratings, profiles and Watch Party. Aniuzu includes anime home, search, genres, seasons, studios, collections, anime watchlist, detail pages and episode playback.</p></div></details>
+      <details class="faq-item"><summary>Why can’t I find a title that I know exists?</summary><div class="faq-answer"><p>The catalogue is based on external metadata and provider availability. Try the title’s original name, an alternate spelling, fewer search words, or the other UzzUTV/Aniuzu section. A title may also be missing, delayed, region-limited or unavailable from the external playback sources.</p></div></details>
+      <details class="faq-item"><summary>How do genres and categories work?</summary><div class="faq-answer"><p>Genres are discovery collections created from the available movie and TV metadata. UzzUTV category pages can mix movies and series in one paginated feed. Aniuzu has its own anime genre, season, studio and collection browsing pages.</p></div></details>
+    </div>
+  </section>
+
+  <section class="faq-section" id="discovery">
+    <div class="faq-section-heading"><span>02 / Explore</span><h2>Discovery, categories and search</h2></div>
+    <div class="faq-list">
+      <details class="faq-item"><summary>How are the home page rows chosen?</summary><div class="faq-answer"><p>The home page combines live catalogue data into discovery rows such as trending, popular and top-rated movies and series, along with genre-focused rows. These rankings come from the external catalogue data and can change over time.</p></div></details>
+      <details class="faq-item"><summary>Is the catalogue updated in real time?</summary><div class="faq-answer"><p>UzzUTV and Aniuzu request current metadata from TMDB and AniList, but responses are cached for performance. A new release, poster, rating, episode count or title change may take some time to appear. Refreshing later can help when an external service has just updated its data.</p></div></details>
+      <details class="faq-item"><summary>What is the difference between Trending, Popular and Top Rated?</summary><div class="faq-answer"><p>They are different discovery rankings supplied by the relevant catalogue service. Trending emphasizes current interest, Popular emphasizes broad popularity, and Top Rated emphasizes higher user scores. The exact ranking and available titles are controlled by TMDB for UzzUTV and AniList for Aniuzu.</p></div></details>
+      <details class="faq-item"><summary>Why do some category pages mix movies and series?</summary><div class="faq-answer"><p>UzzUTV’s general genre, Popular and Top Rated category pages are designed as a combined feed, so a genre can show both movies and TV series. You can use the Movies or Series pages when you want only one media type.</p></div></details>
+      <details class="faq-item"><summary>How do category filters and pagination work?</summary><div class="faq-answer"><p>Open a category from Home or a Movies/Series page, then use the page controls to move through more results. Popular and Top Rated categories can also be opened with a movie or TV filter. Results are loaded in pages so the browser does not need to render the entire catalogue at once.</p></div></details>
+      <details class="faq-item"><summary>What can I learn from a title detail page?</summary><div class="faq-answer"><p>A detail page brings together the title description, release or air information, genres, poster or backdrop, cast, ratings and reviews, recommendations, watchlist control and watch action. The detail page is the best place to confirm that you have selected the correct movie, series or anime before starting playback.</p></div></details>
+      <details class="faq-item"><summary>What does “More Like This” or Related Anime show?</summary><div class="faq-answer"><p>These are catalogue recommendations returned by the metadata service. They are suggestions for discovery, not a guarantee that a recommended title has a working external player or is available in your region.</p></div></details>
+      <details class="faq-item"><summary>Why do posters, logos, cast photos or descriptions sometimes change?</summary><div class="faq-answer"><p>Artwork and descriptive information are supplied by external catalogue services and can be corrected, replaced or localized. UzzUTV also uses lazy-loaded images in some rows, so images may appear progressively as you scroll.</p></div></details>
+      <details class="faq-item"><summary>How do I find the ID needed for a Watch Party?</summary><div class="faq-answer"><p>Open the UzzUTV detail page for the movie or series. The number in its URL after <strong>/movie/</strong> or <strong>/tv/</strong> is the TMDB ID. Enter that number in Party; series rooms also require the season and episode number.</p></div></details>
+    </div>
+  </section>
+
+  <section class="faq-section" id="watching">
+    <div class="faq-section-heading"><span>03 / Playback</span><h2>Watching movies and series</h2></div>
+    <div class="faq-list">
+      <details class="faq-item"><summary>How do I start watching a movie?</summary><div class="faq-answer"><p>Open a movie’s detail page, choose its watch action, and wait for the player page to load. If more than one source is offered, select the source that works best for you. You may need to allow the embedded player to load in your browser.</p></div></details>
+      <details class="faq-item"><summary>How do I watch a TV episode?</summary><div class="faq-answer"><p>Open the series detail or watch page, choose a season, and select an episode. The player page provides the season and episode navigation so you can move through the series without returning to the catalogue.</p></div></details>
+      <details class="faq-item"><summary>What should I do when the player does not load?</summary><div class="faq-answer"><p>First click <strong>Try again</strong> and give the player a moment to respond. If it still does not load, try another available server, refresh the page, or open the title in a current browser such as Brave, Chrome, Firefox or Safari. Privacy extensions, strict content blockers, network filters and disabled third-party frames can prevent an external player from appearing.</p><p>Never install an extension or download a file simply because an embedded player asks you to.</p></div></details>
+      <details class="faq-item"><summary>The video is buffering, blank or keeps stopping. What can I try?</summary><div class="faq-answer"><ul><li>Check your connection and pause other high-bandwidth downloads.</li><li>Refresh the watch page and try the player again.</li><li>Switch to another listed source or server if one is available.</li><li>Try a current browser or a private window with extensions temporarily disabled.</li><li>If only one title or episode fails, the external source may be temporarily unavailable.</li></ul></div></details>
+      <details class="faq-item"><summary>Why is a server or episode unavailable?</summary><div class="faq-answer"><p>UzzUTV and Aniuzu rely on external playback providers. Their sources can go offline, change URLs, rate-limit requests, remove a title, or work differently by country and network. This is why one server may work while another does not, and why an episode can be visible in the catalogue but unavailable in a player.</p></div></details>
+      <details class="faq-item"><summary>Does UzzUTV host the movies and episodes?</summary><div class="faq-answer"><p>No. UzzUTV does not host the media files on its own servers. It presents catalogue information and embeds or links to third-party playback sources. Those sources control their own availability, subtitles, quality, advertising and player behaviour.</p></div></details>
+      <details class="faq-item"><summary>Are subtitles, dubs and video quality guaranteed?</summary><div class="faq-answer"><p>No. Subtitles, audio tracks, dubbing, resolution, playback controls and availability depend on the external source selected for the title. If a source offers multiple options, use the controls inside that provider’s player.</p></div></details>
+      <details class="faq-item"><summary>Can I watch on my phone, tablet or smart TV?</summary><div class="faq-answer"><p>The site is designed to be responsive on modern desktop and mobile browsers. Compatibility with a particular smart TV, casting setup or external player depends on that device, its browser and the third-party source. If playback is unreliable on one device, try a current browser on a phone or computer to isolate the issue.</p></div></details>
+      <details class="faq-item"><summary>Why is the title information different from what I expected?</summary><div class="faq-answer"><p>UzzUTV receives movie and TV metadata from TMDB, while Aniuzu receives anime metadata from AniList. Names, posters, release dates, episode counts, genres and descriptions can be updated by those services or differ between regional and alternate titles.</p></div></details>
+    </div>
+  </section>
+
+  <section class="faq-section" id="accounts">
+    <div class="faq-section-heading"><span>04 / Your account</span><h2>Accounts and personal features</h2></div>
+    <div class="faq-list">
+      <details class="faq-item"><summary>How do I create an account?</summary><div class="faq-answer"><p>Open <strong>Login</strong> from the navigation and choose the sign-up option. Follow the form’s instructions to create your account. Accounts are powered by Supabase, and the UzzUTV and Aniuzu areas share the same authentication session.</p></div></details>
+      <details class="faq-item"><summary>How do I sign in or sign out?</summary><div class="faq-answer"><p>Use the Login button in the navigation. After you sign in, the navigation shows your account state and a Logout action. If you arrived from a personal page, the site tries to return you to the relevant area after authentication.</p></div></details>
+      <details class="faq-item"><summary>I forgot my password. How do I reset it?</summary><div class="faq-answer"><p>Open the Login page and choose the forgot-password option. Enter the email associated with your account and follow the recovery link from Supabase. If the message is not visible, check spam or promotions folders and make sure you entered the same email used when signing up.</p></div></details>
+      <details class="faq-item"><summary>What does my account unlock?</summary><div class="faq-answer"><p>Signing in lets you save titles, keep Continue Watching history, rate movies and series, write comments, manage your profile, view ratings and use Watch Party features. Personal data is tied to your account so these features can follow you across supported devices.</p></div></details>
+      <details class="faq-item"><summary>How does the UzzUTV watchlist work?</summary><div class="faq-answer"><p>While signed in, use the watchlist control on a UzzUTV movie or series to save it for later. Open Watchlist from your account area to see saved titles. Removing a title deletes it from your saved list; it does not delete the title from the public catalogue.</p></div></details>
+      <details class="faq-item"><summary>How does Continue Watching work?</summary><div class="faq-answer"><p>For signed-in users, UzzUTV keeps progress for movies and TV episodes so you can resume across devices. For TV, the latest watched season and episode are used to help you continue. A completed item may be removed from the Continue Watching row.</p></div></details>
+      <details class="faq-item"><summary>Is Aniuzu Continue Watching separate?</summary><div class="faq-answer"><p>Yes. Aniuzu stores anime progress separately from UzzUTV’s movie and TV history. It can remember the anime, episode, selected server or variant, playback position and progress percentage, and the anime detail page can offer a Resume action when history is available.</p></div></details>
+      <details class="faq-item"><summary>Why did my watchlist or progress not appear?</summary><div class="faq-answer"><p>Confirm that you are signed into the same account and that the save or progress action completed. Refresh the page and check the correct area: UzzUTV watchlist and history are separate from Aniuzu’s. A browser’s blocked storage, a lost session or a temporary network issue can also prevent a sync from completing.</p></div></details>
+      <details class="faq-item"><summary>How do ratings and reviews work?</summary><div class="faq-answer"><p>Signed-in users can rate a movie or series from its detail page and add a comment or review. Detail pages show the rating summary, average score, star distribution and paginated comments. Your profile and rated page collect your own activity, while public profiles can display information that you have chosen to make visible.</p></div></details>
+      <details class="faq-item"><summary>Can I rate and comment on anime too?</summary><div class="faq-answer"><p>Yes. Signed-in users can rate an Aniuzu anime from its detail page and leave a comment. Aniuzu ratings use the same five-star style as UzzUTV ratings, while anime ratings and comments are stored and displayed separately for the anime catalogue.</p></div></details>
+      <details class="faq-item"><summary>What is the Rated page for?</summary><div class="faq-answer"><p>The Rated page collects titles you have rated so you can revisit your movie and series opinions. Public profile pages can also show a user’s ratings and comments, including links back to the relevant titles.</p></div></details>
+      <details class="faq-item"><summary>What is a public profile?</summary><div class="faq-answer"><p>A public profile is a shareable profile page at <strong>/profile/&lt;user_id&gt;/</strong>. Depending on the available activity, it can show a username, avatar, rated titles, anime ratings and comments. Do not put private contact details or other sensitive information in profile content.</p></div></details>
+      <details class="faq-item"><summary>Why does Party or Watchlist appear only after I sign in?</summary><div class="faq-answer"><p>Those areas use account-owned data and authenticated Supabase access. The navigation reveals account-specific links after your session is recognized. If you sign out, you can still browse public catalogue pages, but personal controls and party actions will ask you to log in.</p></div></details>
+      <details class="faq-item"><summary>Can I delete my account?</summary><div class="faq-answer"><p>Yes. Open your own profile and use the Danger Zone account-deletion action. You must confirm by typing <strong>DELETE</strong>. Account deletion is permanent: your authentication account and associated personal data, including saved items, progress, ratings, comments and Watch Party ownership data, are removed according to the site’s data relationships.</p></div></details>
+    </div>
+  </section>
+
+  <section class="faq-section" id="aniuzu">
+    <div class="faq-section-heading"><span>05 / Anime</span><h2>Using Aniuzu</h2></div>
+    <div class="faq-list">
+      <details class="faq-item"><summary>What is Aniuzu?</summary><div class="faq-answer"><p>Aniuzu is UzzUTV’s anime-focused experience. It uses AniList for anime discovery and metadata, with pages for trending, popular and highly rated titles, anime search, genres, seasons, studios and collections.</p></div></details>
+      <details class="faq-item"><summary>How do I find anime on Aniuzu?</summary><div class="faq-answer"><p>Use the Aniuzu navigation to browse Home, Genres, Seasons, Studios or Collections, or search for an anime by title. Open a result to view its description, artwork, related anime, available episodes and watch action.</p></div></details>
+      <details class="faq-item"><summary>How do I choose an Aniuzu episode?</summary><div class="faq-answer"><p>Open an anime detail page and choose Watch, or open the anime watch page directly. Use the episode list and its search or paging controls to find an episode. The watch page keeps the player and episode navigation together so you can move to the next episode quickly.</p></div></details>
+      <details class="faq-item"><summary>What are SUB, DUB and variants on Aniuzu?</summary><div class="faq-answer"><p>When the selected AniLink or TryEmbed source provides variants, Aniuzu lets you choose the available subtitle or dub option. The selected variant and server are kept with your current episode where possible. Exact language and availability are controlled by the external provider.</p></div></details>
+      <details class="faq-item"><summary>Which Aniuzu playback sources are supported?</summary><div class="faq-answer"><p>Aniuzu playback is designed around the documented AniLink and TryEmbed iframe providers. If one source does not work, use the server switcher when available, retry the current source, or try a current browser. Source availability can change without notice because the providers are external.</p></div></details>
+      <details class="faq-item"><summary>Why does an airing anime show fewer episodes than expected?</summary><div class="faq-answer"><p>For currently airing anime, AniList may not have a confirmed total episode count. In that case Aniuzu uses the next scheduled episode to show the episodes available so far. The list may change when AniList receives an updated count or airing schedule.</p></div></details>
+      <details class="faq-item"><summary>Why is an Aniuzu episode missing?</summary><div class="faq-answer"><p>The episode may not have aired yet, may not have been added to the external source, or may be affected by an unconfirmed airing schedule. Refresh the anime page, search the episode list, and try again later. If other episodes load but one does not, the issue is usually source availability rather than your account.</p></div></details>
+      <details class="faq-item"><summary>Does Aniuzu have a separate watchlist?</summary><div class="faq-answer"><p>Yes. Signed-in users can save anime to the Aniuzu watchlist. It uses the same account session as UzzUTV, but it is intentionally separate from the movie and TV watchlist so your anime library stays organized.</p></div></details>
+    </div>
+  </section>
+
+  <section class="faq-section" id="watch-party">
+    <div class="faq-section-heading"><span>06 / Together</span><h2>Watch Party</h2></div>
+    <div class="faq-list">
+      <details class="faq-item"><summary>What is a Watch Party?</summary><div class="faq-answer"><p>Watch Party lets two people watch together in a synchronized room. A host creates a room, shares its room code or invite link, and a guest joins. The current experience supports one host and one guest in each room.</p></div></details>
+      <details class="faq-item"><summary>How do I create or join a room?</summary><div class="faq-answer"><p>Open <strong>Party</strong>, create a room as the host, then share the room code or invite link. A friend can paste the code into the Join a Watch Party form or open the invite link directly. You need to be signed in for the party features to work.</p></div></details>
+      <details class="faq-item"><summary>What can Watch Party synchronize?</summary><div class="faq-answer"><p>The room is built for synchronized playback, so the host and guest can watch the same selected player together. Network conditions and the external media source can still cause small timing differences or playback failures.</p></div></details>
+      <details class="faq-item"><summary>Does Watch Party include video calling?</summary><div class="faq-answer"><p>Yes. Watch Party supports a one-to-one video call with controls to accept, decline, cancel, reconnect, mute the microphone, manage the camera, minimize the call and end it. Your browser will ask for camera and microphone permission before those devices can be used.</p></div></details>
+      <details class="faq-item"><summary>Why can’t my friend join or connect?</summary><div class="faq-answer"><p>Check that the room code or invite link is complete, the room is still active, and both people are signed in. Also check browser permissions, camera and microphone access, network restrictions and whether a VPN or strict privacy setting is blocking realtime connections. Refreshing the room can help after a temporary connection drop.</p></div></details>
+      <details class="faq-item"><summary>How long does a Watch Party room last?</summary><div class="faq-answer"><p>Rooms are created with a 24-hour expiry window. If an older invite no longer opens the room, create a new party and share its fresh room code or invite link.</p></div></details>
+      <details class="faq-item"><summary>Why does the host control the Watch Party playback?</summary><div class="faq-answer"><p>The host’s player is the source of truth for synchronized playback. When the host plays, pauses or seeks, the guest follows the host’s position through the realtime room connection. Small differences can still happen because each person’s network and external player are separate.</p></div></details>
+      <details class="faq-item"><summary>Which fullscreen button should I use in a Watch Party?</summary><div class="faq-answer"><p>For a movie room where you want the call overlay to remain visible, use UzzUTV’s fullscreen control around the player. The external VidFast iframe’s own fullscreen button may hide the call overlay.</p></div></details>
+      <details class="faq-item"><summary>Can I make a Watch Party larger than two people?</summary><div class="faq-answer"><p>Not currently. Each room supports one host and one guest. Larger rooms may be supported in a future version.</p></div></details>
+    </div>
+  </section>
+
+  <section class="faq-section" id="more-help">
+    <div class="faq-section-heading"><span>07 / Good to know</span><h2>More questions</h2></div>
+    <div class="faq-list">
+      <details class="faq-item"><summary>Is UzzUTV free to use?</summary><div class="faq-answer"><p>The current site has no documented paid subscription or checkout flow. Browsing and the site’s account features are available without a site subscription. External playback providers may have their own advertisements, restrictions or terms.</p></div></details>
+      <details class="faq-item"><summary>Can I download movies or anime for offline viewing?</summary><div class="faq-answer"><p>There is no official offline-download feature in the current UzzUTV or Aniuzu interface. Playback is designed for the browser through the available embedded sources. Do not download files from suspicious pop-ups or third-party prompts.</p></div></details>
+      <details class="faq-item"><summary>How can I remove something from Continue Watching?</summary><div class="faq-answer"><p>Use the remove control on the relevant Continue Watching card. UzzUTV and Aniuzu provide separate history rows, so remove the item from the area where it appears. Removing history does not remove the title from your watchlist or from the public catalogue.</p></div></details>
+      <details class="faq-item"><summary>Can I use the same account on more than one device?</summary><div class="faq-answer"><p>Yes. Sign in with the same account on each supported browser or device. Watchlists, ratings, comments and Continue Watching are associated with your authenticated account, although the UzzUTV and Aniuzu history/watchlist areas remain separate.</p></div></details>
+      <details class="faq-item"><summary>Who can access my saved items and progress?</summary><div class="faq-answer"><p>Account-owned records are protected by authenticated access rules and are intended for the account that created them. Keep your password private, sign out on shared devices, and do not share invite links or account recovery emails with people you do not trust.</p></div></details>
+      <details class="faq-item"><summary>Are Aniuzu playback URLs saved in my account?</summary><div class="faq-answer"><p>No playback URL is stored for Aniuzu Continue Watching. The site stores the anime, episode, selected server and audio variant, position and progress, then rebuilds the watch link when you resume.</p></div></details>
+      <details class="faq-item"><summary>What if the title metadata or episode information is wrong?</summary><div class="faq-answer"><p>Metadata is supplied by TMDB, AniList and, for some episode-count fallback logic, MyAnimeList data through Jikan. Check the title’s alternate name and refresh later; corrections may need to happen in the upstream catalogue before they appear on UzzUTV.</p></div></details>
+      <details class="faq-item"><summary>How do I report a broken page or player?</summary><div class="faq-answer"><p>Send the affected page URL, title, season and episode if relevant, your browser/device, the server you tried and what happened. Include whether retrying or switching sources helped. This makes it easier to tell a site issue from a temporary external-provider outage.</p></div></details>
+    </div>
+  </section>
+
+  <section class="faq-section" id="policies">
+    <div class="faq-section-heading"><span>08 / Trust &amp; safety</span><h2>Policies, copyright and privacy</h2></div>
+    <div class="faq-list">
+      <details class="faq-item"><summary>Where can I read the Terms and DMCA policy?</summary><div class="faq-answer"><p>Use the Terms and DMCA links in the Support section of the footer. The <a href="{% url 'terms' %}">Terms &amp; Conditions</a> explain the general use of the site, and the <a href="{% url 'dmca' %}">DMCA Policy</a> explains how copyright notices are reviewed.</p></div></details>
+      <details class="faq-item"><summary>How do I report a copyright concern?</summary><div class="faq-answer"><p>Read the DMCA Policy first and send the requested information through the contact described there, including your contact details, a description of the copyrighted work, the relevant URL and a good-faith statement. UzzUTV does not host the media files itself, but it reviews reports about pages and external embedded content in line with that policy.</p></div></details>
+      <details class="faq-item"><summary>Is the content available everywhere?</summary><div class="faq-answer"><p>No guarantee is made that a title, episode, subtitle, source or player will work in every country or network. External providers may apply their own regional restrictions, availability rules and changes.</p></div></details>
+      <details class="faq-item"><summary>What information does my account use?</summary><div class="faq-answer"><p>Account features use Supabase authentication and associated profile data to provide sign-in, saved items, progress, ratings, comments and realtime Watch Party functions. Use only information you are comfortable placing in your profile, and do not share your password or private account details with another person.</p></div></details>
+      <details class="faq-item"><summary>What should I do if I see suspicious pop-ups or downloads?</summary><div class="faq-answer"><p>Close the tab and do not install unknown software, extensions or “updates.” Embedded third-party sources may show their own advertising or redirects. Use a current browser with sensible privacy and security protections, and try another available source if the player behaves unexpectedly.</p></div></details>
+      <details class="faq-item"><summary>How do I contact UzzUTV?</summary><div class="faq-answer"><p>Use the email icon in the footer to contact the site team about general questions. For copyright concerns, follow the dedicated instructions on the DMCA page. Include the page URL and a short description of the problem so it can be investigated more efficiently.</p></div></details>
+    </div>
+  </section>
+
+  <aside class="faq-contact">
+    <h2>Still need a hand?</h2>
+    <p>Try the playback steps above first, then contact the UzzUTV team from the email link in the footer with the affected title, episode, page URL, browser and a short description of what happened.</p>
+  </aside>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(() => {
+  const search = document.getElementById('faq-search');
+  const toggle = document.getElementById('faq-toggle');
+  const empty = document.getElementById('faq-empty');
+  const items = [...document.querySelectorAll('.faq-item')];
+  const sections = [...document.querySelectorAll('.faq-section')];
+  let expanded = false;
+
+  function filterFaq() {
+    const query = search.value.trim().toLowerCase();
+    let matches = 0;
+    items.forEach((item) => {
+      const matched = !query || item.textContent.toLowerCase().includes(query);
+      item.hidden = !matched;
+      if (matched) matches += 1;
+    });
+    sections.forEach((section) => {
+      section.hidden = !section.querySelector('.faq-item:not([hidden])');
+    });
+    empty.style.display = matches ? 'none' : 'block';
+  }
+
+  search.addEventListener('input', filterFaq);
+  toggle.addEventListener('click', () => {
+    expanded = !expanded;
+    items.forEach((item) => { if (!item.hidden) item.open = expanded; });
+    toggle.textContent = expanded ? 'Collapse all' : 'Expand all';
+  });
+})();
+</script>
+{% endblock %}

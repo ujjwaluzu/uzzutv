@@ -389,6 +389,28 @@ body{
   transform-origin:bottom left;
 }
 
+.footer-faq details{
+  border-bottom:1px solid rgba(226,225,211,.12);
+  padding:0 0 10px;
+  margin:0 0 10px;
+}
+
+.footer-faq summary{
+  color:rgba(226,225,211,.85);
+  cursor:pointer;
+  font-size:14px;
+  line-height:1.35;
+  list-style:none;
+  padding-right:18px;
+  position:relative;
+}
+
+.footer-faq summary::-webkit-details-marker{display:none}
+.footer-faq summary::after{content:"+";position:absolute;right:0;top:-2px;color:#e2e1d3;font-size:18px;font-weight:400}
+.footer-faq details[open] summary::after{content:"-"}
+.footer-faq summary:hover{color:#fff}
+.footer-faq p{color:rgba(226,225,211,.55);font-size:12px;line-height:1.5;margin:8px 0 0}
+
 .footer-top-col{
   display:flex;
   align-items:flex-start;
