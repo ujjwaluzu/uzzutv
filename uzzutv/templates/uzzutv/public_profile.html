@@ -789,6 +789,12 @@ async function loadMediaInfos(items) {
 }
 
 
+function animeProfileSlug(title, id, year) {
+    const base = year ? `${title}-${year}` : title;
+    const slug = String(base || '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    return slug || String(id);
+}
+
 async function loadAnimeInfos(ids) {
 
     const unique = [...new Set(ids.filter(Boolean))];
@@ -1190,7 +1196,7 @@ async function renderAnimeRatings(ratings) {
 
         const card = document.createElement("a");
 
-        card.href = `/aniuzu/anime/${rating.anilist_id}/`;
+        card.href = `/aniuzu/anime/${encodeURIComponent(animeProfileSlug(title, rating.anilist_id, info && info.year))}/`;
         card.className = "profile-card";
         card.style.textDecoration = "none";
 
@@ -1388,7 +1394,7 @@ async function renderAnimeComments(comments) {
 
         const link = document.createElement("a");
 
-        link.href = `/aniuzu/anime/${comment.anilist_id}/`;
+        link.href = `/aniuzu/anime/${encodeURIComponent(animeProfileSlug(title, comment.anilist_id, info && info.year))}/`;
         link.textContent = title;
 
         mediaLine.appendChild(link);

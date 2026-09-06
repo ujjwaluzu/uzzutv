@@ -12,6 +12,12 @@ function _azWlHtmlEscape(text) {
         .replace(/>/g, "&gt;");
 }
 
+function _azWlSlugify(text, fallback, year) {
+    var base = year ? String(text || "") + "-" + String(year) : String(text || "");
+    var slug = base.normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+    return slug || String(fallback || "");
+}
+
 async function addAniuzuWatchlist(anilistId, title, poster) {
     try {
         var user = await getCurrentUser();
@@ -212,8 +218,23 @@ async function loadAniuzuWatchlist(containerId) {
             return;
         }
 
+        try {
+            var metadataResponse = await fetch("/aniuzu/continue-metadata/?ids=" + encodeURIComponent(data.map(function(item) { return item.media_id; }).join(",")), { credentials: "same-origin" });
+            if (metadataResponse.ok) {
+                var metadata = await metadataResponse.json();
+                var metadataById = {};
+                (metadata.items || []).forEach(function(item) { metadataById[Number(item.id)] = item; });
+                data.forEach(function(item) {
+                    var meta = metadataById[Number(item.media_id)];
+                    if (meta) item.year = meta.year || meta.seasonYear || "";
+                });
+            }
+        } catch (metadataError) {
+            // Existing watchlist rows still work with their title-only fallback.
+        }
+
         var cardsHtml = data.map(function(item) {
-            var link = "/aniuzu/anime/" + Number(item.media_id) + "/";
+            var link = "/aniuzu/anime/" + encodeURIComponent(_azWlSlugify(item.title, item.media_id, item.year)) + "/";
             return '<div class="az-card" style="position:relative;">'
                 + '<button onclick="removeAniuzuWatchlistItem(' + Number(item.media_id) + ')" style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.75);border:none;color:white;width:44px;height:44px;border-radius:50%;cursor:pointer;z-index:10;line-height:44px;text-align:center;" aria-label="Remove from watchlist">&#10005;</button>'
                 + '<a class="card-link" href="' + link + '">'

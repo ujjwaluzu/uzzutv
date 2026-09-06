@@ -1,5 +1,5 @@
 {% extends 'uzzutv/layout.html' %}
-{% load static %}
+{% load static media_tags %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'uzzutv/home.css' %}">
@@ -22,11 +22,11 @@
 
 {% block title %}Aniuzu - {{ title|default:romaji|default:"Anime" }}{% endblock %}
 {% block meta_description %}{{ description|striptags|truncatewords:40 }}{% endblock %}
-{% block canonical %}<link rel="canonical" href="{{ site_url }}/aniuzu/anime/{{ anilist_id }}/">{% endblock %}
+{% block canonical %}<link rel="canonical" href="{{ site_url }}/aniuzu/anime/{{ title_slug }}/">{% endblock %}
 {% block og_type %}video.other{% endblock %}
 {% block og_title %}Aniuzu - {{ title|default:romaji|default:"Anime" }}{% endblock %}
 {% block og_description %}{{ description|striptags|truncatewords:40 }}{% endblock %}
-{% block og_url %}{{ site_url }}/aniuzu/anime/{{ anilist_id }}/{% endblock %}
+{% block og_url %}{{ site_url }}/aniuzu/anime/{{ title_slug }}/{% endblock %}
 {% block og_image %}{% if anime.coverImage.large %}{{ anime.coverImage.large }}{% else %}{{ site_url }}/static/uzzutv/images/logo.png{% endif %}{% endblock %}
 
 {% block body %}
@@ -156,7 +156,7 @@
 <p class="az-hero-desc">{{ description|striptags|truncatewords:40 }}</p>
 {% endif %}
 <div class="az-actions">
-<a id="az-detail-watch" data-anilist-id="{{ anilist_id }}" href="{% url 'aniuzu_watch' anilist_id 1 %}" class="az-watch-btn"><span class="material-icons">play_arrow</span> <span class="az-detail-watch-label">Watch</span></a>
+<a id="az-detail-watch" data-anilist-id="{{ anilist_id }}" data-title-slug="{{ title_slug }}" href="{% url 'aniuzu_watch_slug' title_slug 1 %}" class="az-watch-btn"><span class="material-icons">play_arrow</span> <span class="az-detail-watch-label">Watch</span></a>
 <button class="az-watchlist-btn" data-id="{{ anilist_id }}" data-type="anime" data-title="{{ title|default:romaji }}" data-poster="{{ anime.coverImage.large }}">&#65291; Add to Watchlist</button>
 </div>
 </div>
@@ -263,7 +263,7 @@
 <div class="az-row" id="az-related-slider">
 {% for item in related|slice:":12" %}
 <div class="az-card">
-<a class="card-link" href="{% url 'aniuzu_detail' item.id %}">
+<a class="card-link" href="{% url 'aniuzu_detail_slug' item|media_slug %}">
 <div class="card-poster">
 <img loading="lazy" decoding="async" alt="{{ item.title }} poster" {% if item.cover %}src="{{ item.cover }}"{% else %}src="{% static 'uzzutv/images/logo.png' %}{% endif %}">
 <span class="card-gradient"></span>
@@ -292,7 +292,7 @@
 <div class="az-row" id="az-rec-slider">
 {% for item in recommendations|slice:":12" %}
 <div class="az-card">
-<a class="card-link" href="{% url 'aniuzu_detail' item.id %}">
+<a class="card-link" href="{% url 'aniuzu_detail_slug' item|media_slug %}">
 <div class="card-poster">
 <img loading="lazy" decoding="async" alt="{{ item.title }} poster" {% if item.cover %}src="{{ item.cover }}"{% else %}src="{% static 'uzzutv/images/logo.png' %}{% endif %}">
 <span class="card-gradient"></span>

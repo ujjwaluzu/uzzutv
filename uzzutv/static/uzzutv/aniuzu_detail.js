@@ -4,6 +4,7 @@
 
     var button = document.getElementById("az-detail-watch");
     if (!button || typeof getCurrentUser !== "function" || typeof supabaseClient === "undefined") return;
+    var titleSlug = button.dataset.titleSlug || button.dataset.anilistId;
 
     function applyResume(record) {
         if (!record) return;
@@ -13,7 +14,7 @@
         var variant = record.variant === "dub" ? "dub" : "sub";
         var position = Number(record.position);
         var resume = Number.isFinite(position) && position > 0 ? Math.floor(position) : 0;
-        var href = "/aniuzu/anime/" + encodeURIComponent(button.dataset.anilistId) + "/watch/" + episode +
+        var href = "/aniuzu/anime/" + encodeURIComponent(titleSlug) + "/watch/" + episode +
             "/?server=" + encodeURIComponent(server) + "&variant=" + encodeURIComponent(variant) +
             "&resume=1&resume_position=" + resume;
         button.href = href;

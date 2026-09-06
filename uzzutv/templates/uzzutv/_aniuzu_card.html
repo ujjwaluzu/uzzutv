@@ -1,6 +1,6 @@
-{% load static %}
+{% load static media_tags %}
 <div class="az-card">
-<a class="card-link" href="{% url 'aniuzu_detail' anime.id %}">
+<a class="card-link" href="{% url 'aniuzu_detail_slug' anime|media_slug %}">
 <div class="card-poster">
 <img loading="lazy" decoding="async" alt="{{ anime.title.english|default:anime.title.romaji }} poster" {% if anime.coverImage.large %}src="{{ anime.coverImage.large }}"{% else %}src="{% static 'uzzutv/images/logo.png' %}"{% endif %}>
 <span class="card-gradient"></span>

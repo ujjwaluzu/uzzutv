@@ -8,11 +8,11 @@
 
 {% block title %}UzzUTV - {{ title_full }}{% endblock %}
 {% block meta_description %}{{ meta_desc|truncatewords:40 }}{% endblock %}
-{% block canonical %}<link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}/{{ type }}/{{ data.id }}/">{% endblock %}
+{% block canonical %}<link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}/{{ type }}/{{ title_slug }}/">{% endblock %}
 {% block og_type %}{% if type == "movie" %}video.movie{% else %}video.tv_show{% endif %}{% endblock %}
 {% block og_title %}UzzUTV - {{ title_full }}{% endblock %}
 {% block og_description %}{{ meta_desc|truncatewords:40 }}{% endblock %}
-{% block og_url %}{{ request.scheme }}://{{ request.get_host }}/{{ type }}/{{ data.id }}/{% endblock %}
+{% block og_url %}{{ request.scheme }}://{{ request.get_host }}/{{ type }}/{{ title_slug }}/{% endblock %}
 {% block og_image %}{% if data.poster_path %}https://image.tmdb.org/t/p/w500{{ data.poster_path }}{% else %}{{ request.scheme }}://{{ request.get_host }}/static/uzzutv/images/logo.png{% endif %}{% endblock %}
 {% block head %}
 <script type="application/ld+json">
@@ -20,7 +20,7 @@
   "@context": "https://schema.org",
   "@type": "{% if type == 'movie' %}Movie{% else %}TVSeries{% endif %}",
   "name": "{% if type == 'movie' %}{{ data.title|escapejs }}{% else %}{{ data.name|escapejs }}{% endif %}",
-  "url": "{{ request.scheme }}://{{ request.get_host }}/{{ type }}/{{ data.id }}/"
+  "url": "{{ request.scheme }}://{{ request.get_host }}/{{ type }}/{{ title_slug }}/"
   {% if data.poster_path %},"image": "https://image.tmdb.org/t/p/w500{{ data.poster_path }}"{% endif %}
   {% if data.overview %},"description": "{{ data.overview|escapejs }}"{% endif %}
   {% if data.release_date %},"datePublished": "{{ data.release_date }}"{% elif data.first_air_date %},"datePublished": "{{ data.first_air_date }}"{% endif %}
@@ -885,12 +885,10 @@ src="https://image.tmdb.org/t/p/w1280{{ data.backdrop_path }}">
 <div class="hero-buttons">
 
 {% if type == "movie" %}
-<a href="{% url 'watchmov' data.id %}"
-onclick="saveContinue('{{data.id}}','movie','{{data.poster_path}}')"
+<a href="{% url 'watchmov_slug' title_slug %}"
 class="watch-btn"><span class="material-icons">play_arrow</span> Watch Now</a>
 {% else %}
-<a href="{% url 'watchtv' data.id %}"
-onclick="saveContinueTV('{{data.id}}','{{data.poster_path}}','1','1')"
+<a href="{% url 'watchtv_slug' title_slug %}"
 class="watch-btn"><span class="material-icons">play_arrow</span> Watch Now</a>
 {% endif %}
 

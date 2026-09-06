@@ -168,6 +168,8 @@ CSRF_COOKIE_SECURE=False
 
 Run [`sql/aniuzu_tables.sql`](sql/aniuzu_tables.sql) in the Supabase SQL editor. It creates the Aniuzu watchlist and `aniuzu_continue_watching` tables, indexes, constraints, and Row Level Security policies. Continue Watching uses one row per authenticated user/anime and updates that row with the latest episode, server, variant, and position. The SQL also migrates older per-episode data by retaining the most recently updated row for each user/anime. Policies allow each authenticated user to select, insert, update, and delete only their own rows.
 
+Run [`sql/continue_watching_progress.sql`](sql/continue_watching_progress.sql) once for the UzzUTV Continue Watching table. It adds the selected server, playback position, duration, progress percentage, title and release year used by the resume cards.
+
 Run [`sql/watch_parties.sql`](sql/watch_parties.sql) to create the Watch Party tables, indexes, and Row Level Security policies for synchronized playback rooms.
 
 ### Account deletion database setup (verify required)

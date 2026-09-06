@@ -1,5 +1,5 @@
 {% extends 'uzzutv/layout.html' %}
-{% load static %}
+{% load static media_tags %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'uzzutv/home.css' %}">
@@ -37,9 +37,9 @@
 <div class="movie-card">
 
 {% if item.media_type == "movie" %}
-<a class="card-link" href="{% url 'detail' 'movie' item.id %}">
+<a class="card-link" href="{% url 'detail_slug' 'movie' item|media_slug %}">
 {% else %}
-<a class="card-link" href="{% url 'detail' 'tv' item.id %}">
+<a class="card-link" href="{% url 'detail_slug' 'tv' item|media_slug %}">
 {% endif %}
 
 <div class="card-poster">

@@ -1,5 +1,5 @@
 {% extends 'uzzutv/layout.html' %}
-{% load static %}
+{% load static media_tags %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'uzzutv/home.css' %}">
@@ -63,7 +63,7 @@
 {% endif %}
 {% if item.description %}<p class="az-hero-desc">{{ item.description|striptags|truncatewords:30 }}</p>{% endif %}
 <div class="az-hero-buttons">
-<a href="{% url 'aniuzu_detail' item.id %}" class="watch-btn"><span class="material-icons">info</span> View Details</a>
+<a href="{% url 'aniuzu_detail_slug' item|media_slug %}" class="watch-btn"><span class="material-icons">info</span> View Details</a>
 </div>
 </div>
 </div>

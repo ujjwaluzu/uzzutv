@@ -35,10 +35,11 @@
         return output;
     }
 
-    function watchUrl(record) {
+    function watchUrl(record, meta) {
         var savedPosition = Number(record.position);
         var resumePosition = Number.isFinite(savedPosition) && savedPosition > 0 ? Math.floor(savedPosition) : 0;
-        return "/aniuzu/anime/" + Number(record.anilist_id) + "/watch/" + Number(record.episode_number) + "/?server=" + encodeURIComponent(record.server === "tryembed" ? "tryembed" : "anilink") + "&variant=" + encodeURIComponent(record.variant === "dub" ? "dub" : "sub") + "&resume=1&resume_position=" + resumePosition;
+        var slug = meta && meta.slug ? meta.slug : String(record.anilist_id);
+        return "/aniuzu/anime/" + encodeURIComponent(slug) + "/watch/" + Number(record.episode_number) + "/?server=" + encodeURIComponent(record.server === "tryembed" ? "tryembed" : "anilink") + "&variant=" + encodeURIComponent(record.variant === "dub" ? "dub" : "sub") + "&resume=1&resume_position=" + resumePosition;
     }
 
     function render(container, records, metadata) {
@@ -47,7 +48,7 @@
             if (!meta) return "";
             var season = meta.season && meta.seasonYear ? "Season " + String(meta.season).charAt(0) + String(meta.season).slice(1).toLowerCase() + " " + meta.seasonYear : "Season unavailable";
             var progress = percentage(record);
-            return '<div class="az-continue-card"><a class="az-continue-link" href="' + watchUrl(record) + '"><div class="az-continue-poster">' +
+            return '<div class="az-continue-card"><a class="az-continue-link" href="' + watchUrl(record, meta) + '"><div class="az-continue-poster">' +
                 '<img loading="lazy" decoding="async" src="' + escapeHtml(meta.poster) + '" alt="' + escapeHtml(meta.title) + ' poster">' +
                 '<span class="az-continue-progress"><i style="width:' + progress.toFixed(2) + '%"></i></span></div>' +
                 '<div class="az-continue-info"><h3>' + escapeHtml(meta.title) + '</h3><p>' + escapeHtml(season) + ' · Episode ' + Number(record.episode_number) + '</p><span>' + escapeHtml(formatRemaining(record)) + '</span></div></a>' +

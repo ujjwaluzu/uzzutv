@@ -1,4 +1,4 @@
-{% load static %}
+{% load static media_tags %}
 <!DOCTYPE html>
 <html lang="en"><head>
 <meta charset="UTF-8">
@@ -242,7 +242,7 @@ body { min-width: 0; }
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
                 
                 <!-- Movie Genre 1 -->
-                <a href="{% if genre_movies.action.id %}{% if genre_movies.action.media_type == 'tv' %}{% url 'watchtv' genre_movies.action.id %}{% else %}{% url 'watchmov' genre_movies.action.id %}{% endif %}{% else %}{% url 'category' 'action' %}{% endif %}" class="relative aspect-square w-full overflow-hidden group cursor-pointer bg-[#0a0a0a] block">
+                <a href="{% if genre_movies.action.id %}{% if genre_movies.action.media_type == 'tv' %}{% url 'watchtv_slug' genre_movies.action|media_slug %}{% else %}{% url 'watchmov_slug' genre_movies.action|media_slug %}{% endif %}{% else %}{% url 'category' 'action' %}{% endif %}" class="relative aspect-square w-full overflow-hidden group cursor-pointer bg-[#0a0a0a] block">
                     {% if genre_movies.action.poster_path %}
                     <img src="https://image.tmdb.org/t/p/w780{{ genre_movies.action.poster_path }}" alt="Action" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
                     {% else %}
@@ -259,7 +259,7 @@ body { min-width: 0; }
                 </a>
 
                 <!-- Movie Genre 2 -->
-                <a href="{% if genre_movies.comedy.id %}{% if genre_movies.comedy.media_type == 'tv' %}{% url 'watchtv' genre_movies.comedy.id %}{% else %}{% url 'watchmov' genre_movies.comedy.id %}{% endif %}{% else %}{% url 'category' 'comedy' %}{% endif %}" class="relative aspect-square w-full overflow-hidden group cursor-pointer bg-[#0a0a0a] block">
+                <a href="{% if genre_movies.comedy.id %}{% if genre_movies.comedy.media_type == 'tv' %}{% url 'watchtv_slug' genre_movies.comedy|media_slug %}{% else %}{% url 'watchmov_slug' genre_movies.comedy|media_slug %}{% endif %}{% else %}{% url 'category' 'comedy' %}{% endif %}" class="relative aspect-square w-full overflow-hidden group cursor-pointer bg-[#0a0a0a] block">
                     {% if genre_movies.comedy.poster_path %}
                     <img src="https://image.tmdb.org/t/p/w780{{ genre_movies.comedy.poster_path }}" alt="Comedy" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
                     {% else %}
@@ -276,7 +276,7 @@ body { min-width: 0; }
                 </a>
 
                 <!-- Movie Genre 3 -->
-                <a href="{% if genre_movies.thriller.id %}{% if genre_movies.thriller.media_type == 'tv' %}{% url 'watchtv' genre_movies.thriller.id %}{% else %}{% url 'watchmov' genre_movies.thriller.id %}{% endif %}{% else %}{% url 'category' 'thriller' %}{% endif %}" class="relative aspect-square w-full overflow-hidden group cursor-pointer bg-[#0a0a0a] block">
+                <a href="{% if genre_movies.thriller.id %}{% if genre_movies.thriller.media_type == 'tv' %}{% url 'watchtv_slug' genre_movies.thriller|media_slug %}{% else %}{% url 'watchmov_slug' genre_movies.thriller|media_slug %}{% endif %}{% else %}{% url 'category' 'thriller' %}{% endif %}" class="relative aspect-square w-full overflow-hidden group cursor-pointer bg-[#0a0a0a] block">
                     {% if genre_movies.thriller.poster_path %}
                     <img src="https://image.tmdb.org/t/p/w780{{ genre_movies.thriller.poster_path }}" alt="Thriller" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
                     {% else %}
@@ -293,7 +293,7 @@ body { min-width: 0; }
                 </a>
 
                 <!-- Movie Genre 4 -->
-                <a href="{% if genre_movies.scifi.id %}{% if genre_movies.scifi.media_type == 'tv' %}{% url 'watchtv' genre_movies.scifi.id %}{% else %}{% url 'watchmov' genre_movies.scifi.id %}{% endif %}{% else %}{% url 'category' 'scifi' %}{% endif %}" class="relative aspect-square w-full overflow-hidden group cursor-pointer bg-[#0a0a0a] block">
+                <a href="{% if genre_movies.scifi.id %}{% if genre_movies.scifi.media_type == 'tv' %}{% url 'watchtv_slug' genre_movies.scifi|media_slug %}{% else %}{% url 'watchmov_slug' genre_movies.scifi|media_slug %}{% endif %}{% else %}{% url 'category' 'scifi' %}{% endif %}" class="relative aspect-square w-full overflow-hidden group cursor-pointer bg-[#0a0a0a] block">
                     {% if genre_movies.scifi.poster_path %}
                     <img src="https://image.tmdb.org/t/p/w780{{ genre_movies.scifi.poster_path }}" alt="Sci-Fi" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
                     {% else %}

@@ -1,5 +1,5 @@
 {% extends 'uzzutv/layout.html' %}
-{% load static %}
+{% load static media_tags %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'uzzutv/home.css' %}">
@@ -177,17 +177,16 @@ src="https://image.tmdb.org/t/p/w1280{{ item.backdrop_path }}">
 <div class="hero-buttons">
 
 {% if item.media_type == "movie" %}
-<a href="{% url 'watchmov' item.id %}"
-onclick="saveContinue('{{item.id}}','movie','{{item.poster_path}}')"
+<a href="{% url 'watchmov_slug' item|media_slug %}"
 class="watch-btn"><span class="material-icons">play_arrow</span> Watch Now</a>
 {% else %}
-<a class="watch-btn" href="{% url 'watchtv' item.id %}"><span class="material-icons">play_arrow</span> Watch Now</a>
+<a class="watch-btn" href="{% url 'watchtv_slug' item|media_slug %}"><span class="material-icons">play_arrow</span> Watch Now</a>
 {% endif %}
 
 {% if item.media_type == "movie" %}
-<a class="info-btn" href="{% url 'detail' 'movie' item.id %}">More Info</a>
+<a class="info-btn" href="{% url 'detail_slug' 'movie' item|media_slug %}">More Info</a>
 {% else %}
-<a class="info-btn" href="{% url 'detail' 'tv' item.id %}">More Info</a>
+<a class="info-btn" href="{% url 'detail_slug' 'tv' item|media_slug %}">More Info</a>
 {% endif %}
 
 </div>
@@ -233,9 +232,9 @@ class="watch-btn"><span class="material-icons">play_arrow</span> Watch Now</a>
 <span class="rank">{{ forloop.counter }}</span>
 
 {% if item.media_type == "movie" %}
-<a href="{% url 'detail' 'movie' item.id %}">
+<a href="{% url 'detail_slug' 'movie' item|media_slug %}">
 {% else %}
-<a href="{% url 'detail' 'tv' item.id %}">
+<a href="{% url 'detail_slug' 'tv' item|media_slug %}">
 {% endif %}
 
 <img loading="lazy" decoding="async" alt="{% if item.title %}{{ item.title }}{% else %}{{ item.name }}{% endif %} poster" {% if item.poster_path %}src="https://image.tmdb.org/t/p/w342{{ item.poster_path }}"{% else %}src="{% static 'uzzutv/images/logo.png' %}"{% endif %}>
@@ -281,9 +280,9 @@ class="watch-btn"><span class="material-icons">play_arrow</span> Watch Now</a>
 <div class="movie-card">
 
 {% if item.media_type == "movie" %}
-<a class="card-link" href="{% url 'detail' 'movie' item.id %}">
+<a class="card-link" href="{% url 'detail_slug' 'movie' item|media_slug %}">
 {% else %}
-<a class="card-link" href="{% url 'detail' 'tv' item.id %}">
+<a class="card-link" href="{% url 'detail_slug' 'tv' item|media_slug %}">
 {% endif %}
 
 <div class="card-poster">
@@ -332,9 +331,9 @@ class="watch-btn"><span class="material-icons">play_arrow</span> Watch Now</a>
 <div class="movie-card">
 
 {% if item.media_type == "movie" %}
-<a class="card-link" href="{% url 'detail' 'movie' item.id %}">
+<a class="card-link" href="{% url 'detail_slug' 'movie' item|media_slug %}">
 {% else %}
-<a class="card-link" href="{% url 'detail' 'tv' item.id %}">
+<a class="card-link" href="{% url 'detail_slug' 'tv' item|media_slug %}">
 {% endif %}
 
 <div class="card-poster">
@@ -383,9 +382,9 @@ class="watch-btn"><span class="material-icons">play_arrow</span> Watch Now</a>
 <div class="movie-card">
 
 {% if item.media_type == "movie" %}
-<a class="card-link" href="{% url 'detail' 'movie' item.id %}">
+<a class="card-link" href="{% url 'detail_slug' 'movie' item|media_slug %}">
 {% else %}
-<a class="card-link" href="{% url 'detail' 'tv' item.id %}">
+<a class="card-link" href="{% url 'detail_slug' 'tv' item|media_slug %}">
 {% endif %}
 
 <div class="card-poster">
@@ -434,9 +433,9 @@ class="watch-btn"><span class="material-icons">play_arrow</span> Watch Now</a>
 <div class="movie-card">
 
 {% if item.media_type == "movie" %}
-<a class="card-link" href="{% url 'detail' 'movie' item.id %}">
+<a class="card-link" href="{% url 'detail_slug' 'movie' item|media_slug %}">
 {% else %}
-<a class="card-link" href="{% url 'detail' 'tv' item.id %}">
+<a class="card-link" href="{% url 'detail_slug' 'tv' item|media_slug %}">
 {% endif %}
 
 <div class="card-poster">

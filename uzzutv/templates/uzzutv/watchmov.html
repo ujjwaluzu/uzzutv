@@ -4,9 +4,9 @@
 {% block title %}UzzUTV - Watch {{ title }}{% endblock %}
 {% block meta_description %}Watch {{ title }} online on UzzUTV. Stream this movie now with multiple server options.{% endblock %}
 {% block robots %}noindex, follow{% endblock %}
-{% block canonical %}<link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}/movie/{{ tmdb_id }}/">{% endblock %}
+{% block canonical %}<link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}/movie/{{ title_slug }}/">{% endblock %}
 {% block og_type %}video.movie{% endblock %}
-{% block og_url %}{{ request.scheme }}://{{ request.get_host }}/movie/{{ tmdb_id }}/{% endblock %}
+{% block og_url %}{{ request.scheme }}://{{ request.get_host }}/movie/{{ title_slug }}/{% endblock %}
 {% block og_image %}{% if poster %}https://image.tmdb.org/t/p/w500{{ poster }}{% else %}{{ request.scheme }}://{{ request.get_host }}/static/uzzutv/images/logo.png{% endif %}{% endblock %}
 {% block head %}
 <script type="application/ld+json">
@@ -14,7 +14,7 @@
   "@context": "https://schema.org",
   "@type": "Movie",
   "name": "{{ title|escapejs }}",
-  "url": "{{ request.scheme }}://{{ request.get_host }}/movie/{{ tmdb_id }}/"
+  "url": "{{ request.scheme }}://{{ request.get_host }}/movie/{{ title_slug }}/"
   {% if poster %},"image": "https://image.tmdb.org/t/p/w500{{ poster }}"{% endif %}
 }
 </script>
@@ -253,28 +253,23 @@ allow="autoplay; encrypted-media">
 
 <div class="server-list">
 
-<button class="server-btn active"
-onclick="changeServer('{{url4}}', this)">
+<button class="server-btn active" data-server="vidfast" aria-pressed="true">
 Vidfast
 </button>
 
-<button class="server-btn"
-onclick="changeServer('{{url}}', this)">
+<button class="server-btn" data-server="vidking" aria-pressed="false">
 Vidking
 </button>
 
-<button class="server-btn"
-onclick="changeServer('{{url2}}', this)">
+<button class="server-btn" data-server="vidnest" aria-pressed="false">
 Vidnest
 </button>
 
-<button class="server-btn"
-onclick="changeServer('{{url3}}', this)">
+<button class="server-btn" data-server="vidsrc" aria-pressed="false">
 Vidsrc
 </button>
 
-<button class="server-btn"
-onclick="changeServer('{{url5}}', this)">
+<button class="server-btn" data-server="videasy" aria-pressed="false">
 Videasy
 </button>
 </div>
@@ -358,14 +353,15 @@ player.addEventListener("load", () => {
 
 vidfastWatchdog(player);
 
-saveContinue(
-"{{tmdb_id}}",
-"movie",
-"{{poster}}"
-);
-
 });
 
+</script>
+
+{{ playback_config|json_script:"uzzutv-playback-config" }}
+<script>
+window.addEventListener("DOMContentLoaded", function () {
+    initUzzPlayback(JSON.parse(document.getElementById("uzzutv-playback-config").textContent));
+});
 </script>
 
 {% endblock %}

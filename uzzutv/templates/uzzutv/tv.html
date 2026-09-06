@@ -1,5 +1,5 @@
 {% extends 'uzzutv/layout.html' %}
-{% load static %}
+{% load static media_tags %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'uzzutv/home.css' %}">
@@ -63,9 +63,9 @@ src="https://image.tmdb.org/t/p/w1280{{ tv.backdrop_path }}">
 
 <div class="hero-buttons">
 
-<a class="watch-btn" href="{% url 'watchtv' tv.id %}"><span class="material-icons">play_arrow</span> Watch Now</a>
+<a class="watch-btn" href="{% url 'watchtv_slug' tv|media_slug %}"><span class="material-icons">play_arrow</span> Watch Now</a>
 
-<a class="info-btn" href="{% url 'detail' 'tv' tv.id %}">More Info</a>
+<a class="info-btn" href="{% url 'detail_slug' 'tv' tv|media_slug %}">More Info</a>
 
 </div>
 
@@ -113,7 +113,7 @@ src="https://image.tmdb.org/t/p/w1280{{ tv.backdrop_path }}">
 
 <div class="movie-card">
 
-<a class="card-link" href="{% url 'detail' 'tv' popular.id %}">
+<a class="card-link" href="{% url 'detail_slug' 'tv' popular|media_slug %}">
 
 <div class="card-poster">
 <img loading="lazy" decoding="async" alt="{{ popular.name }} poster" {% if popular.poster_path %}src="https://image.tmdb.org/t/p/w342{{ popular.poster_path }}"{% else %}src="{% static 'uzzutv/images/logo.png' %}"{% endif %}>
@@ -163,7 +163,7 @@ src="https://image.tmdb.org/t/p/w1280{{ tv.backdrop_path }}">
 
 <div class="movie-card">
 
-<a class="card-link" href="{% url 'detail' 'tv' top.id %}">
+<a class="card-link" href="{% url 'detail_slug' 'tv' top|media_slug %}">
 
 <div class="card-poster">
 <img loading="lazy" decoding="async" alt="{{ top.name }} poster" {% if top.poster_path %}src="https://image.tmdb.org/t/p/w342{{ top.poster_path }}"{% else %}src="{% static 'uzzutv/images/logo.png' %}"{% endif %}>

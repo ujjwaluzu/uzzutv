@@ -4,6 +4,7 @@ from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.core.cache import cache
+from django.utils.text import slugify
 from concurrent.futures import ThreadPoolExecutor
 import copy
 import json
@@ -147,7 +148,7 @@ def media_info(request, type, id):
     if type not in ("movie", "tv"):
         return HttpResponse("Invalid type", status=400)
 
-    cache_key = f"media_info_v2_{type}_{id}"
+    cache_key = f"media_info_v3_{type}_{id}"
     info = cache.get(cache_key)
 
     if info:
@@ -173,6 +174,7 @@ def media_info(request, type, id):
         "id": data.get("id"),
         "type": type,
         "title": data.get("title") or data.get("name", ""),
+        "year": str(data.get("release_date") or data.get("first_air_date") or "")[:4],
         "poster_path": data.get("poster_path", ""),
         "imdb_id": ""
     }
@@ -253,7 +255,7 @@ def index(request):
 
 def load_index_genre_movies():
 
-    cache_key = "index_genre_movies_v3"
+    cache_key = "index_genre_movies_v4"
     data = cache.get(cache_key)
 
     if data:
@@ -338,7 +340,9 @@ def load_index_genre_movies():
 
             entry = {
                 "poster_path": pick["poster_path"] if pick else None,
-                "stack_poster_path": pick2["poster_path"] if pick2 else None
+                "stack_poster_path": pick2["poster_path"] if pick2 else None,
+                "title": (pick.get("title") or pick.get("name") or "") if pick else "",
+                "year": ((pick.get("release_date") or pick.get("first_air_date") or "")[:4]) if pick else "",
             }
 
             if name in tv_genres_for_cards:
@@ -501,6 +505,114 @@ def get_anime_logo(anime):
 
     cache.set(cache_key, logo_url or "", 21600)
     return logo_url
+
+
+def _media_slug(title, year="", fallback=""):
+    base = f"{title}-{year}" if title and year else title
+    return slugify(base) or str(fallback)
+
+
+def _tmdb_item_slug(item, fallback=""):
+    title = (item or {}).get("title") or (item or {}).get("name") or ""
+    date = (item or {}).get("release_date") or (item or {}).get("first_air_date") or ""
+    return _media_slug(title, str(date)[:4], fallback)
+
+
+def _anilist_item_slug(item, fallback=""):
+    item = item or {}
+    titles = item.get("title") or {}
+    title = titles.get("english") or titles.get("romaji") or titles.get("native") or ""
+    year = item.get("seasonYear") or (item.get("startDate") or {}).get("year") or ""
+    return _media_slug(title, year, fallback)
+
+
+def _resolve_tmdb_id_from_slug(media_type, title_slug):
+    """Resolve a readable movie/series URL back to its TMDB id."""
+    if media_type not in ("movie", "tv") or not title_slug:
+        return None
+
+    cache_key = f"tmdb_slug_{media_type}_{title_slug}"
+    cached = cache.get(cache_key)
+    if cached is not None:
+        return cached or None
+
+    query_slug = re.sub(r"-\d{4}$", "", title_slug)
+    query = query_slug.replace("-", " ")
+    try:
+        response = requests.get(
+            f"{BASE_URL}/search/{media_type}",
+            params={"api_key": API_KEY, "query": query, "include_adult": "false"},
+            timeout=10,
+        )
+        results = response.json().get("results", []) if response.status_code == 200 else []
+    except (requests.RequestException, ValueError):
+        results = []
+
+    exact = next((item for item in results if _tmdb_item_slug(item) == title_slug), None)
+    if exact is None:
+        exact = next(
+            (
+                item for item in results
+                if slugify(item.get("title") or item.get("name") or "") == title_slug
+            ),
+            None,
+        )
+    match = exact or (results[0] if results else None)
+    media_id = match.get("id") if match else None
+    cache.set(cache_key, media_id or 0, 21600)
+    return media_id
+
+
+def _resolve_anilist_id_from_slug(title_slug):
+    """Resolve an AniList anime title slug without removing numeric URLs."""
+    if not title_slug:
+        return None
+
+    cache_key = f"anilist_slug_{title_slug}"
+    cached = cache.get(cache_key)
+    if cached is not None:
+        return cached or None
+
+    query_slug = re.sub(r"-\d{4}$", "", title_slug)
+    query = query_slug.replace("-", " ")
+    result = anilist_search(query, page=1)
+    items = result.get("items", []) if result else []
+    match = None
+    for item in items:
+        if _anilist_item_slug(item) == title_slug:
+            match = item
+            break
+    if match is None:
+        for item in items:
+            titles = item.get("title") or {}
+            if any(slugify(titles.get(key) or "") == title_slug for key in ("english", "romaji", "native")):
+                match = item
+                break
+    match = match or (items[0] if items else None)
+    anime_id = match.get("id") if match else None
+    cache.set(cache_key, anime_id or 0, 21600)
+    return anime_id
+
+
+def detail_slug(request, type, title_slug):
+    media_id = _resolve_tmdb_id_from_slug(type, title_slug)
+    if not media_id:
+        raise Http404(f"{type} title not found")
+    return detail(request, type, media_id)
+
+
+def watchmov_slug(request, title_slug):
+    movie_id = _resolve_tmdb_id_from_slug("movie", title_slug)
+    if not movie_id:
+        raise Http404("Movie title not found")
+    return watchmov(request, movie_id)
+
+
+def watchtv_slug(request, title_slug):
+    tv_id = _resolve_tmdb_id_from_slug("tv", title_slug)
+    if not tv_id:
+        raise Http404("Series title not found")
+    return watchtv(request, tv_id)
 
 
 # ----------------------------
@@ -777,8 +889,10 @@ def watchtv(request, tv_id):
     url3 = f"https://vidsrcme.ru/embed/tv?imdb={imdb}&season={season}&episode={episode}&ds_lang=en&autoplay=1"
     url = f"https://www.vidking.net/embed/tv/{tv_id}/{season}/{episode}?color=e50914&autoPlay=true&nextEpisode=false&episodeSelector=false"
 
+    tv_year = str(tv.get("first_air_date") or "")[:4]
     return render(request, "uzzutv/watchtv.html", {
         "id": tv_id,
+        "title_slug": _tmdb_item_slug(tv, tv_id),
         "poster": poster,
         "url":url,
         "url2":url2,
@@ -787,10 +901,27 @@ def watchtv(request, tv_id):
         "url5":url5,
         "imdb": imdb,
         "title": tv.get("name", ""),
+        "year": tv_year,
         "seasons": seasons,
         "episodes": episodes,
         "current_season": season,
-        "current_episode": episode
+        "current_episode": episode,
+        "playback_config": {
+            "id": tv_id,
+            "type": "tv",
+            "title": tv.get("name", ""),
+            "year": tv_year,
+            "poster": poster or "",
+            "season": season,
+            "episode": episode,
+            "urls": {
+                "vidfast": url4,
+                "vidking": url,
+                "vidnest": url2,
+                "vidsrc": url3,
+                "videasy": url5,
+            },
+        },
     })
 
 
@@ -832,12 +963,14 @@ def watchmov(request, movie_id):
     # -----------------------------
 
     title_cache_key = f"movie_title_{movie_id}"
+    year_cache_key = f"movie_year_{movie_id}"
     title = cache.get(title_cache_key)
+    year = cache.get(year_cache_key)
 
     poster_cache_key = f"movie_poster_{movie_id}"
     poster = cache.get(poster_cache_key)
 
-    if not title:
+    if not title or year is None:
 
         try:
             movie_data = requests.get(
@@ -849,12 +982,14 @@ def watchmov(request, movie_id):
             return HttpResponse("Movie data unavailable", status=502)
 
         title = movie_data.get("title", "")
+        year = str(movie_data.get("release_date") or "")[:4]
 
         if not poster:
             poster = movie_data.get("poster_path", "")
 
         if title:
             cache.set(title_cache_key, title, 86400)
+        cache.set(year_cache_key, year, 86400)
 
         if poster:
             cache.set(poster_cache_key, poster, 86400)
@@ -867,6 +1002,7 @@ def watchmov(request, movie_id):
     url3 = f"https://vidsrcme.ru/embed/movie?imdb={imdb}&ds_lang=en&autoplay=1"
     url4 = f"https://vidfast.pro/movie/{imdb}?autoPlay=true&sub=en&mute=false"
     url5 = f"https://player.videasy.net/movie/{movie_id}?color=8B5CF6&autoPlay=true"
+    year = year or ""
     return render(request, "uzzutv/watchmov.html", {
         "url": url,
         "url2": url2,
@@ -875,8 +1011,24 @@ def watchmov(request, movie_id):
         "url5": url5,
         "id":imdb,
         "tmdb_id": movie_id,
+        "title_slug": _media_slug(title, year, movie_id),
         "poster": poster,
-        "title":title
+        "title": title,
+        "year": year,
+        "playback_config": {
+            "id": movie_id,
+            "type": "movie",
+            "title": title,
+            "year": year,
+            "poster": poster or "",
+            "urls": {
+                "vidfast": url4,
+                "vidking": url,
+                "vidnest": url2,
+                "vidsrc": url3,
+                "videasy": url5,
+            },
+        },
     })
 
 
@@ -1227,7 +1379,7 @@ def category(request, slug):
 
 def detail(request, type, id):
 
-    cache_key = f"detail_v2_{type}_{id}"
+    cache_key = f"detail_v3_{type}_{id}"
     context = cache.get(cache_key)
 
     if not context:
@@ -1270,6 +1422,7 @@ def detail(request, type, id):
             "data": data,
             "type": type,
             "title_full": title_full,
+            "title_slug": _media_slug(title, year, id),
             "meta_desc": meta_desc,
             "logo": logo,
             "genres": [g.get("name", "") for g in genres],
@@ -1336,7 +1489,7 @@ def sitemap_xml(request):
 
     site_url = request.build_absolute_uri('/').rstrip('/')
 
-    cache_key = "sitemap_urls_v3"
+    cache_key = "sitemap_urls_v5"
     urls = cache.get(cache_key)
 
     if urls is None:
@@ -1351,12 +1504,9 @@ def sitemap_xml(request):
             {"loc": f"{site_url}/dmca/", "priority": "0.3"},
             {"loc": f"{site_url}/faq/", "priority": "0.4"},
             {"loc": f"{site_url}/aniuzu/", "priority": "0.9"},
-            {"loc": f"{site_url}/aniuzu/top/", "priority": "0.8"},
             {"loc": f"{site_url}/aniuzu/seasons/", "priority": "0.8"},
             {"loc": f"{site_url}/aniuzu/studios/", "priority": "0.7"},
-            {"loc": f"{site_url}/aniuzu/upcoming/", "priority": "0.7"},
             {"loc": f"{site_url}/aniuzu/collections/", "priority": "0.7"},
-            {"loc": f"{site_url}/aniuzu/schedule/", "priority": "0.6"},
             {"loc": f"{site_url}/aniuzu/search/", "priority": "0.5"},
         ]
 
@@ -1381,8 +1531,10 @@ def sitemap_xml(request):
                     if key in seen:
                         continue
                     seen.add(key)
+                    title = item.get("title") or item.get("name") or ""
+                    title_slug = _tmdb_item_slug(item, item_id)
                     urls.append({
-                        "loc": f"{site_url}/{media_type}/{item_id}/",
+                        "loc": f"{site_url}/{media_type}/{title_slug}/",
                         "priority": "0.8",
                     })
         except Exception:
@@ -1398,8 +1550,11 @@ def sitemap_xml(request):
                     if not item_id or item_id in seen:
                         continue
                     seen.add(item_id)
+                    title_data = item.get("title") or {}
+                    title = title_data.get("english") or title_data.get("romaji") or ""
+                    title_slug = _anilist_item_slug(item, item_id)
                     urls.append({
-                        "loc": f"{site_url}/aniuzu/anime/{item_id}/",
+                        "loc": f"{site_url}/aniuzu/anime/{title_slug}/",
                         "priority": "0.8",
                     })
         except Exception:
@@ -1568,6 +1723,7 @@ query ($id: Int) {
             id
             title { romaji english }
             coverImage { large }
+            seasonYear
             format
             episodes
             status
@@ -1582,6 +1738,7 @@ query ($id: Int) {
           id
           title { romaji english }
           coverImage { large }
+          seasonYear
           bannerImage
           format
           episodes
@@ -1997,6 +2154,7 @@ def anilist_anime_detail(anilist_id):
                 related_anime.append({
                     "id": node["id"],
                     "title": node.get("title", {}).get("english") or node.get("title", {}).get("romaji", ""),
+                    "year": (node.get("startDate") or {}).get("year") or node.get("seasonYear") or "",
                     "cover": (node.get("coverImage") or {}).get("large", ""),
                     "format": node.get("format", ""),
                     "episodes": node.get("episodes"),
@@ -2013,6 +2171,7 @@ def anilist_anime_detail(anilist_id):
             recommendations.append({
                 "id": rm["id"],
                 "title": rm.get("title", {}).get("english") or rm.get("title", {}).get("romaji", ""),
+                "year": (rm.get("startDate") or {}).get("year") or rm.get("seasonYear") or "",
                 "cover": (rm.get("coverImage") or {}).get("large", ""),
                 "banner": rm.get("bannerImage", ""),
                 "format": rm.get("format", ""),
@@ -2250,13 +2409,14 @@ def aniuzu_detail(request, anilist_id):
     if ctx is None:
         return render(request, "uzzutv/aniuzu_404.html", status=404)
 
-    ctx["logo"] = get_anime_logo(ctx.get("anime") or {})
+    anime = ctx.get("anime") or {}
+    ctx["logo"] = get_anime_logo(anime)
     ctx["anilist_id"] = anilist_id
+    ctx["title_slug"] = _anilist_item_slug(anime, anilist_id)
     ctx["meta_desc"] = sanitize_anilist_description(ctx["meta_desc"])
     ctx["description"] = sanitize_anilist_description(ctx["description"])
 
     site_url = request.build_absolute_uri("/").rstrip("/")
-    anime = ctx.get("anime") or {}
     start_date = ""
     sy = (anime.get("startDate") or {}).get("year")
     sm = (anime.get("startDate") or {}).get("month")
@@ -2275,7 +2435,7 @@ def aniuzu_detail(request, anilist_id):
         "alternateName": ctx.get("romaji", ""),
         "description": (ctx.get("description") or "")[:300],
         "image": (anime.get("coverImage") or {}).get("extraLarge") or (anime.get("coverImage") or {}).get("large", ""),
-        "url": f"{site_url}/aniuzu/anime/{anilist_id}/",
+        "url": f"{site_url}/aniuzu/anime/{ctx['title_slug']}/",
         "genre": ctx.get("genres", []),
         "numberOfEpisodes": anime.get("episodes"),
         "duration": anime.get("duration"),
@@ -2298,6 +2458,13 @@ def aniuzu_detail(request, anilist_id):
     ctx["site_url"] = site_url
 
     return render(request, "uzzutv/aniuzu_detail.html", ctx)
+
+
+def aniuzu_detail_slug(request, title_slug):
+    anilist_id = _resolve_anilist_id_from_slug(title_slug)
+    if not anilist_id:
+        raise Http404("Anime title not found")
+    return aniuzu_detail(request, anilist_id)
 
 
 def _aniuzu_playable_episodes(media):
@@ -2338,6 +2505,7 @@ def aniuzu_watch(request, anilist_id, episode):
     title = ctx.get("title") or ctx.get("romaji") or "Anime"
     watch_config = {
         "anilistId": anilist_id,
+        "titleSlug": _anilist_item_slug(anime, anilist_id),
         "episodeNumber": episode,
         "episodes": playable_episodes,
         "title": title,
@@ -2349,10 +2517,18 @@ def aniuzu_watch(request, anilist_id, episode):
         "anime": anime,
         "title": title,
         "anilist_id": anilist_id,
+        "title_slug": _anilist_item_slug(anime, anilist_id),
         "episode": episode,
         "related": ctx.get("related", []),
         "watch_config": watch_config,
     })
+
+
+def aniuzu_watch_slug(request, title_slug, episode):
+    anilist_id = _resolve_anilist_id_from_slug(title_slug)
+    if not anilist_id:
+        raise Http404("Anime title not found")
+    return aniuzu_watch(request, anilist_id, episode)
 
 
 def aniuzu_continue_metadata(request):
@@ -2366,15 +2542,18 @@ def aniuzu_continue_metadata(request):
     if not ids:
         return JsonResponse({"items": []})
 
-    cache_key = "aniuzu_continue_metadata_" + "_".join(map(str, sorted(ids)))
+    cache_key = "aniuzu_continue_metadata_v2_" + "_".join(map(str, sorted(ids)))
     items = cache.get(cache_key)
     if items is None:
         data = anilist_query(ANIME_CONTINUE_METADATA_QUERY, {"ids": ids})
         items = []
         for media in (data or {}).get("Page", {}).get("media", []):
+            title = (media.get("title") or {}).get("english") or (media.get("title") or {}).get("romaji") or "Anime"
             items.append({
                 "id": media.get("id"),
-                "title": (media.get("title") or {}).get("english") or (media.get("title") or {}).get("romaji") or "Anime",
+                "title": title,
+                "slug": _anilist_item_slug(media, media.get("id") or ""),
+                "year": media.get("seasonYear") or (media.get("startDate") or {}).get("year") or "",
                 "poster": (media.get("coverImage") or {}).get("extraLarge") or (media.get("coverImage") or {}).get("large") or "",
                 "season": media.get("season") or "",
                 "seasonYear": media.get("seasonYear") or "",

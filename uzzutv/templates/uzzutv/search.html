@@ -1,5 +1,5 @@
 {% extends 'uzzutv/layout.html' %}
-{% load static %}
+{% load static media_tags %}
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'uzzutv/home.css' %}">
@@ -51,7 +51,7 @@ No results found 😢
 {% if top.poster_path %}
 
 <div class="movie-card">
-<a class="card-link" href="{% url 'detail' 'movie' top.id %}">
+<a class="card-link" href="{% url 'detail_slug' 'movie' top|media_slug %}">
 <div class="card-poster">
 <img loading="lazy" decoding="async" alt="{{ top.title }} poster" src="https://image.tmdb.org/t/p/w342{{ top.poster_path }}">
 <span class="card-gradient"></span>
@@ -96,7 +96,7 @@ No results found 😢
 {% if top.poster_path %}
 
 <div class="movie-card">
-<a class="card-link" href="{% url 'detail' 'tv' top.id %}">
+<a class="card-link" href="{% url 'detail_slug' 'tv' top|media_slug %}">
 <div class="card-poster">
 <img loading="lazy" decoding="async" alt="{{ top.name }} poster" src="https://image.tmdb.org/t/p/w342{{ top.poster_path }}">
 <span class="card-gradient"></span>

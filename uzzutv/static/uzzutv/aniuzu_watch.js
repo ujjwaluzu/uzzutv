@@ -26,6 +26,7 @@
     var variant = query.get("variant") === "dub" ? "dub" : "sub";
     var state = {
         anilistId: Number(config.anilistId),
+        titleSlug: config.titleSlug || String(config.anilistId),
         episodeNumber: Number(config.episodeNumber),
         server: server,
         variant: variant,
@@ -47,7 +48,7 @@
     var lastSaveAt = 0;
     var playerTimer = null;
     var preWatchUrl = (function () {
-        var fallback = "/aniuzu/anime/" + state.anilistId + "/";
+        var fallback = "/aniuzu/anime/" + encodeURIComponent(state.titleSlug) + "/";
         var referrer = document.referrer || "";
         return referrer && referrer.indexOf(window.location.host) !== -1 ? referrer : fallback;
     }());
@@ -106,7 +107,7 @@
     }
 
     function updateAddress(replace) {
-        var url = "/aniuzu/anime/" + state.anilistId + "/watch/" + state.episodeNumber + "/?server=" + encodeURIComponent(state.server) + "&variant=" + encodeURIComponent(state.variant);
+        var url = "/aniuzu/anime/" + encodeURIComponent(state.titleSlug) + "/watch/" + state.episodeNumber + "/?server=" + encodeURIComponent(state.server) + "&variant=" + encodeURIComponent(state.variant);
         // Keep the watch-page marker and the preserved pre-watch page on every
         // entry this script writes, so a refresh can recognise the watch entry
         // and Back can always leave the watch experience in one step.
