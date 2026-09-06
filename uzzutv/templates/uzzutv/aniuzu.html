@@ -78,6 +78,16 @@
 
 <section id="az-continue-watching" class="az-continue-watching" aria-live="polite"></section>
 
+{% if catalog_unavailable %}
+<section class="az-content-section" aria-live="polite">
+  <div class="az-empty-state">
+    <span class="material-icons" aria-hidden="true">cloud_off</span>
+    <h2>Anime catalogue temporarily unavailable</h2>
+    <p>Aniuzu could not reach its anime data provider. Please refresh in a moment. Your account and watch history are not affected.</p>
+  </div>
+</section>
+{% endif %}
+
 {% if trending %}
 <div class="az-content-section">
 <div class="az-slider-header">

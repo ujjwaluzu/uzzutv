@@ -1658,15 +1658,27 @@ def anilist_query(query, variables=None, retries=2):
             resp = session.post(
                 ANILIST_URL,
                 json={"query": query, "variables": variables or {}},
+                headers={
+                    "Accept": "application/json",
+                    "Content-Type": "application/json",
+                    "User-Agent": "UzzUTV/1.0",
+                },
                 timeout=15,
             )
             if resp.status_code == 429:
+                logger.warning("AniList rate limit on attempt %s", attempt + 1)
                 time.sleep(1 * (attempt + 1))
                 continue
             if resp.status_code != 200:
+                logger.warning("AniList returned HTTP %s: %s", resp.status_code, resp.text[:300])
                 return None
-            return resp.json().get("data")
-        except requests.RequestException:
+            payload = resp.json()
+            if payload.get("errors"):
+                logger.warning("AniList GraphQL errors: %s", payload["errors"][:2])
+                return None
+            return payload.get("data")
+        except (requests.RequestException, ValueError) as exc:
+            logger.warning("AniList request failed on attempt %s: %s", attempt + 1, exc)
             if attempt < retries:
                 time.sleep(0.5)
             continue
@@ -1985,36 +1997,36 @@ ANIZU_STUDIOS = [
 # DATA FETCHERS
 # ----------------------------------------------------------------
 
-def anilist_trending():
-    cache_key = "anilist_trending"
-    data = cache.get(cache_key)
-    if data:
-        return data
+def _anilist_list(cache_key, query, variables):
+    """Fetch a list while retaining the last successful response as a fallback."""
+    cached = cache.get(cache_key)
+    if cached:
+        return cached
 
-    data = anilist_query(ANIME_PAGE_QUERY, {
+    data = anilist_query(query, variables)
+    items = (data or {}).get("Page", {}).get("media", []) if data else None
+    if items:
+        cache.set(cache_key, items, 21600)
+        cache.set(f"{cache_key}_stale", items, 604800)
+        return items
+
+    stale = cache.get(f"{cache_key}_stale")
+    return stale or []
+
+def anilist_trending():
+    return _anilist_list("anilist_trending", ANIME_PAGE_QUERY, {
         "page": 1, "perPage": 15,
         "sort": ["TRENDING_DESC", "POPULARITY_DESC"],
         "type": "ANIME",
     })
-    items = (data or {}).get("Page", {}).get("media", [])
-    cache.set(cache_key, items, 21600)
-    return items
 
 
 def anilist_popular():
-    cache_key = "anilist_popular"
-    data = cache.get(cache_key)
-    if data:
-        return data
-
-    data = anilist_query(ANIME_PAGE_QUERY, {
+    return _anilist_list("anilist_popular", ANIME_PAGE_QUERY, {
         "page": 1, "perPage": 15,
         "sort": ["POPULARITY_DESC"],
         "type": "ANIME",
     })
-    items = (data or {}).get("Page", {}).get("media", [])
-    cache.set(cache_key, items, 21600)
-    return items
 
 
 def anilist_current_season():
@@ -2022,70 +2034,39 @@ def anilist_current_season():
     season = _season_to_upper(_current_season()[0])
 
     cache_key = f"anilist_season_{season}_{year}"
-    data = cache.get(cache_key)
-    if data:
-        return data
-
-    data = anilist_query(ANIME_PAGE_QUERY, {
+    return _anilist_list(cache_key, ANIME_PAGE_QUERY, {
         "page": 1, "perPage": 15,
         "sort": ["POPULARITY_DESC"],
         "season": season,
         "seasonYear": year,
         "type": "ANIME",
     })
-    items = (data or {}).get("Page", {}).get("media", [])
-    cache.set(cache_key, items, 21600)
-    return items
 
 
 def anilist_airing():
-    cache_key = "anilist_airing"
-    data = cache.get(cache_key)
-    if data:
-        return data
-
-    data = anilist_query(ANIME_PAGE_QUERY, {
+    return _anilist_list("anilist_airing", ANIME_PAGE_QUERY, {
         "page": 1, "perPage": 15,
         "sort": ["POPULARITY_DESC"],
         "status": "RELEASING",
         "type": "ANIME",
     })
-    items = (data or {}).get("Page", {}).get("media", [])
-    cache.set(cache_key, items, 21600)
-    return items
 
 
 def anilist_top_rated():
-    cache_key = "anilist_top_rated"
-    data = cache.get(cache_key)
-    if data:
-        return data
-
-    data = anilist_query(ANIME_PAGE_QUERY, {
+    return _anilist_list("anilist_top_rated", ANIME_PAGE_QUERY, {
         "page": 1, "perPage": 15,
         "sort": ["SCORE_DESC"],
         "type": "ANIME",
     })
-    items = (data or {}).get("Page", {}).get("media", [])
-    cache.set(cache_key, items, 21600)
-    return items
 
 
 def anilist_upcoming():
-    cache_key = "anilist_upcoming"
-    data = cache.get(cache_key)
-    if data:
-        return data
-
-    data = anilist_query(ANIME_PAGE_QUERY, {
+    return _anilist_list("anilist_upcoming", ANIME_PAGE_QUERY, {
         "page": 1, "perPage": 15,
         "sort": ["POPULARITY_DESC"],
         "status": "NOT_YET_RELEASED",
         "type": "ANIME",
     })
-    items = (data or {}).get("Page", {}).get("media", [])
-    cache.set(cache_key, items, 21600)
-    return items
 
 
 def anilist_studio(studio_name, page=1):
@@ -2411,6 +2392,7 @@ def aniuzu(request):
         "airing": airing,
         "seasonal": seasonal,
         "top_rated": top_rated,
+        "catalog_unavailable": not any((trending, popular, airing, seasonal, top_rated)),
         "current_season": season,
         "current_season_label": season_label,
         "current_year": year,

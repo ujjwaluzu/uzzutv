@@ -48,6 +48,9 @@
 /* 404 page */
 .az-404{max-width:600px;margin:0 auto;padding:80px 16px;text-align:center}.az-404-emoji{font-size:72px;color:#ff3c3c;margin-bottom:20px}.az-404-heading{font-family:'Anton',sans-serif;font-size:2rem;color:#fff;margin-bottom:12px;letter-spacing:.5px;text-transform:uppercase}.az-404-desc{color:#9ca3af;font-size:15px;margin:0 0 32px;line-height:1.6}.az-404-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:12px}
 
+/* AniList/API unavailable state */
+.az-empty-state{max-width:680px;margin:30px auto;padding:42px 24px;text-align:center;background:linear-gradient(145deg,#151515,#101010);border:1px solid rgba(255,255,255,.1);border-radius:16px}.az-empty-state .material-icons{font-size:42px;color:#ff4d5a;margin-bottom:12px}.az-empty-state h2{margin:0 0 10px;color:#fff;font-family:'Anton',sans-serif;letter-spacing:.4px}.az-empty-state p{margin:0;color:#9ca3af;line-height:1.6;font-size:14px}
+
 /* Collection detail header */
 .az-collection-header{text-align:center;margin-bottom:32px}.az-back-link{display:inline-flex;align-items:center;gap:6px;color:#9ca3af;font-size:13px;text-decoration:none;margin-bottom:12px;transition:color .2s}.az-back-link:hover{color:#ff3c3c}
 
