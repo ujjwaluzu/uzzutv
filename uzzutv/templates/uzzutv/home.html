@@ -97,6 +97,20 @@ pointer-events:none;
   color:#bcefd1;
 }
 
+.catalog-unavailable-banner{
+  max-width:900px;
+  margin:32px auto;
+  padding:28px 24px;
+  text-align:center;
+  color:#d1d5db;
+  background:linear-gradient(145deg,#171717,#101010);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:16px;
+}
+.catalog-unavailable-banner .material-icons{display:block;color:#ff5c5c;font-size:38px;margin-bottom:10px}
+.catalog-unavailable-banner h2{margin:0 0 8px;color:#fff;font-size:22px}
+.catalog-unavailable-banner p{margin:0;color:#9ca3af;font-size:14px;line-height:1.6}
+
 </style>
 {% endblock %}
 
@@ -142,6 +156,14 @@ pointer-events:none;
     </div>
   </div>
 </div>
+
+{% if catalog_unavailable %}
+<div class="catalog-unavailable-banner" role="status" aria-live="polite">
+  <span class="material-icons" aria-hidden="true">cloud_off</span>
+  <h2>UzzUTV catalogue temporarily unavailable</h2>
+  <p>Movie and series data could not be loaded from TMDB. Please check your API configuration or refresh in a moment.</p>
+</div>
+{% endif %}
 
 <div class="hero-wrapper">
 

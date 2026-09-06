@@ -198,10 +198,13 @@ def media_info(request, type, id):
 
 def load_homepage_data():
 
-    cache_key = "homepage_data"
+    cache_key = "homepage_data_v2"
     data = cache.get(cache_key)
 
-    if data:
+    if data and any(data.get(key) for key in (
+        "trending_movies", "popular_movies", "top_movies",
+        "trending_tv", "popular_tv", "toprated_tv",
+    )):
         return data
 
     params = {"api_key": API_KEY}
@@ -210,8 +213,12 @@ def load_homepage_data():
         try:
             p = {**params, **(extra_params or {})}
             resp = requests.get(f"{BASE_URL}/{endpoint}", params=p, timeout=10)
+            if resp.status_code != 200:
+                logger.warning("TMDB returned HTTP %s for %s: %s", resp.status_code, endpoint, resp.text[:300])
+                return []
             return resp.json().get("results", [])
         except (requests.RequestException, ValueError):
+            logger.exception("TMDB request failed for %s", endpoint)
             return []
 
     trending_movies = _tmdb_get("trending/movie/day")
@@ -237,7 +244,8 @@ def load_homepage_data():
         "toprated_tv": toprated_tv
     }
 
-    cache.set(cache_key, data, 21600)  # 6 hours
+    if any(data.values()):
+        cache.set(cache_key, data, 21600)  # 6 hours
 
     return data
 
@@ -255,7 +263,7 @@ def index(request):
 
 def load_index_genre_movies():
 
-    cache_key = "index_genre_movies_v4"
+    cache_key = "index_genre_movies_v5"
     data = cache.get(cache_key)
 
     if data:
@@ -364,7 +372,8 @@ def load_index_genre_movies():
 
             data[name] = entry
 
-    cache.set(cache_key, data, 21600)  # 6 hours
+    if any(entry.get("poster_path") for entry in data.values() if isinstance(entry, dict)):
+        cache.set(cache_key, data, 21600)  # 6 hours
 
     return data
 
@@ -563,6 +572,10 @@ def _resolve_tmdb_id_from_slug(media_type, title_slug):
     return media_id
 
 
+class AniListUnavailable(Exception):
+    """Raised when AniList cannot resolve a readable anime URL."""
+
+
 def _resolve_anilist_id_from_slug(title_slug):
     """Resolve an AniList anime title slug without removing numeric URLs."""
     if not title_slug:
@@ -576,6 +589,8 @@ def _resolve_anilist_id_from_slug(title_slug):
     query_slug = re.sub(r"-\d{4}$", "", title_slug)
     query = query_slug.replace("-", " ")
     result = anilist_search(query, page=1)
+    if result.get("api_unavailable"):
+        raise AniListUnavailable
     items = result.get("items", []) if result else []
     match = None
     for item in items:
@@ -1109,10 +1124,10 @@ def discover_mix(movie_genre, tv_genre, cache_key):
 
 def load_homepage_data2():
 
-    cache_key = "homepage_data_mix"
+    cache_key = "homepage_data_mix_v2"
     data = cache.get(cache_key)
 
-    if data:
+    if data and any(data.get(key) for key in ("hero", "top10", "action", "romance", "comedy", "anime")):
         return data
 
     params = {"api_key": API_KEY}
@@ -1137,10 +1152,10 @@ def load_homepage_data2():
             item["logo"] = get_tv_logo(item["id"])
 
     # GENRE ROWS
-    action = discover_mix(28, 10759, "genre_action")
-    romance = discover_mix(10749, 10749, "genre_romance")
-    comedy = discover_mix(35, 35, "genre_comedy")
-    anime = discover_mix(16, 16, "anime")
+    action = discover_mix(28, 10759, "genre_action_v2")
+    romance = discover_mix(10749, 10749, "genre_romance_v2")
+    comedy = discover_mix(35, 35, "genre_comedy_v2")
+    anime = discover_mix(16, 16, "anime_v2")
 
     data = {
         "hero": trending,
@@ -1151,7 +1166,8 @@ def load_homepage_data2():
         "anime": anime
     }
 
-    cache.set(cache_key, data, 21600)
+    if any(data.values()):
+        cache.set(cache_key, data, 21600)
 
     return data
 
@@ -1166,7 +1182,8 @@ def home(request):
         "action": data["action"],
         "romance": data["romance"],
         "comedy": data["comedy"],
-        "anime": data["anime"]
+        "anime": data["anime"],
+        "catalog_unavailable": not any(data.values()),
     })
 
 
@@ -2121,6 +2138,8 @@ def anilist_anime_detail(anilist_id):
         return context
 
     data = anilist_query(ANIME_DETAIL_QUERY, {"id": anilist_id})
+    if data is None:
+        return {"api_unavailable": True}
     media = (data or {}).get("Media")
     if not media:
         return None
@@ -2230,6 +2249,8 @@ def anilist_search(query, page=1):
         "page": page,
         "perPage": 24,
     })
+    if data is None:
+        return {"items": [], "total_pages": 1, "api_unavailable": True}
     page_data = (data or {}).get("Page", {})
     items = page_data.get("media", [])
     total_pages = (page_data.get("pageInfo") or {}).get("lastPage", 1)
@@ -2402,6 +2423,10 @@ def aniuzu(request):
 def aniuzu_detail(request, anilist_id):
     """Anime detail page."""
     ctx = anilist_anime_detail(anilist_id)
+    if ctx and ctx.get("api_unavailable"):
+        return render(request, "uzzutv/aniuzu_404.html", {
+            "catalog_unavailable": True,
+        }, status=503)
     if ctx is None:
         return render(request, "uzzutv/aniuzu_404.html", status=404)
 
@@ -2457,7 +2482,12 @@ def aniuzu_detail(request, anilist_id):
 
 
 def aniuzu_detail_slug(request, title_slug):
-    anilist_id = _resolve_anilist_id_from_slug(title_slug)
+    try:
+        anilist_id = _resolve_anilist_id_from_slug(title_slug)
+    except AniListUnavailable:
+        return render(request, "uzzutv/aniuzu_404.html", {
+            "catalog_unavailable": True,
+        }, status=503)
     if not anilist_id:
         raise Http404("Anime title not found")
     return aniuzu_detail(request, anilist_id)
@@ -2490,6 +2520,10 @@ def _aniuzu_playable_episodes(media):
 def aniuzu_watch(request, anilist_id, episode):
     """Aniuzu watch shell. Playback and authenticated progress stay client-side."""
     ctx = anilist_anime_detail(anilist_id)
+    if ctx and ctx.get("api_unavailable"):
+        return render(request, "uzzutv/aniuzu_404.html", {
+            "catalog_unavailable": True,
+        }, status=503)
     if ctx is None:
         return render(request, "uzzutv/aniuzu_404.html", status=404)
 
@@ -2521,7 +2555,12 @@ def aniuzu_watch(request, anilist_id, episode):
 
 
 def aniuzu_watch_slug(request, title_slug, episode):
-    anilist_id = _resolve_anilist_id_from_slug(title_slug)
+    try:
+        anilist_id = _resolve_anilist_id_from_slug(title_slug)
+    except AniListUnavailable:
+        return render(request, "uzzutv/aniuzu_404.html", {
+            "catalog_unavailable": True,
+        }, status=503)
     if not anilist_id:
         raise Http404("Anime title not found")
     return aniuzu_watch(request, anilist_id, episode)

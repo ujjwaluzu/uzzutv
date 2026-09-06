@@ -6,15 +6,15 @@
 <link rel="stylesheet" href="{% static 'uzzutv/aniuzu.css' %}">
 {% endblock %}
 
-{% block title %}Anime Not Found - Aniuzu{% endblock %}
+{% block title %}{% if catalog_unavailable %}AniList Temporarily Unavailable - Aniuzu{% else %}Anime Not Found - Aniuzu{% endif %}{% endblock %}
 
 {% block body %}
-<h1 class="visually-hidden">Anime Not Found</h1>
+<h1 class="visually-hidden">{% if catalog_unavailable %}AniList Temporarily Unavailable{% else %}Anime Not Found{% endif %}</h1>
 
 <div class="az-404">
-<div class="az-404-emoji">&#128531;</div>
-<h2 class="az-404-heading">Anime Not Found</h2>
-<p class="az-404-desc">Sorry, the anime you're looking for doesn't exist or may have been removed.</p>
+<div class="az-404-emoji">{% if catalog_unavailable %}&#9729;{% else %}&#128531;{% endif %}</div>
+<h2 class="az-404-heading">{% if catalog_unavailable %}AniList Temporarily Unavailable{% else %}Anime Not Found{% endif %}</h2>
+<p class="az-404-desc">{% if catalog_unavailable %}Aniuzu could not reach its anime data provider. Please try again after AniList restores API access.{% else %}Sorry, the anime you're looking for doesn't exist or may have been removed.{% endif %}</p>
 <div class="az-404-actions">
 <a href="{% url 'aniuzu' %}" class="watch-btn"><span class="material-icons">home</span> Aniuzu Home</a>
 <a href="{% url 'aniuzu_search' %}" class="watch-btn" style="background:transparent;border:1px solid rgba(255,255,255,.2);"><span class="material-icons">search</span> Search Anime</a>

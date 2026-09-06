@@ -652,6 +652,12 @@
     margin-top: 44px;
 }
 
+.party-guide-intro{max-width:650px;margin:-6px 0 22px;color:#9ca3af;font-size:14px;line-height:1.65}
+.party-quick-note{display:flex;align-items:flex-start;gap:12px;margin:0 0 22px;padding:15px 18px;border:1px solid rgba(255,60,60,.22);border-radius:14px;background:linear-gradient(135deg,rgba(255,60,60,.10),rgba(255,255,255,.025))}
+.party-quick-note>.material-icons{color:#ff6b6b;font-size:22px;margin-top:1px}
+.party-quick-note strong{display:block;color:#f3f4f6;font-size:13px;margin-bottom:3px}
+.party-quick-note p{margin:0;color:#aeb3bd;font-size:13px;line-height:1.55}
+
 .party-steps{
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -701,7 +707,7 @@
 
 .party-feature-grid{
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(3, 1fr);
     gap: 16px;
     margin-top: 24px;
 }
@@ -780,6 +786,10 @@
     }
 
     .party-steps{
+        grid-template-columns: 1fr;
+    }
+
+    .party-feature-grid{
         grid-template-columns: 1fr;
     }
 
@@ -1111,14 +1121,26 @@
 
         <div class="party-guide">
 
-            <h2 class="party-section-title">How to Use</h2>
+            <h2 class="party-section-title">How it works</h2>
+
+            <p class="party-guide-intro">
+                Set up a room in seconds, send one invite, and watch together. The host controls playback while the guest follows along in real time.
+            </p>
+
+            <div class="party-quick-note">
+                <span class="material-icons" aria-hidden="true">auto_awesome</span>
+                <div>
+                    <strong>Quickest way to start</strong>
+                    <p>Open any movie or series detail page and choose <b>Start Watch Party</b>. The title is selected automatically, so you do not need to copy an ID from the URL.</p>
+                </div>
+            </div>
 
             <div class="party-note" style="margin-top:0;margin-bottom:18px;">
                 In a room, the host starts the one-to-one Video Call and the guest chooses Accept or Decline. For movie fullscreen with the call still visible, use the UzzUTV fullscreen icon in the Watch Party player, not VidFast's internal iframe fullscreen button.
             </div>
 
             <div class="party-note" style="margin-top:0;margin-bottom:18px;">
-                You no longer need to find a TMDB ID in the UzzUTV URL. Open a movie or series detail page and choose <b>Start Watch Party</b>; the correct ID will be filled automatically. If you start here instead, you can still enter the TMDB ID from the title’s TMDB page.
+                If you start from this page, enter the TMDB ID manually. From a movie or series detail page, use <b>Start Watch Party</b> to fill the title automatically.
             </div>
 
             <div class="party-steps">
@@ -1127,10 +1149,10 @@
 
                     <div class="party-step-num">1</div>
 
-                    <div class="party-step-title">Create a party</div>
+                    <div class="party-step-title">Choose what to watch</div>
 
                     <div class="party-step-text">
-                        Open a title detail page and choose Start Watch Party, or enter the TMDB ID manually (plus season and episode for a series), then hit Create Watch Party. You'll get a 6-character room code and an invite link.
+                        Start from a title’s detail page, or enter its TMDB ID here. For a series, choose the season and episode before creating the room.
                     </div>
 
                 </div>
@@ -1139,10 +1161,10 @@
 
                     <div class="party-step-num">2</div>
 
-                    <div class="party-step-title">Invite your friends</div>
+                    <div class="party-step-title">Share the invite</div>
 
                     <div class="party-step-text">
-                        Share the room code or the invite link. Friends paste the code into the "Join a Watch Party" box on this page to jump in as the guest, or just open the invite link. It takes them straight to the room. Each room supports one host and one guest.
+                        Copy the invite link or send the 6-character room code. Your friend can open the link directly or paste the code into Join a Watch Party.
                     </div>
 
                 </div>
@@ -1151,15 +1173,17 @@
 
                     <div class="party-step-num">3</div>
 
-                    <div class="party-step-title">Watch together</div>
+                    <div class="party-step-title">Press play together</div>
 
                     <div class="party-step-text">
-                        The host's player is the source of truth. Guests' players automatically sync to the host's position in real time. When the host pauses, plays or seeks, everyone follows along so you're all watching the same scene at the same time. Hit the 📹 Video Call button to chat face-to-face while you watch.
+                        The host’s player is the source of truth. Play, pause and seek from the host’s player; the guest’s player follows automatically.
                     </div>
 
                 </div>
 
             </div>
+
+            <h3 class="party-section-title" style="margin-top:38px;">Room controls</h3>
 
             <!-- ---------- FEATURES ---------- -->
 
@@ -1171,10 +1195,10 @@
                         <span class="material-icons" aria-hidden="true">theaters</span>
                     </div>
 
-                    <div class="party-feature-title">Watch Party</div>
+                    <div class="party-feature-title">Synchronized playback</div>
 
                     <div class="party-feature-text">
-                        A watch party keeps everyone's playback in sync with the host in real time. The members panel, live host position and position check all work together so you never miss a scene. Pause, play and seek along with the host automatically.
+                        Playback follows the host in real time. Small timing differences can happen because each person has a separate connection to the external player.
                     </div>
 
                 </div>
@@ -1185,29 +1209,25 @@
                         <span class="material-icons" aria-hidden="true">videocam</span>
                     </div>
 
-                    <div class="party-feature-title">Video Call</div>
+                    <div class="party-feature-title">Video call</div>
 
                     <div class="party-feature-text">
-                        Click the 📹 Video Call button in the room to request a one-on-one call. The other person can accept or decline. Once connected, mute your mic, turn your camera on or off, minimize the call, or use Expand on desktop to turn the call into a full-page Discord-style view with the remote video filling the screen and your preview in the bottom-right. You'll need a camera and microphone, and you must allow browser access when prompted.
+                        The host can start a one-to-one call. The guest can accept or decline, then both people can manage camera, microphone, minimize and end-call controls.
                     </div>
 
                 </div>
 
-            </div>
-
-            <div class="party-feature-grid" style="margin-top:16px;">
-
                 <div class="party-feature">
                     <div class="party-feature-icon"><span class="material-icons" aria-hidden="true">fullscreen</span></div>
-                    <div class="party-feature-title">UzzUTV fullscreen</div>
+                    <div class="party-feature-title">Fullscreen</div>
                     <img class="party-fullscreen-guide-image" src="{% static 'uzzutv/images/party-fullscreen-guide.svg' %}" alt="Video call controls with the fullscreen button highlighted">
-                    <div class="party-feature-text">Use the fullscreen icon inside the Watch Party player. It enlarges the UzzUTV wrapper, keeping the VidFast movie and your existing call window together. VidFast's own iframe fullscreen cannot show UzzUTV overlays.</div>
+                    <div class="party-feature-text">Use UzzUTV’s fullscreen button around the player to keep the video-call overlay visible. The external player’s fullscreen button may hide the overlay.</div>
                 </div>
 
             </div>
 
             <div class="party-note">
-                Right now each room supports <b>one host and one guest</b> with a one-on-one video call. Bigger rooms are planned for the future.
+                Each room currently supports <b>one host and one guest</b>. Both people must be signed in, and camera/microphone features require browser permission.
             </div>
 
         </div>
