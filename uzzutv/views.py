@@ -1500,7 +1500,7 @@ def faq(request):
     return render(request, "uzzutv/faq.html")
 
 
-STATUS_CACHE_KEY = "public_system_status_v1"
+STATUS_CACHE_KEY = "public_system_status_v2"
 STATUS_CACHE_SECONDS = 60
 
 
@@ -1513,24 +1513,23 @@ def _status_item(name, status, label, detail):
     }
 
 
-def _probe_streaming_host(name, url):
-    """Check whether a playback host responds without attempting a title stream."""
+def _browser_streaming_check(name, url):
+    """Describe a playback host for a browser-side reachability check.
 
-    try:
-        response = requests.get(
-            url,
-            headers={"User-Agent": "UzzUTV status monitor/1.0"},
-            timeout=5,
-            allow_redirects=True,
-        )
-    except requests.RequestException:
-        return _status_item(name, "offline", "Offline", "No response within 5 seconds")
+    External iframe providers can reject requests from PythonAnywhere or other
+    server/datacenter IPs while still working normally in a viewer's browser.
+    Their reachability must therefore be tested from the status page itself.
+    """
 
-    if response.status_code >= 500:
-        return _status_item(name, "degraded", "Degraded", f"HTTP {response.status_code}")
-
-    # A 403/404 from a provider root still proves that the host is reachable.
-    return _status_item(name, "operational", "Reachable", f"HTTP {response.status_code}")
+    item = _status_item(
+        name,
+        "checking",
+        "Checking",
+        "Testing from your browser",
+    )
+    item["browser_check"] = True
+    item["probe_url"] = url
+    return item
 
 
 def _probe_tmdb():
@@ -1610,13 +1609,13 @@ def _build_system_status():
         ("Application APIs", _probe_tmdb),
         ("Application APIs", _probe_anilist),
         ("Application APIs", _probe_supabase),
-        ("UzzUTV playback hosts", lambda: _probe_streaming_host("VidFast", "https://vidfast.pro/")),
-        ("UzzUTV playback hosts", lambda: _probe_streaming_host("VidKing", "https://www.vidking.net/")),
-        ("UzzUTV playback hosts", lambda: _probe_streaming_host("VidNest", "https://vidnest.fun/")),
-        ("UzzUTV playback hosts", lambda: _probe_streaming_host("VidSrc", "https://vidsrcme.ru/")),
-        ("UzzUTV playback hosts", lambda: _probe_streaming_host("Videasy", "https://player.videasy.net/")),
-        ("Aniuzu playback hosts", lambda: _probe_streaming_host("AniLink", "https://anilink.cc/")),
-        ("Aniuzu playback hosts", lambda: _probe_streaming_host("TryEmbed", "https://tryembed.us.cc/")),
+        ("UzzUTV playback hosts", lambda: _browser_streaming_check("VidFast", "https://vidfast.pro/")),
+        ("UzzUTV playback hosts", lambda: _browser_streaming_check("VidKing", "https://www.vidking.net/")),
+        ("UzzUTV playback hosts", lambda: _browser_streaming_check("VidNest", "https://vidnest.fun/")),
+        ("UzzUTV playback hosts", lambda: _browser_streaming_check("VidSrc", "https://vidsrcme.ru/")),
+        ("UzzUTV playback hosts", lambda: _browser_streaming_check("Videasy", "https://player.videasy.net/")),
+        ("Aniuzu playback hosts", lambda: _browser_streaming_check("AniLink", "https://anilink.cc/")),
+        ("Aniuzu playback hosts", lambda: _browser_streaming_check("TryEmbed", "https://tryembed.us.cc/")),
     ]
 
     with ThreadPoolExecutor(max_workers=len(checks)) as executor:
@@ -1632,6 +1631,8 @@ def _build_system_status():
 
     if any(item["status"] in ("offline", "degraded") for item in results):
         overall = _status_item("Overall", "degraded", "Some services need attention", "One or more checks reported an issue")
+    elif any(item["status"] == "checking" for item in results):
+        overall = _status_item("Overall", "checking", "Checking playback hosts", "Playback checks will finish in your browser")
     else:
         overall = _status_item("Overall", "operational", "All systems operational", "All checks are responding")
 

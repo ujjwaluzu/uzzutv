@@ -28,6 +28,8 @@ body:has(.status-page){background:#090a0c!important}
 .status-dot.status-operational{background:#35c77a;box-shadow:0 0 0 4px rgba(53,199,122,.12)}
 .status-dot.status-degraded{background:#f0b34a;box-shadow:0 0 0 4px rgba(240,179,74,.12)}
 .status-dot.status-offline{background:#ef6262;box-shadow:0 0 0 4px rgba(239,98,98,.12)}
+.status-dot.status-checking{background:#8f9bea;box-shadow:0 0 0 4px rgba(143,155,234,.12);animation:status-pulse 1.5s ease-in-out infinite}
+@keyframes status-pulse{0%,100%{opacity:.45}50%{opacity:1}}
 .status-groups{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;margin-top:48px}
 .status-group{overflow:hidden;border:1px solid rgba(255,255,255,.12);border-radius:14px;background:rgba(18,20,24,.78);box-shadow:0 12px 30px rgba(0,0,0,.14)}
 .status-group-heading{display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding:21px 22px 17px;border-bottom:1px solid rgba(255,255,255,.12)}
@@ -45,6 +47,7 @@ body:has(.status-page){background:#090a0c!important}
 .status-badge.status-operational{border-color:rgba(53,199,122,.3);color:#63db9a}
 .status-badge.status-degraded{border-color:rgba(240,179,74,.32);color:#f5c36d}
 .status-badge.status-offline{border-color:rgba(239,98,98,.3);color:#f48383}
+.status-badge.status-checking{border-color:rgba(143,155,234,.3);color:#aeb8f1}
 .status-note{margin:52px 0 0;padding:23px 24px;border:1px solid rgba(255,255,255,.11);border-radius:12px;background:rgba(18,20,24,.58);color:#9297a1;font-size:13px;line-height:1.75}
 .status-note strong{color:#d8d9dc}
 .status-home{display:inline-block;margin-top:18px;color:#ff6c6c;font-size:13px;text-decoration:none}
@@ -107,10 +110,10 @@ body:has(.status-page){background:#090a0c!important}
       <div class="status-summary">
         <div class="status-summary-heading"><span>Current state</span><span class="material-icons" aria-hidden="true">monitor_heart</span></div>
         <div class="status-summary-copy">
-          <span class="status-dot status-{{ overall.status }}" aria-hidden="true"></span>
+          <span id="status-overall-dot" class="status-dot status-{{ overall.status }}" aria-hidden="true"></span>
           <div>
-            <strong>{{ overall.label }}</strong>
-            <small>{{ overall.detail }}</small>
+            <strong id="status-overall-label">{{ overall.label }}</strong>
+            <small id="status-overall-detail">{{ overall.detail }}</small>
           </div>
         </div>
         <div class="status-summary-footer"><span>Last checked</span><strong>{{ checked_at }}</strong></div>
@@ -127,15 +130,15 @@ body:has(.status-page){background:#090a0c!important}
         </div>
         <div class="status-list">
           {% for item in group.items %}
-            <div class="status-row">
+            <div class="status-row" data-item-status="{{ item.status }}"{% if item.browser_check %} data-browser-check data-status-url="{{ item.probe_url }}"{% endif %}>
               <div class="status-row-main">
-                <span class="status-dot status-{{ item.status }}" aria-hidden="true"></span>
+                <span class="status-dot status-{{ item.status }}" data-status-dot aria-hidden="true"></span>
                 <div>
                   <strong>{{ item.name }}</strong>
-                  <small>{{ item.detail }}</small>
+                  <small data-status-detail>{{ item.detail }}</small>
                 </div>
               </div>
-              <span class="status-badge status-{{ item.status }}">{{ item.label }}</span>
+              <span class="status-badge status-{{ item.status }}" data-status-badge>{{ item.label }}</span>
             </div>
           {% endfor %}
         </div>
@@ -143,7 +146,73 @@ body:has(.status-page){background:#090a0c!important}
     {% endfor %}
   </div>
 
-  <p class="status-note"><strong>What these checks mean:</strong> API checks confirm that the service responds. Playback checks confirm that a provider host is reachable; they cannot guarantee that every title, episode, region, or embedded player is working. If one provider is unavailable, try another server on the watch page.</p>
+  <p class="status-note"><strong>What these checks mean:</strong> API checks run on UzzUTV’s server. Playback checks run from your browser because external iframe providers may block server/datacenter traffic. A reachable host still cannot guarantee that every title, episode, region, or embedded player is working. If one provider is unavailable, try another server on the watch page.</p>
   <a class="status-home" href="{% url 'index' %}">&larr; Back to UzzUTV</a>
 </main>
+
+<script>
+(function () {
+  var rows = Array.from(document.querySelectorAll("[data-browser-check]"));
+  var overallDot = document.getElementById("status-overall-dot");
+  var overallLabel = document.getElementById("status-overall-label");
+  var overallDetail = document.getElementById("status-overall-detail");
+
+  function setClass(element, prefix, status) {
+    if (!element) return;
+    element.className = prefix + " status-" + status;
+  }
+
+  function updateOverall() {
+    var statuses = Array.from(document.querySelectorAll("[data-item-status]"))
+      .map(function (row) { return row.dataset.itemStatus; });
+    var next;
+
+    if (statuses.some(function (status) { return status === "offline" || status === "degraded"; })) {
+      next = { status: "degraded", label: "Some services need attention", detail: "One or more checks reported an issue" };
+    } else if (statuses.some(function (status) { return status === "checking"; })) {
+      next = { status: "checking", label: "Checking playback hosts", detail: "Playback checks are still running in your browser" };
+    } else {
+      next = { status: "operational", label: "All systems operational", detail: "All checks are responding" };
+    }
+
+    setClass(overallDot, "status-dot", next.status);
+    if (overallLabel) overallLabel.textContent = next.label;
+    if (overallDetail) overallDetail.textContent = next.detail;
+  }
+
+  function updateRow(row, status, label, detail) {
+    row.dataset.itemStatus = status;
+    setClass(row.querySelector("[data-status-dot]"), "status-dot", status);
+    setClass(row.querySelector("[data-status-badge]"), "status-badge", status);
+    var badge = row.querySelector("[data-status-badge]");
+    var detailNode = row.querySelector("[data-status-detail]");
+    if (badge) badge.textContent = label;
+    if (detailNode) detailNode.textContent = detail;
+    updateOverall();
+  }
+
+  function checkHost(row) {
+    var controller = new AbortController();
+    var timeout = window.setTimeout(function () { controller.abort(); }, 7000);
+
+    return fetch(row.dataset.statusUrl, {
+      method: "GET",
+      mode: "no-cors",
+      cache: "no-store",
+      credentials: "omit",
+      redirect: "follow",
+      signal: controller.signal
+    }).then(function () {
+      updateRow(row, "operational", "Reachable", "Reachable from this browser");
+    }).catch(function () {
+      updateRow(row, "offline", "Unavailable", "Unavailable from this browser");
+    }).finally(function () {
+      window.clearTimeout(timeout);
+    });
+  }
+
+  updateOverall();
+  rows.forEach(checkHost);
+}());
+</script>
 {% endblock %}
