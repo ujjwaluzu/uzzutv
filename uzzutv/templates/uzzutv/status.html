@@ -1,0 +1,149 @@
+{% extends "uzzutv/layout.html" %}
+
+{% block title %}System Status - UzzUTV{% endblock %}
+{% block meta_description %}Check the current availability of UzzUTV catalogue APIs and playback providers.{% endblock %}
+{% block canonical %}<link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}/status/">{% endblock %}
+{% block og_url %}{{ request.scheme }}://{{ request.get_host }}/status/{% endblock %}
+{% block og_title %}System Status - UzzUTV{% endblock %}
+{% block og_description %}Current availability of UzzUTV catalogue APIs and playback providers.{% endblock %}
+{% block twitter_title %}System Status - UzzUTV{% endblock %}
+{% block twitter_description %}Current availability of UzzUTV catalogue APIs and playback providers.{% endblock %}
+
+{% block body %}
+<style>
+body:has(.status-page){background:#090a0c!important}
+.status-page{position:relative;max-width:1080px;margin:0 auto;padding:78px 24px 100px;color:#d8d9dc}
+.status-page::before{content:"";position:absolute;z-index:0;top:0;left:50%;width:780px;height:340px;transform:translateX(-50%);background:radial-gradient(ellipse,rgba(229,61,61,.12),transparent 68%);pointer-events:none}
+.status-hero,.status-groups,.status-note,.status-home{position:relative;z-index:1}
+.status-hero{padding:0 0 42px;border-bottom:1px solid rgba(255,255,255,.13)}
+.status-kicker{margin:0 0 15px;color:#ff5a5a;font-size:11px;font-weight:800;letter-spacing:2.8px;text-transform:uppercase}
+.status-page h1{margin:0;color:#f8f8f6;font-size:clamp(46px,8vw,86px);font-weight:800;letter-spacing:-4px;line-height:.92}
+.status-lead{max-width:650px;margin:22px 0 0;color:#aeb1b8;font-size:16px;line-height:1.75}
+.status-summary{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-top:38px;padding:25px 26px;border:1px solid rgba(255,255,255,.16);border-radius:14px;background:linear-gradient(110deg,rgba(27,29,34,.98),rgba(18,20,24,.92));box-shadow:0 18px 45px rgba(0,0,0,.2)}
+.status-summary-copy{display:flex;align-items:center;gap:15px;min-width:0}
+.status-summary-copy strong{display:block;color:#f5f5f3;font-size:17px;font-weight:750}
+.status-summary-copy small{display:block;margin-top:5px;color:#9297a1;font-size:12px}
+.status-checked{color:#8e939d;font-size:12px;white-space:nowrap}
+.status-dot{display:inline-block;width:10px;height:10px;flex:0 0 10px;border-radius:50%;background:#9297a1;box-shadow:0 0 0 4px rgba(146,151,161,.12)}
+.status-dot.status-operational{background:#35c77a;box-shadow:0 0 0 4px rgba(53,199,122,.12)}
+.status-dot.status-degraded{background:#f0b34a;box-shadow:0 0 0 4px rgba(240,179,74,.12)}
+.status-dot.status-offline{background:#ef6262;box-shadow:0 0 0 4px rgba(239,98,98,.12)}
+.status-groups{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;margin-top:48px}
+.status-group{overflow:hidden;border:1px solid rgba(255,255,255,.12);border-radius:14px;background:rgba(18,20,24,.78);box-shadow:0 12px 30px rgba(0,0,0,.14)}
+.status-group-heading{display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding:21px 22px 17px;border-bottom:1px solid rgba(255,255,255,.12)}
+.status-group h2{margin:0;color:#f3f3f2;font-size:19px;letter-spacing:-.45px}
+.status-group-count{color:#747a85;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+.status-list{padding:0 22px}
+.status-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:17px 0;border-bottom:1px solid rgba(255,255,255,.1);transition:transform .2s ease,border-color .2s ease}
+.status-row:last-child{border-bottom:0}
+.status-row:hover{border-color:rgba(255,255,255,.22);transform:translateX(3px)}
+.status-row-main{display:flex;align-items:flex-start;gap:12px;min-width:0}
+.status-row-main .status-dot{margin-top:5px}
+.status-row-main strong{display:block;color:#e7e8ea;font-size:14px;font-weight:650}
+.status-row-main small{display:block;margin-top:4px;color:#858b96;font-size:12px}
+.status-badge{padding:5px 8px;border:1px solid rgba(255,255,255,.14);border-radius:999px;color:#aeb3bc;font-size:10px;font-weight:800;letter-spacing:.5px;line-height:1;white-space:nowrap}
+.status-badge.status-operational{border-color:rgba(53,199,122,.3);color:#63db9a}
+.status-badge.status-degraded{border-color:rgba(240,179,74,.32);color:#f5c36d}
+.status-badge.status-offline{border-color:rgba(239,98,98,.3);color:#f48383}
+.status-note{margin:52px 0 0;padding:23px 24px;border:1px solid rgba(255,255,255,.11);border-radius:12px;background:rgba(18,20,24,.58);color:#9297a1;font-size:13px;line-height:1.75}
+.status-note strong{color:#d8d9dc}
+.status-home{display:inline-block;margin-top:18px;color:#ff6c6c;font-size:13px;text-decoration:none}
+.status-home:hover{text-decoration:underline}
+@media(max-width:700px){
+  .status-page{padding:58px 16px 70px}.status-summary{display:block}.status-checked{display:block;margin-top:14px}.status-groups{grid-template-columns:1fr;gap:18px;margin-top:36px}.status-list{padding:0 18px}.status-group-heading{padding-left:18px;padding-right:18px}
+}
+@media(max-width:430px){.status-page h1{font-size:42px;letter-spacing:-1.8px}.status-row{align-items:flex-start}.status-badge{margin-top:1px}.status-row-main small{line-height:1.45}.status-summary{padding:21px 18px}.status-note{padding:19px 18px}}
+
+/* Product-style status dashboard refinement */
+.status-page{max-width:1120px;padding-top:66px}
+.status-hero{padding-bottom:48px}
+.status-kicker-row{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:23px}
+.status-kicker-row .status-kicker{margin:0}
+.status-live-pill{display:inline-flex;align-items:center;gap:9px;padding:8px 11px;border:1px solid rgba(53,199,122,.2);border-radius:999px;background:rgba(53,199,122,.07);color:#75dfa3;font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;white-space:nowrap}
+.status-live-pill .status-dot{width:7px;height:7px;flex-basis:7px;box-shadow:0 0 0 3px rgba(53,199,122,.12)}
+.status-hero-grid{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(330px,.92fr);align-items:end;gap:64px}
+.status-lead{max-width:570px;margin-top:25px}
+.status-summary{height:100%;min-height:190px;margin-top:0;padding:25px 26px 21px;display:flex;flex-direction:column;align-items:stretch;justify-content:space-between;gap:22px;border-radius:16px;background:linear-gradient(145deg,rgba(31,33,39,.98),rgba(16,18,22,.96));box-shadow:0 25px 65px rgba(0,0,0,.26)}
+.status-summary-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;color:#7f8590;font-size:10px;font-weight:800;letter-spacing:1.8px;text-transform:uppercase}
+.status-summary-heading .material-icons{font-size:18px;color:#656b76}
+.status-summary-copy{gap:15px}
+.status-summary-copy .status-dot{width:13px;height:13px;flex-basis:13px}
+.status-summary-copy strong{font-size:20px;letter-spacing:-.4px}
+.status-summary-copy small{font-size:12px;line-height:1.5}
+.status-summary-footer{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-top:15px;border-top:1px solid rgba(255,255,255,.11);color:#777e89;font-size:11px}
+.status-summary-footer strong{color:#b6bac1;font-weight:650}
+.status-groups{margin-top:54px;gap:24px}
+.status-group{border-color:rgba(255,255,255,.14);background:linear-gradient(155deg,rgba(21,23,28,.9),rgba(14,16,19,.88));box-shadow:0 16px 38px rgba(0,0,0,.18)}
+.status-group-heading{padding:23px 24px 18px;background:rgba(255,255,255,.018)}
+.status-group-heading h2{font-size:18px}
+.status-group-count{padding:5px 8px;border:1px solid rgba(255,255,255,.1);border-radius:999px;font-size:9px;letter-spacing:1.2px}
+.status-list{padding:0 24px}
+.status-row{min-height:66px;padding:15px 0}
+.status-row-main{gap:13px}
+.status-row-main .status-dot{margin-top:4px}
+.status-row-main strong{font-size:13px}
+.status-row-main small{font-size:11px}
+.status-badge{padding:6px 9px;font-size:9px;letter-spacing:.8px}
+.status-note{margin-top:56px}
+@media(max-width:800px){
+  .status-page{padding-top:54px}.status-hero-grid{grid-template-columns:1fr;gap:34px}.status-summary{min-height:0}.status-groups{margin-top:38px}
+}
+@media(max-width:430px){.status-kicker-row{align-items:flex-start;flex-direction:column;gap:14px}.status-live-pill{font-size:9px}.status-summary-footer{align-items:flex-start;flex-direction:column;gap:6px}}
+</style>
+
+<main class="status-page">
+  <section class="status-hero">
+    <div class="status-kicker-row">
+      <p class="status-kicker">UzzUTV operations</p>
+      <span class="status-live-pill"><span class="status-dot status-operational" aria-hidden="true"></span>Live checks <span aria-hidden="true">·</span> 60 sec cache</span>
+    </div>
+
+    <div class="status-hero-grid">
+      <div class="status-hero-copy">
+        <h1>System status</h1>
+        <p class="status-lead">A quick view of the catalogue APIs and external playback hosts used by UzzUTV and Aniuzu.</p>
+      </div>
+
+      <div class="status-summary">
+        <div class="status-summary-heading"><span>Current state</span><span class="material-icons" aria-hidden="true">monitor_heart</span></div>
+        <div class="status-summary-copy">
+          <span class="status-dot status-{{ overall.status }}" aria-hidden="true"></span>
+          <div>
+            <strong>{{ overall.label }}</strong>
+            <small>{{ overall.detail }}</small>
+          </div>
+        </div>
+        <div class="status-summary-footer"><span>Last checked</span><strong>{{ checked_at }}</strong></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="status-groups">
+    {% for group in groups %}
+      <section class="status-group" aria-labelledby="status-group-{{ forloop.counter }}">
+        <div class="status-group-heading">
+          <h2 id="status-group-{{ forloop.counter }}">{{ group.title }}</h2>
+          <span class="status-group-count">{{ group.items|length }} checks</span>
+        </div>
+        <div class="status-list">
+          {% for item in group.items %}
+            <div class="status-row">
+              <div class="status-row-main">
+                <span class="status-dot status-{{ item.status }}" aria-hidden="true"></span>
+                <div>
+                  <strong>{{ item.name }}</strong>
+                  <small>{{ item.detail }}</small>
+                </div>
+              </div>
+              <span class="status-badge status-{{ item.status }}">{{ item.label }}</span>
+            </div>
+          {% endfor %}
+        </div>
+      </section>
+    {% endfor %}
+  </div>
+
+  <p class="status-note"><strong>What these checks mean:</strong> API checks confirm that the service responds. Playback checks confirm that a provider host is reachable; they cannot guarantee that every title, episode, region, or embedded player is working. If one provider is unavailable, try another server on the watch page.</p>
+  <a class="status-home" href="{% url 'index' %}">&larr; Back to UzzUTV</a>
+</main>
+{% endblock %}

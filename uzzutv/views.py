@@ -4,6 +4,7 @@ from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.core.cache import cache
+from django.utils import timezone
 from django.utils.text import slugify
 from concurrent.futures import ThreadPoolExecutor
 import copy
@@ -1499,6 +1500,157 @@ def faq(request):
     return render(request, "uzzutv/faq.html")
 
 
+STATUS_CACHE_KEY = "public_system_status_v1"
+STATUS_CACHE_SECONDS = 60
+
+
+def _status_item(name, status, label, detail):
+    return {
+        "name": name,
+        "status": status,
+        "label": label,
+        "detail": detail,
+    }
+
+
+def _probe_streaming_host(name, url):
+    """Check whether a playback host responds without attempting a title stream."""
+
+    try:
+        response = requests.get(
+            url,
+            headers={"User-Agent": "UzzUTV status monitor/1.0"},
+            timeout=5,
+            allow_redirects=True,
+        )
+    except requests.RequestException:
+        return _status_item(name, "offline", "Offline", "No response within 5 seconds")
+
+    if response.status_code >= 500:
+        return _status_item(name, "degraded", "Degraded", f"HTTP {response.status_code}")
+
+    # A 403/404 from a provider root still proves that the host is reachable.
+    return _status_item(name, "operational", "Reachable", f"HTTP {response.status_code}")
+
+
+def _probe_tmdb():
+    if not API_KEY:
+        return _status_item("TMDB", "degraded", "Not configured", "TMDB_KEY is missing")
+
+    try:
+        response = requests.get(
+            f"{BASE_URL}/configuration",
+            params={"api_key": API_KEY},
+            headers={"User-Agent": "UzzUTV status monitor/1.0"},
+            timeout=5,
+        )
+    except requests.RequestException:
+        return _status_item("TMDB", "offline", "Offline", "No response within 5 seconds")
+
+    if response.status_code == 200:
+        return _status_item("TMDB", "operational", "Operational", "Catalogue API is responding")
+    if response.status_code in (401, 403):
+        return _status_item("TMDB", "degraded", "Configuration error", "TMDB rejected the configured API key")
+    if response.status_code >= 500:
+        return _status_item("TMDB", "degraded", "Degraded", f"HTTP {response.status_code}")
+    return _status_item("TMDB", "degraded", "Degraded", f"HTTP {response.status_code}")
+
+
+def _probe_anilist():
+    query = "{ Page(page: 1, perPage: 1) { media(type: ANIME) { id } } }"
+
+    try:
+        response = requests.post(
+            ANILIST_URL,
+            json={"query": query},
+            headers={
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "User-Agent": "UzzUTV status monitor/1.0",
+            },
+            timeout=5,
+        )
+    except requests.RequestException:
+        return _status_item("AniList", "offline", "Offline", "No response within 5 seconds")
+
+    if response.status_code == 200:
+        return _status_item("AniList", "operational", "Operational", "Anime catalogue API is responding")
+    if response.status_code == 403:
+        return _status_item("AniList", "degraded", "Temporarily unavailable", "AniList rejected the request")
+    if response.status_code == 429:
+        return _status_item("AniList", "degraded", "Rate limited", "AniList is limiting requests")
+    if response.status_code >= 500:
+        return _status_item("AniList", "degraded", "Degraded", f"HTTP {response.status_code}")
+    return _status_item("AniList", "degraded", "Degraded", f"HTTP {response.status_code}")
+
+
+def _probe_supabase():
+    supabase_url = (os.getenv("SUPABASE_URL") or "").rstrip("/")
+    if not supabase_url:
+        return _status_item("Supabase", "degraded", "Not configured", "SUPABASE_URL is missing")
+
+    try:
+        response = requests.get(
+            f"{supabase_url}/rest/v1/",
+            headers={"Accept": "application/json", "User-Agent": "UzzUTV status monitor/1.0"},
+            timeout=5,
+        )
+    except requests.RequestException:
+        return _status_item("Supabase", "offline", "Offline", "No response within 5 seconds")
+
+    if response.status_code >= 500:
+        return _status_item("Supabase", "degraded", "Degraded", f"HTTP {response.status_code}")
+
+    # The REST root commonly returns 401 without an API key; that still confirms reachability.
+    return _status_item("Supabase", "operational", "Reachable", f"HTTP {response.status_code}")
+
+
+def _build_system_status():
+    checks = [
+        ("Application APIs", _probe_tmdb),
+        ("Application APIs", _probe_anilist),
+        ("Application APIs", _probe_supabase),
+        ("UzzUTV playback hosts", lambda: _probe_streaming_host("VidFast", "https://vidfast.pro/")),
+        ("UzzUTV playback hosts", lambda: _probe_streaming_host("VidKing", "https://www.vidking.net/")),
+        ("UzzUTV playback hosts", lambda: _probe_streaming_host("VidNest", "https://vidnest.fun/")),
+        ("UzzUTV playback hosts", lambda: _probe_streaming_host("VidSrc", "https://vidsrcme.ru/")),
+        ("UzzUTV playback hosts", lambda: _probe_streaming_host("Videasy", "https://player.videasy.net/")),
+        ("Aniuzu playback hosts", lambda: _probe_streaming_host("AniLink", "https://anilink.cc/")),
+        ("Aniuzu playback hosts", lambda: _probe_streaming_host("TryEmbed", "https://tryembed.us.cc/")),
+    ]
+
+    with ThreadPoolExecutor(max_workers=len(checks)) as executor:
+        results = [future.result() for future in [executor.submit(check) for _, check in checks]]
+
+    groups = []
+    for group_name, result in zip((group for group, _ in checks), results):
+        group = next((existing for existing in groups if existing["title"] == group_name), None)
+        if group is None:
+            group = {"title": group_name, "items": []}
+            groups.append(group)
+        group["items"].append(result)
+
+    if any(item["status"] in ("offline", "degraded") for item in results):
+        overall = _status_item("Overall", "degraded", "Some services need attention", "One or more checks reported an issue")
+    else:
+        overall = _status_item("Overall", "operational", "All systems operational", "All checks are responding")
+
+    return {
+        "overall": overall,
+        "groups": groups,
+        "checked_at": timezone.localtime().strftime("%d %b %Y, %H:%M %Z"),
+    }
+
+
+def system_status(request):
+    status_data = cache.get(STATUS_CACHE_KEY)
+    if status_data is None:
+        status_data = _build_system_status()
+        cache.set(STATUS_CACHE_KEY, status_data, STATUS_CACHE_SECONDS)
+
+    return render(request, "uzzutv/status.html", status_data)
+
+
 def robots_txt(request):
     site_url = request.build_absolute_uri('/').rstrip('/')
     lines = [
@@ -1520,7 +1672,7 @@ def sitemap_xml(request):
 
     site_url = request.build_absolute_uri('/').rstrip('/')
 
-    cache_key = "sitemap_urls_v5"
+    cache_key = "sitemap_urls_v6"
     urls = cache.get(cache_key)
 
     if urls is None:
@@ -1534,6 +1686,7 @@ def sitemap_xml(request):
             {"loc": f"{site_url}/terms/", "priority": "0.3"},
             {"loc": f"{site_url}/dmca/", "priority": "0.3"},
             {"loc": f"{site_url}/faq/", "priority": "0.4"},
+            {"loc": f"{site_url}/status/", "priority": "0.3"},
             {"loc": f"{site_url}/aniuzu/", "priority": "0.9"},
             {"loc": f"{site_url}/aniuzu/seasons/", "priority": "0.8"},
             {"loc": f"{site_url}/aniuzu/studios/", "priority": "0.7"},
