@@ -225,7 +225,6 @@ body:has(.faq-page){background:#0b0c0f!important}
     </div>
     <div class="faq-tool-actions">
       <output class="faq-result-count" id="faq-result-count" aria-live="polite"></output>
-      <button type="button" class="faq-toggle" id="faq-toggle" aria-expanded="false">Expand all</button>
     </div>
   </div>
 
@@ -364,14 +363,21 @@ body:has(.faq-page){background:#0b0c0f!important}
 (() => {
   const search = document.getElementById('faq-search');
   const clear = document.getElementById('faq-clear');
-  const toggle = document.getElementById('faq-toggle');
   const empty = document.getElementById('faq-empty');
   const resultCount = document.getElementById('faq-result-count');
   const topButton = document.getElementById('faq-top-button');
   const items = [...document.querySelectorAll('.faq-item')];
   const sections = [...document.querySelectorAll('.faq-section')];
-  let expanded = false;
   let previousQuery = '';
+
+  items.forEach((item) => {
+    item.addEventListener('toggle', () => {
+      if (!item.open) return;
+      items.forEach((other) => {
+        if (other !== item && other.open) other.open = false;
+      });
+    });
+  });
 
   function filterFaq() {
     const query = search.value.trim().toLowerCase();
@@ -397,11 +403,6 @@ body:has(.faq-page){background:#0b0c0f!important}
       if (firstVisibleSection) setActiveSection(firstVisibleSection.id);
       else setActiveSection('');
     }
-    if (!query) {
-      expanded = false;
-      toggle.textContent = 'Expand all';
-      toggle.setAttribute('aria-expanded', 'false');
-    }
     previousQuery = query;
   }
 
@@ -411,13 +412,6 @@ body:has(.faq-page){background:#0b0c0f!important}
     search.focus();
     filterFaq();
   });
-  toggle.addEventListener('click', () => {
-    expanded = !expanded;
-    items.forEach((item) => { if (!item.hidden) item.open = expanded; });
-    toggle.textContent = expanded ? 'Collapse all' : 'Expand all';
-    toggle.setAttribute('aria-expanded', String(expanded));
-  });
-
   document.addEventListener('keydown', (event) => {
     const tag = document.activeElement && document.activeElement.tagName;
     if (event.key === '/' && tag !== 'INPUT' && tag !== 'TEXTAREA' && tag !== 'SELECT') {
