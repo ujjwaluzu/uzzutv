@@ -131,9 +131,72 @@ body:has(.faq-page){background:#0b0c0f!important}
   .faq-item summary{padding:18px 42px 18px 0;font-size:15px}.faq-item summary::after{right:2px;top:12px}.faq-answer{padding:0 25px 19px 0;font-size:13.5px}.faq-contact{margin-top:50px;padding:26px 0}
 }
 @media(max-width:420px){.faq-hero-links{grid-template-columns:1fr}.faq-page h1{font-size:42px;letter-spacing:-1.8px}}
+
+/* Interaction-focused FAQ refinement */
+.faq-page,
+.faq-page *{box-sizing:border-box}
+.faq-page{width:100%}
+.faq-hero-links{gap:10px;border-top:0}
+.faq-hero-links a{min-height:58px;padding:15px 38px 15px 16px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:linear-gradient(145deg,rgba(25,27,32,.9),rgba(16,18,22,.72));transition:color .2s ease,border-color .2s ease,background .2s ease,transform .2s ease}
+.faq-hero-links a::after{content:"↗";right:14px;top:50%;transform:translateY(-50%)}
+.faq-hero-links a:hover{border-color:rgba(255,75,75,.55);background:linear-gradient(145deg,rgba(39,27,31,.96),rgba(24,19,23,.9));transform:translateY(-2px)}
+.faq-hero-links a:hover::after{transform:translate(2px,-50%)}
+.faq-hero-links a.is-active{border-color:rgba(255,75,75,.62);background:linear-gradient(145deg,rgba(58,29,35,.92),rgba(27,20,25,.88));color:#fff;box-shadow:inset 3px 0 #ff4b4b,0 8px 24px rgba(0,0,0,.16)}
+.faq-hero-links a.is-active::after{color:#ff7070}
+.faq-tools{position:sticky;top:58px;z-index:10;display:flex;align-items:center;gap:16px;margin:30px 0 14px;padding:12px 0;background:rgba(11,12,15,.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.16)}
+.faq-search-wrap{min-width:0}
+.faq-search{padding-right:48px;border-radius:12px;background:rgba(23,25,29,.96)}
+.faq-clear{position:absolute;right:10px;top:50%;display:grid;width:30px;height:30px;place-items:center;transform:translateY(-50%);border:0;border-radius:50%;background:transparent;color:#8e949f;cursor:pointer;font-size:20px;line-height:1}
+.faq-clear:hover{background:rgba(255,255,255,.09);color:#fff}
+.faq-clear:focus-visible{outline:2px solid #ff4b4b;outline-offset:2px}
+.faq-tool-actions{display:flex;align-items:center;justify-content:flex-end;gap:12px;flex:0 0 auto}
+.faq-result-count{color:#858b96;font-size:11px;white-space:nowrap}
+.faq-toggle{padding:9px 13px;border:1px solid rgba(255,255,255,.14);border-radius:9px;background:rgba(255,255,255,.045);color:#c1c5cc;transition:background .2s ease,border-color .2s ease,color .2s ease}
+.faq-toggle:hover{border-color:rgba(255,75,75,.5);background:rgba(255,75,75,.1);color:#fff}
+.faq-section{scroll-margin-top:145px}
+.faq-list{overflow:hidden;border:1px solid rgba(255,255,255,.12);border-radius:14px;background:rgba(15,17,21,.56)}
+.faq-item{background:transparent;transition:background .2s ease,border-color .2s ease}
+.faq-item:hover{background:rgba(255,255,255,.025)}
+.faq-item[open]{background:linear-gradient(90deg,rgba(255,75,75,.065),rgba(255,255,255,.018) 38%,transparent)}
+.faq-item summary{padding:20px 62px 20px 18px;transition:color .2s ease,background .2s ease}
+.faq-item summary:hover{background:rgba(255,255,255,.025)}
+.faq-item[open] summary{color:#fff}
+.faq-item[open] .faq-answer{animation:faq-answer-in .22s ease both}
+@keyframes faq-answer-in{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.faq-item summary::after{right:17px;top:50%;display:grid;width:29px;height:29px;place-items:center;transform:translateY(-50%);border:1px solid rgba(255,75,75,.35);border-radius:50%;background:rgba(255,75,75,.08);font-size:21px;line-height:1;transition:background .2s ease,transform .2s ease}
+.faq-item[open] summary::after{content:"−";transform:translateY(-50%) rotate(180deg);background:rgba(255,75,75,.18)}
+.faq-answer{padding:0 62px 24px 18px}
+.faq-answer p:first-child{margin-top:0}
+.faq-empty{margin:16px 0 0;padding:16px 18px;border:1px solid rgba(255,75,75,.22);border-radius:10px;background:rgba(255,75,75,.07)}
+.faq-contact{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-top:62px;padding:25px 26px;border:1px solid rgba(255,255,255,.12);border-radius:14px;background:linear-gradient(145deg,rgba(25,27,32,.9),rgba(16,18,22,.7))}
+.faq-contact h2{margin:0;flex:0 0 auto}
+.faq-contact p{margin:0;max-width:620px}
+.faq-top{position:fixed;right:clamp(16px,3vw,34px);bottom:24px;z-index:20;display:inline-flex;align-items:center;gap:7px;padding:9px 12px;border:1px solid rgba(255,255,255,.16);border-radius:999px;background:rgba(22,24,29,.92);box-shadow:0 12px 28px rgba(0,0,0,.28);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:#d8dbe0;text-decoration:none;font-size:11px;font-weight:750;opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .2s ease,transform .2s ease,border-color .2s ease,background .2s ease}
+.faq-top.is-visible{opacity:1;pointer-events:auto;transform:translateY(0)}
+.faq-top:hover{border-color:rgba(255,75,75,.55);background:rgba(48,27,33,.95);color:#fff}
+.faq-top .material-icons{font-size:16px}
+@media(max-width:650px){
+  .faq-tools{top:52px;display:flex;flex-wrap:wrap;gap:10px;margin-top:23px}
+  .faq-search-wrap{flex:1 1 100%}
+  .faq-tool-actions{width:100%;justify-content:space-between}
+  .faq-section{scroll-margin-top:125px}
+  .faq-item summary{padding:18px 52px 18px 15px}
+  .faq-item summary::after{right:14px}
+  .faq-answer{padding:0 52px 20px 15px}
+  .faq-contact{display:block;padding:21px 18px}
+  .faq-contact p{margin-top:9px}
+  .faq-top{right:14px;bottom:16px;padding:9px 10px}
+  .faq-top span:last-child{display:none}
+}
+@media(max-width:420px){
+  .faq-result-count{font-size:10px}
+  .faq-toggle{padding:8px 10px;font-size:12px}
+  .faq-hero-links{gap:8px}
+  .faq-hero-links a{min-height:52px;padding-left:13px}
+}
 </style>
 
-<main class="faq-page">
+<main class="faq-page" id="faq-top">
   <header class="faq-hero">
     <div class="faq-hero-content">
       <p class="faq-kicker">UzzUTV help centre</p>
@@ -157,12 +220,16 @@ body:has(.faq-page){background:#0b0c0f!important}
     <div class="faq-search-wrap">
       <span class="material-icons" aria-hidden="true">search</span>
       <label class="visually-hidden" for="faq-search">Search frequently asked questions</label>
-      <input id="faq-search" class="faq-search" type="search" placeholder="Search the FAQ..." autocomplete="off">
+      <input id="faq-search" class="faq-search" type="search" placeholder="Search questions, playback, accounts..." autocomplete="off" aria-describedby="faq-result-count">
+      <button type="button" class="faq-clear" id="faq-clear" aria-label="Clear FAQ search" hidden>&times;</button>
     </div>
-    <button type="button" class="faq-toggle" id="faq-toggle">Expand all</button>
+    <div class="faq-tool-actions">
+      <output class="faq-result-count" id="faq-result-count" aria-live="polite"></output>
+      <button type="button" class="faq-toggle" id="faq-toggle" aria-expanded="false">Expand all</button>
+    </div>
   </div>
 
-  <p class="faq-empty" id="faq-empty">No questions matched your search. Try a different word, or <a href="mailto:baunthiyalujjwal52@gmail.com">contact us</a>.</p>
+  <p class="faq-empty" id="faq-empty" role="status">No questions matched your search. Try a different word, or <a href="mailto:baunthiyalujjwal52@gmail.com">contact us</a>.</p>
 
   <section class="faq-section" id="getting-started">
     <div class="faq-section-heading"><span>01 / Start here</span><h2>Getting started with UzzUTV</h2></div>
@@ -289,38 +356,110 @@ body:has(.faq-page){background:#0b0c0f!important}
     <p>Try the playback steps above first, then contact the UzzUTV team from the email link in the footer with the affected title, episode, page URL, browser and a short description of what happened.</p>
   </aside>
 </main>
+<a class="faq-top" id="faq-top-button" href="#faq-top" aria-label="Back to top"><span class="material-icons" aria-hidden="true">arrow_upward</span><span>Back to top</span></a>
 {% endblock %}
 
 {% block extra_js %}
 <script>
 (() => {
   const search = document.getElementById('faq-search');
+  const clear = document.getElementById('faq-clear');
   const toggle = document.getElementById('faq-toggle');
   const empty = document.getElementById('faq-empty');
+  const resultCount = document.getElementById('faq-result-count');
+  const topButton = document.getElementById('faq-top-button');
   const items = [...document.querySelectorAll('.faq-item')];
   const sections = [...document.querySelectorAll('.faq-section')];
   let expanded = false;
+  let previousQuery = '';
 
   function filterFaq() {
     const query = search.value.trim().toLowerCase();
     let matches = 0;
+    let firstMatch = null;
     items.forEach((item) => {
       const matched = !query || item.textContent.toLowerCase().includes(query);
       item.hidden = !matched;
+      if (matched && !firstMatch) firstMatch = item;
       if (matched) matches += 1;
     });
     sections.forEach((section) => {
       section.hidden = !section.querySelector('.faq-item:not([hidden])');
     });
     empty.style.display = matches ? 'none' : 'block';
+    clear.hidden = !query;
+    resultCount.textContent = query
+      ? `${matches} ${matches === 1 ? 'answer' : 'answers'} found`
+      : `${matches} answers`;
+    if (query && !previousQuery && firstMatch) firstMatch.open = true;
+    if (query) {
+      const firstVisibleSection = sections.find((section) => !section.hidden);
+      if (firstVisibleSection) setActiveSection(firstVisibleSection.id);
+      else setActiveSection('');
+    }
+    if (!query) {
+      expanded = false;
+      toggle.textContent = 'Expand all';
+      toggle.setAttribute('aria-expanded', 'false');
+    }
+    previousQuery = query;
   }
 
   search.addEventListener('input', filterFaq);
+  clear.addEventListener('click', () => {
+    search.value = '';
+    search.focus();
+    filterFaq();
+  });
   toggle.addEventListener('click', () => {
     expanded = !expanded;
     items.forEach((item) => { if (!item.hidden) item.open = expanded; });
     toggle.textContent = expanded ? 'Collapse all' : 'Expand all';
+    toggle.setAttribute('aria-expanded', String(expanded));
   });
+
+  document.addEventListener('keydown', (event) => {
+    const tag = document.activeElement && document.activeElement.tagName;
+    if (event.key === '/' && tag !== 'INPUT' && tag !== 'TEXTAREA' && tag !== 'SELECT') {
+      event.preventDefault();
+      search.focus();
+    }
+    if (event.key === 'Escape' && search.value) {
+      search.value = '';
+      filterFaq();
+      search.focus();
+    }
+  });
+
+  const updateTopButton = () => {
+    topButton.classList.toggle('is-visible', window.scrollY > 520);
+  };
+  window.addEventListener('scroll', updateTopButton, { passive: true });
+  updateTopButton();
+
+  const navLinks = [...document.querySelectorAll('.faq-hero-links a[href^="#"]')];
+  const setActiveSection = (id) => {
+    navLinks.forEach((link) => {
+      const active = link.getAttribute('href') === `#${id}`;
+      link.classList.toggle('is-active', active);
+      if (active) link.setAttribute('aria-current', 'location');
+      else link.removeAttribute('aria-current');
+    });
+  };
+
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver((entries) => {
+      const visible = entries
+        .filter((entry) => entry.isIntersecting)
+        .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+      if (visible[0]) setActiveSection(visible[0].target.id);
+    }, { rootMargin: '-18% 0px -68% 0px', threshold: [0, 0.15, 0.5] });
+    sections.forEach((section) => observer.observe(section));
+  }
+
+  setActiveSection(sections[0]?.id);
+
+  filterFaq();
 })();
 </script>
 {% endblock %}

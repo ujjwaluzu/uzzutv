@@ -147,6 +147,37 @@ body:has(.status-page){background:#090a0c!important}
   .status-group-heading{padding-left:14px;padding-right:14px}
   .status-summary{padding-left:15px;padding-right:15px}
 }
+
+/* Clarity pass: make the current state and individual checks easier to scan. */
+.status-summary{position:relative;isolation:isolate;overflow:hidden;border-color:rgba(255,255,255,.18)}
+.status-summary::before{content:"";position:absolute;z-index:-1;inset:0;background:radial-gradient(circle at 100% 0,rgba(53,199,122,.12),transparent 48%);pointer-events:none}
+.status-summary.status-summary-degraded::before{background:radial-gradient(circle at 100% 0,rgba(240,179,74,.16),transparent 48%)}
+.status-summary.status-summary-checking::before{background:radial-gradient(circle at 100% 0,rgba(143,155,234,.15),transparent 48%)}
+.status-summary-copy .status-dot{box-shadow:0 0 0 6px rgba(53,199,122,.1),0 0 22px rgba(53,199,122,.35)}
+.status-summary-copy .status-dot.status-degraded{box-shadow:0 0 0 6px rgba(240,179,74,.1),0 0 22px rgba(240,179,74,.28)}
+.status-summary-copy .status-dot.status-checking{box-shadow:0 0 0 6px rgba(143,155,234,.1),0 0 22px rgba(143,155,234,.28)}
+.status-group-heading{align-items:center}
+.status-group-count{white-space:nowrap}
+.status-row{position:relative}
+.status-row::before{content:"";position:absolute;left:-24px;top:0;bottom:0;width:2px;background:transparent;transition:background .2s ease}
+.status-row:hover::before{background:#ff5a5a}
+.status-row-main strong{letter-spacing:-.1px}
+.status-badge{background:rgba(255,255,255,.025)}
+.status-note{display:flex;align-items:flex-start;gap:12px}
+.status-note .material-icons{flex:0 0 auto;margin-top:1px;color:#ff9b72;font-size:19px}
+.status-note-copy{min-width:0}
+.status-home{padding:8px 0}
+.status-context{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:24px}
+.status-context-item{display:flex;align-items:flex-start;gap:10px;min-width:0;padding:13px 14px;border:1px solid rgba(255,255,255,.1);border-radius:11px;background:rgba(255,255,255,.025);color:#8f96a1;font-size:11px;line-height:1.5}
+.status-context-item .material-icons{flex:0 0 auto;color:#8f9bea;font-size:17px}
+.status-context-item strong{display:block;margin-bottom:2px;color:#d8dbe0;font-size:11px;font-weight:750;letter-spacing:.2px}
+.status-context-item span:last-child{min-width:0;overflow-wrap:anywhere}
+@media(max-width:560px){
+  .status-row::before{left:-18px}
+  .status-note .material-icons{font-size:18px}
+  .status-context{grid-template-columns:1fr;gap:9px;margin-top:20px}
+  .status-context-item{padding:12px 13px}
+}
 </style>
 
 <main class="status-page">
@@ -162,19 +193,24 @@ body:has(.status-page){background:#090a0c!important}
         <p class="status-lead">A quick view of the catalogue APIs and external playback hosts used by UzzUTV and Aniuzu.</p>
       </div>
 
-      <div class="status-summary">
+      <div class="status-summary status-summary-{{ overall.status }}" id="status-summary">
         <div class="status-summary-heading"><span>Current state</span><span class="material-icons" aria-hidden="true">monitor_heart</span></div>
         <div class="status-summary-copy">
           <span id="status-overall-dot" class="status-dot status-{{ overall.status }}" aria-hidden="true"></span>
           <div>
-            <strong id="status-overall-label">{{ overall.label }}</strong>
-            <small id="status-overall-detail">{{ overall.detail }}</small>
+            <strong id="status-overall-label" aria-live="polite">{{ overall.label }}</strong>
+            <small id="status-overall-detail" aria-live="polite">{{ overall.detail }}</small>
           </div>
         </div>
         <div class="status-summary-footer"><span>Last checked</span><strong>{{ checked_at }}</strong></div>
       </div>
     </div>
   </section>
+
+  <div class="status-context" aria-label="How status checks work">
+    <div class="status-context-item"><span class="material-icons" aria-hidden="true">dns</span><span><strong>Server checks</strong>TMDB, AniList and Supabase are checked from UzzUTV’s server.</span></div>
+    <div class="status-context-item"><span class="material-icons" aria-hidden="true">language</span><span><strong>Browser checks</strong>Playback hosts are tested from your browser for a more realistic result.</span></div>
+  </div>
 
   <div class="status-groups">
     {% for group in groups %}
@@ -201,7 +237,7 @@ body:has(.status-page){background:#090a0c!important}
     {% endfor %}
   </div>
 
-  <p class="status-note"><strong>What these checks mean:</strong> API checks run on UzzUTV’s server. Playback checks run from your browser because external iframe providers may block server/datacenter traffic. A reachable host still cannot guarantee that every title, episode, region, or embedded player is working. If one provider is unavailable, try another server on the watch page.</p>
+  <p class="status-note"><span class="material-icons" aria-hidden="true">info</span><span class="status-note-copy"><strong>What these checks mean:</strong> API checks run on UzzUTV’s server. Playback checks run from your browser because external iframe providers may block server/datacenter traffic. A reachable host still cannot guarantee that every title, episode, region, or embedded player is working. If one provider is unavailable, try another server on the watch page.</span></p>
   <a class="status-home" href="{% url 'index' %}">&larr; Back to UzzUTV</a>
 </main>
 
@@ -211,6 +247,7 @@ body:has(.status-page){background:#090a0c!important}
   var overallDot = document.getElementById("status-overall-dot");
   var overallLabel = document.getElementById("status-overall-label");
   var overallDetail = document.getElementById("status-overall-detail");
+  var overallSummary = document.getElementById("status-summary");
 
   function setClass(element, prefix, status) {
     if (!element) return;
@@ -231,6 +268,7 @@ body:has(.status-page){background:#090a0c!important}
     }
 
     setClass(overallDot, "status-dot", next.status);
+    if (overallSummary) overallSummary.className = "status-summary status-summary-" + next.status;
     if (overallLabel) overallLabel.textContent = next.label;
     if (overallDetail) overallDetail.textContent = next.detail;
   }
