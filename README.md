@@ -1,6 +1,6 @@
 # UzzUTV
 
-UzzUTV is a Netflix-style streaming platform built with Django that lets you discover, search, and watch movies and TV series. All content data is pulled live from **The Movie Database (TMDB) API**, with a responsive, mobile-friendly UI inspired by modern streaming apps. Accounts are powered by **Supabase**, giving you watchlist, Continue Watching, ratings, reviews, public profiles, and Watch Parties.
+UzzUTV is a Netflix-style streaming platform built with Django that lets you discover, search, and watch movies and TV series. Movie and TV content data comes from **The Movie Database (TMDB) API**; the Aniuzu anime catalogue uses **AniList**. The interface is responsive and mobile-friendly, and accounts are powered by **Supabase**, giving you watchlist, Continue Watching, ratings, reviews, public profiles, and Watch Parties.
 
 ---
 
@@ -30,6 +30,7 @@ UzzUTV is a Netflix-style streaming platform built with Django that lets you dis
 
 ### Aniuzu Anime
 - AniList-powered anime discovery, metadata, detail pages, watchlist, and episode navigation
+- AniList is the primary anime catalogue provider; its API can be temporarily unavailable during upstream outages
 - Anime watch route: `/aniuzu/anime/<title-year>/watch/<episode>/` (legacy AniList-ID URLs remain supported)
 - Playback is limited to the documented AniLink and TryEmbed iframe providers
 - SUB/DUB audio selection and AniLink/TryEmbed server switching preserve the current episode
@@ -89,6 +90,7 @@ UzzUTV is a Netflix-style streaming platform built with Django that lets you dis
 
 ### Performance
 - Database-backed response caching (TMDB calls cached for hours)
+- AniList responses are cached, and outbound AniList requests are spaced and backed off after rate-limit or API-unavailable responses
 - GZip compression middleware
 - Lazy-loaded images for faster page loads
 
@@ -152,6 +154,9 @@ SUPABASE_SERVICE_ROLE_KEY="your_supabase_service_role_key"
 DJANGO_SECRET_KEY="a_long_random_secret"
 DJANGO_DEBUG=True
 DJANGO_ALLOWED_HOSTS=*
+
+# Optional: minimum spacing between AniList API requests. Default: 2.1 seconds.
+ANILIST_MIN_INTERVAL_SECONDS="2.1"
 
 SECURE_SSL_REDIRECT=False
 SESSION_COOKIE_SECURE=False
@@ -271,6 +276,7 @@ uzzutv/
 | `/aniuzu/studios/<name>/`  | Anime studio browse page             |
 | `/aniuzu/collections/`     | Anime collections list               |
 | `/aniuzu/collections/<slug>/` | Anime collection browse page       |
+| `/status/`                 | Live catalogue API and playback-host status |
 | `/search/`                | Search                               |
 | `/faq/`                  | FAQ and help centre                  |
 | `/watchlist/`             | Your saved titles                    |
@@ -301,6 +307,7 @@ The project is configured for PythonAnywhere:
   python manage.py collectstatic
   ```
 - In production, set `DJANGO_DEBUG=False` and `DJANGO_ALLOWED_HOSTS` to your domain, and enable the `SECURE_*` flags for HTTPS.
+- AniList availability is checked from the Django server. During an AniList outage, the status page may show AniList as temporarily unavailable and Aniuzu may return an unavailable-catalogue state until the upstream API recovers.
 
 ---
 

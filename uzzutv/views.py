@@ -1810,6 +1810,10 @@ def _season_to_upper(season_lower):
 # ================================================================
 
 ANILIST_URL = "https://graphql.anilist.co"
+ANILIST_MIN_INTERVAL_SECONDS = float(os.getenv("ANILIST_MIN_INTERVAL_SECONDS", "2.1"))
+ANILIST_BACKOFF_CACHE_KEY = "anilist_api_backoff_until"
+ANILIST_RATE_LOCK_CACHE_KEY = "anilist_api_rate_lock"
+ANILIST_NEXT_REQUEST_CACHE_KEY = "anilist_api_next_request_at"
 
 _anilist_session = None
 
@@ -1821,11 +1825,40 @@ def _get_anilist_session():
     return _anilist_session
 
 
+def _wait_for_anilist_slot():
+    """Space requests across Django workers using the shared cache."""
+    while True:
+        if cache.add(ANILIST_RATE_LOCK_CACHE_KEY, True, 15):
+            try:
+                now = time.time()
+                next_request_at = cache.get(ANILIST_NEXT_REQUEST_CACHE_KEY) or 0.0
+                wait_for = max(0.0, next_request_at - now)
+                cache.set(
+                    ANILIST_NEXT_REQUEST_CACHE_KEY,
+                    max(now, next_request_at) + ANILIST_MIN_INTERVAL_SECONDS,
+                    300,
+                )
+            finally:
+                cache.delete(ANILIST_RATE_LOCK_CACHE_KEY)
+
+            if wait_for:
+                time.sleep(wait_for)
+            return
+
+        time.sleep(0.05)
+
+
 def anilist_query(query, variables=None, retries=2):
     """Execute a GraphQL query against the AniList API with retry."""
+    backoff_until = cache.get(ANILIST_BACKOFF_CACHE_KEY)
+    if backoff_until and backoff_until > time.time():
+        logger.info("Skipping AniList request during API backoff")
+        return None
+
     session = _get_anilist_session()
     for attempt in range(retries + 1):
         try:
+            _wait_for_anilist_slot()
             resp = session.post(
                 ANILIST_URL,
                 json={"query": query, "variables": variables or {}},
@@ -1837,9 +1870,21 @@ def anilist_query(query, variables=None, retries=2):
                 timeout=15,
             )
             if resp.status_code == 429:
-                logger.warning("AniList rate limit on attempt %s", attempt + 1)
-                time.sleep(1 * (attempt + 1))
-                continue
+                retry_after = resp.headers.get("Retry-After", "60")
+                try:
+                    retry_after = max(15, min(int(retry_after), 300))
+                except (TypeError, ValueError):
+                    retry_after = 60
+                cache.set(ANILIST_BACKOFF_CACHE_KEY, time.time() + retry_after, retry_after)
+                logger.warning("AniList rate limit; backing off for %s seconds", retry_after)
+                return None
+            if resp.status_code == 403:
+                # AniList documents 403 as its API-disabled response. Avoid
+                # retrying every page request while that condition is active.
+                backoff_seconds = 300
+                cache.set(ANILIST_BACKOFF_CACHE_KEY, time.time() + backoff_seconds, backoff_seconds)
+                logger.warning("AniList API unavailable; backing off for %s seconds", backoff_seconds)
+                return None
             if resp.status_code != 200:
                 logger.warning("AniList returned HTTP %s: %s", resp.status_code, resp.text[:300])
                 return None
