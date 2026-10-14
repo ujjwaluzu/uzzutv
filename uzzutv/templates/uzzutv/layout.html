@@ -193,10 +193,15 @@
     <div>
       <h4 class="footer-heading">Explore</h4>
       <ul class="footer-list">
-        <li><a href="{% url 'home' %}">Home</a></li>
-        <li><a href="{% url 'movie' %}">Movies</a></li>
-        <li><a href="{% url 'tv' %}">Series</a></li>
-        <li><a href="{% url 'aniuzu' %}">Aniuzu</a></li>
+        <li><a href="{% if request.path|slice:':7' == '/aniuzu' %}{% url 'aniuzu' %}{% else %}{% url 'home' %}{% endif %}">Home</a></li>
+        {% if request.path|slice:':7' == '/aniuzu' %}
+          <li><a href="{% url 'aniuzu_genre_list' %}">Genres</a></li>
+          <li><a href="{% url 'aniuzu_collections' %}">Collections</a></li>
+        {% else %}
+          <li><a href="{% url 'movie' %}">Movies</a></li>
+          <li><a href="{% url 'tv' %}">Series</a></li>
+        {% endif %}
+        <li><a href="{% if request.path|slice:':7' == '/aniuzu' %}{% url 'home' %}{% else %}{% url 'aniuzu' %}{% endif %}">{% if request.path|slice:':7' == '/aniuzu' %}Uzzutv{% else %}Aniuzu{% endif %}</a></li>
       </ul>
     </div>
 
