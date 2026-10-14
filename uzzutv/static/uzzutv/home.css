@@ -651,11 +651,11 @@ body{
 
     .watch-btn,
     .info-btn{
-        padding:11px 18px;
-        font-size:14px;
-        flex:1;
+        padding:9px 14px;
+        font-size:13px;
+        flex:0 1 auto;
         justify-content:center;
-        max-width:200px;
+        max-width:160px;
     }
 
     .hero-dots{
