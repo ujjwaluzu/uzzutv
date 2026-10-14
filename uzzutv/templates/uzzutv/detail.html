@@ -446,6 +446,16 @@ body{
     font-size:13px;
 }
 
+.login-hint a{
+    color:#ff3c3c;
+    font-weight:600;
+    text-decoration:none;
+}
+
+.login-hint a:hover{
+    text-decoration:underline;
+}
+
 .user-rating-remove{
     margin-top:10px;
 }
@@ -1362,7 +1372,7 @@ async function loadUserRating() {
 
         userRatingStars.innerHTML = `
             <span class="login-hint">
-                Log in to rate this
+                <a href="/auth/?next=/home/">Log in</a> to rate this
             </span>
         `;
 
