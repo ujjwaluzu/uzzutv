@@ -9,8 +9,8 @@ token against GoTrue server-side and derive the authenticated user id from it.
 We never trust a user id supplied by the browser.
 """
 
-import os
 import logging
+import os
 
 import requests
 
@@ -55,7 +55,10 @@ def get_user_from_access_token(access_token):
         return None
 
     if response.status_code != 200:
-        logger.info("Supabase token verification rejected (status=%s)", response.status_code)
+        logger.info(
+            "Supabase token verification rejected (status=%s)",
+            response.status_code,
+        )
         return None
 
     try:
@@ -104,7 +107,10 @@ def delete_auth_user(user_id):
         logger.info("Supabase user %s already absent (idempotent success)", user_id)
         return True
 
-    logger.error("Supabase admin user deletion failed (status=%s)", response.status_code)
+    logger.error(
+        "Supabase admin user deletion failed (status=%s)",
+        response.status_code,
+    )
     return False
 
 
