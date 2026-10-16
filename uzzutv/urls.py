@@ -1,7 +1,8 @@
 from django.urls import path
+
 from . import views
 
-urlpatterns=[
+urlpatterns = [
     path("", views.index, name="index"),
     path("movie/", views.movie, name="movie"),
     path("tv/", views.tv, name="tv"),
@@ -16,8 +17,8 @@ urlpatterns=[
     path("category/<slug:slug>/", views.category, name="category"),
     path("<str:type>/<int:id>/", views.detail, name="detail"),
     path("watchlist/", views.watchlist, name="watchlist"),
-path("rated/", views.rated, name="rated"),
-path("rated/<uuid:user_id>/", views.rated, name="rated_user"),
+    path("rated/", views.rated, name="rated"),
+    path("rated/<uuid:user_id>/", views.rated, name="rated_user"),
     path("terms/", views.terms, name="terms"),
     path("dmca/", views.dmca, name="dmca"),
     path("faq/", views.faq, name="faq"),
@@ -32,8 +33,16 @@ path("rated/<uuid:user_id>/", views.rated, name="rated_user"),
     path("aniuzu/", views.aniuzu, name="aniuzu"),
     path("aniuzu/watchlist/", views.aniuzu_watchlist, name="aniuzu_watchlist"),
     path("aniuzu/search/", views.aniuzu_search, name="aniuzu_search"),
-    path("aniuzu/anime/<int:anilist_id>/watch/<int:episode>/", views.aniuzu_watch, name="aniuzu_watch"),
-    path("aniuzu/anime/<slug:title_slug>/watch/<int:episode>/", views.aniuzu_watch_slug, name="aniuzu_watch_slug"),
+    path(
+        "aniuzu/anime/<int:anilist_id>/watch/<int:episode>/",
+        views.aniuzu_watch,
+        name="aniuzu_watch",
+    ),
+    path(
+        "aniuzu/anime/<slug:title_slug>/watch/<int:episode>/",
+        views.aniuzu_watch_slug,
+        name="aniuzu_watch_slug",
+    ),
     path("aniuzu/continue-metadata/", views.aniuzu_continue_metadata, name="aniuzu_continue_metadata"),
     path("aniuzu/anime/<int:anilist_id>/", views.aniuzu_detail, name="aniuzu_detail"),
     path("aniuzu/anime/<slug:title_slug>/", views.aniuzu_detail_slug, name="aniuzu_detail_slug"),
@@ -41,11 +50,18 @@ path("rated/<uuid:user_id>/", views.rated, name="rated_user"),
     path("aniuzu/genres/<str:genre>/", views.aniuzu_genre, name="aniuzu_genre"),
     path("aniuzu/seasons/", views.aniuzu_seasons, name="aniuzu_seasons"),
     path("aniuzu/studios/", views.aniuzu_studios, name="aniuzu_studios"),
-    path("aniuzu/studios/<str:studio_name>/", views.aniuzu_studio, name="aniuzu_studio"),
+    path(
+        "aniuzu/studios/<str:studio_name>/",
+        views.aniuzu_studio,
+        name="aniuzu_studio",
+    ),
     path("aniuzu/collections/", views.aniuzu_collections, name="aniuzu_collections"),
-    path("aniuzu/collections/<str:slug>/", views.aniuzu_collection, name="aniuzu_collection"),
+    path(
+        "aniuzu/collections/<str:slug>/",
+        views.aniuzu_collection,
+        name="aniuzu_collection",
+    ),
     path("<str:type>/<slug:title_slug>/", views.detail_slug, name="detail_slug"),
     path("robots.txt", views.robots_txt, name="robots_txt"),
     path("sitemap.xml", views.sitemap_xml, name="sitemap_xml"),
-
 ]
