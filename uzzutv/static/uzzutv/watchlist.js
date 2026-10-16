@@ -3,7 +3,6 @@
 ========================================================= */
 
 async function addToWatchlist(id, type, title, poster) {
-
     const user = await getCurrentUser();
 
     if (!user) {
@@ -36,9 +35,7 @@ async function addToWatchlist(id, type, title, poster) {
     return true;
 }
 
-
 async function removeFromWatchlist(id, type) {
-
     const user = await getCurrentUser();
 
     if (!user) {
@@ -62,9 +59,7 @@ async function removeFromWatchlist(id, type) {
     return true;
 }
 
-
 async function isInWatchlist(id, type) {
-
     const user = await getCurrentUser();
 
     if (!user) {
@@ -87,9 +82,7 @@ async function isInWatchlist(id, type) {
     return !!data;
 }
 
-
 async function toggleWatchlist(id, type, title, poster, button) {
-
     const user = await getCurrentUser();
 
     if (!user) {
@@ -128,13 +121,7 @@ async function toggleWatchlist(id, type, title, poster, button) {
     if (button) button.disabled = false;
 }
 
-
-async function updateWatchlistButton(
-    id,
-    type,
-    button
-) {
-
+async function updateWatchlistButton(id, type, button) {
     const user = await getCurrentUser();
 
     if (!user) {
