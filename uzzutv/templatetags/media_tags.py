@@ -33,7 +33,14 @@ def media_slug(media):
 
     title = media.get("title") or media.get("name") or ""
     if isinstance(title, dict):
-        title = title.get("english") or title.get("romaji") or title.get("native") or ""
+        title = (
+            title.get("english")
+            or title.get("romaji")
+            or title.get("native")
+            or ""
+        )
 
     year = _year_from_media(media)
-    return slugify(f"{title}-{year}" if year else title) or str(media.get("id") or media.get("media_id") or "")
+    return slugify(f"{title}-{year}" if year else title) or str(
+        media.get("id") or media.get("media_id") or ""
+    )
