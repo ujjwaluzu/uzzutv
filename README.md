@@ -13,7 +13,7 @@ UzzUTV is a Netflix-style streaming platform built with Django that lets you dis
 - Landing-page genre cards that jump straight into a random title from that genre
 
 ### Genre Categories
-- Dedicated category pages at `/category/<slug>/` for Action, Romance, Comedy, Animation, Thriller, Drama, Horror, Sci-Fi — plus Popular and Top Rated
+- Dedicated category pages at `/category/<slug>/` for Action, Romance, Comedy, Animation, Thriller, Drama, Horror, Sci-Fi, plus Popular and Top Rated
 - Each page mixes movies and TV shows in one balanced feed
 - Paginated browsing (24 titles per page)
 

@@ -2521,7 +2521,7 @@ def anilist_by_genre(genre, page=1):
 
 
 # ================================================================
-# ANILIST HELPER — sanitize HTML descriptions
+# ANILIST HELPER: sanitize HTML descriptions
 # ================================================================
 
 def sanitize_anilist_description(text):
@@ -2826,7 +2826,7 @@ def aniuzu_search(request):
 
 
 def aniuzu_schedule(request):
-    """Airing schedule page — shows anime airing this week."""
+    """Airing schedule page showing anime airing this week."""
     today = datetime.date.today()
     start_of_week = today - datetime.timedelta(days=today.weekday())
     end_of_week = start_of_week + datetime.timedelta(days=6)
@@ -2857,7 +2857,7 @@ def aniuzu_schedule(request):
 
 
 def aniuzu_genre_list(request):
-    """Genre browse page — shows all available genres."""
+    """Genre browse page showing all available genres."""
     return render(request, "uzzutv/aniuzu_genre_list.html", {
         "genres": ANILIST_GENRES,
     })
@@ -2925,7 +2925,7 @@ def aniuzu_top(request):
 
 
 def aniuzu_upcoming(request):
-    """Upcoming anime page — NOT_YET_RELEASED sorted by popularity."""
+    """Upcoming anime page: NOT_YET_RELEASED sorted by popularity."""
     page = max(1, _safe_int(request.GET.get("page"), 1))
 
     cache_key = f"anilist_upcoming_p{page}"
@@ -2956,7 +2956,7 @@ def aniuzu_upcoming(request):
 
 
 def aniuzu_seasons(request):
-    """Season browser — pick a season and year, see anime from that season."""
+    """Season browser: pick a season and year to see anime from that season."""
     _, _, current_year = _current_season()
     current_season = _season_to_upper(_current_season()[0])
 
@@ -3002,14 +3002,14 @@ def aniuzu_seasons(request):
 
 
 def aniuzu_studios(request):
-    """Studios hub page — curated grid of popular anime studios."""
+    """Studios hub page: curated grid of popular anime studios."""
     return render(request, "uzzutv/aniuzu_studios.html", {
         "studios": ANIZU_STUDIOS,
     })
 
 
 def aniuzu_studio(request, studio_name):
-    """Studio detail page — anime by a specific studio."""
+    """Studio detail page: anime by a specific studio."""
     slug = studio_name.lower().replace(" ", "-")
     studio_obj = None
     for s in ANIZU_STUDIOS:
@@ -3045,7 +3045,7 @@ def aniuzu_collections(request):
 
 
 def aniuzu_collection(request, slug):
-    """Single curated collection — resolves AniList IDs to anime data."""
+    """Single curated collection that resolves AniList IDs to anime data."""
     collection = None
     for c in ANIZU_COLLECTIONS:
         if c["slug"] == slug:

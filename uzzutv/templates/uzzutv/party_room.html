@@ -2456,7 +2456,7 @@ async function checkAndClaimSlot(room) {
 
         myRole = "host";
 
-        console.log("[WatchParty] Role: host — allowed");
+        console.log("[WatchParty] Role: host, allowed");
 
         return true;
     }
@@ -2465,14 +2465,14 @@ async function checkAndClaimSlot(room) {
 
         myRole = "guest";
 
-        console.log("[WatchParty] Role: existing guest — allowed");
+        console.log("[WatchParty] Role: existing guest, allowed");
 
         return true;
     }
 
     if (!room.guest_user_id) {
 
-        console.log("[WatchParty] Guest slot empty — attempting claim");
+        console.log("[WatchParty] Guest slot empty, attempting claim");
 
         const { data, error } = await supabaseClient.rpc("claim_guest_slot", {
             p_room_code: PARTY_ROOM_CODE,
@@ -2485,17 +2485,17 @@ async function checkAndClaimSlot(room) {
 
             myRole = "guest";
 
-            console.log("[WatchParty] Role: new guest — allowed");
+            console.log("[WatchParty] Role: new guest, allowed");
 
             return true;
         }
 
-        console.log("[WatchParty] Claim failed — rejected");
+        console.log("[WatchParty] Claim failed, rejected");
 
         return false;
     }
 
-    console.log("[WatchParty] Guest slot occupied by another user — rejected");
+    console.log("[WatchParty] Guest slot occupied by another user, rejected");
 
     return false;
 }
@@ -3650,7 +3650,7 @@ async function handleVcOffer(payload) {
 
 
 /* ---------------------------------------------------------
-    RECEIVES THE ANSWER (bidirectional — no second offer)
+    RECEIVES THE ANSWER (bidirectional, no second offer)
 --------------------------------------------------------- */
 
 async function handleVcAnswer(payload) {
@@ -3930,18 +3930,18 @@ function handleCallRequest(payload) {
     /* If we're currently calling them, use timestamp to resolve who is the offerer */
     if (vcCallState === "calling" && vcPendingCallerId === payload.senderUserId) {
         if (payload.timestamp < vcCallRequestTs) {
-            /* Their request is older — they should be the offerer, we auto-accept */
-            console.log("[WatchParty WebRTC] Conflict resolved — they are offerer (earlier ts), auto-accepting");
+            /* Their request is older; they should be the offerer, we auto-accept */
+            console.log("[WatchParty WebRTC] Conflict resolved: they are offerer (earlier ts), auto-accepting");
             acceptIncomingCall(payload.senderUserId);
             return;
         } else if (payload.timestamp > vcCallRequestTs) {
-            /* Our request is older — we are the offerer, ignore their request */
-            console.log("[WatchParty WebRTC] Conflict resolved — we are offerer (earlier ts), ignoring their request");
+            /* Our request is older; we are the offerer, ignore their request */
+            console.log("[WatchParty WebRTC] Conflict resolved: we are offerer (earlier ts), ignoring their request");
             return;
         }
     }
 
-    /* We're idle or in a failed state — show incoming call UI */
+    /* We're idle or in a failed state, so show incoming call UI */
     vcIncomingFrom = payload.senderUserId;
     vcPendingCallerId = payload.senderUserId;
     vcCallRequestTs = payload.timestamp || Date.now();
@@ -3960,7 +3960,7 @@ function handleCallRequest(payload) {
         setVcStatus("incoming");
     }).catch(function (err) {
         console.warn("[WatchParty WebRTC] Could not access camera for incoming call:", err);
-        /* Still show incoming call even without camera — camera will be acquired on accept */
+        /* Still show incoming call even without camera; camera is acquired on accept */
         openVcPanel();
         var remoteName = isHost ? (guestUsername || "Guest") : (hostUsername || "Host");
         var incomingName = document.getElementById("vc-incoming-name");
@@ -4030,9 +4030,9 @@ function handleCallAccept(payload) {
 
     if (payload.callerUserId !== currentUser.id) return;
 
-    console.log("[WatchParty WebRTC] Call accepted by", payload.senderUserId, "— creating offer");
+    console.log("[WatchParty WebRTC] Call accepted by " + payload.senderUserId + ", creating offer");
 
-    /* We are the caller — create and send the WebRTC offer */
+    /* We are the caller; create and send the WebRTC offer */
     createOfferAsCaller();
 
 }
@@ -4506,7 +4506,7 @@ function handleNetworkOnline() {
 
     if (vcActive && (vcCallState === "disconnected" || vcCallState === "failed")) {
 
-        console.log("[WatchParty WebRTC] Network restored but call lost — ending call");
+        console.log("[WatchParty WebRTC] Network restored but call lost, ending call");
         endVideoCall();
 
     }

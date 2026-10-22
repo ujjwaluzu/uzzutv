@@ -28,7 +28,7 @@
     gap: 16px;
 }
 
-/* Card grid — reuse az-row from aniuzu.css */
+/* Card grid: reuse az-row from aniuzu.css */
 
 #az-watchlist-grid {
     display: grid;

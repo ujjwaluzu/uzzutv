@@ -18,10 +18,16 @@
     margin-right: 0;
 }
 
+nav:not(.az-navbar):has(.profile-nav-brand){
+    min-height:64px;
+    padding:.8rem clamp(1rem,3vw,2rem);
+}
+
 /* The profile navbar is intentionally reduced to the two application brands. */
 nav:not(.az-navbar):has(.profile-nav-brand) .navbar-toggler,
 nav:not(.az-navbar):has(.profile-nav-brand) #navbarSupportedContent > .navbar-nav,
-nav:not(.az-navbar):has(.profile-nav-brand) #navbarSupportedContent > .uzz-search{
+nav:not(.az-navbar):has(.profile-nav-brand) #navbarSupportedContent > .uzz-search,
+nav:not(.az-navbar):has(.profile-nav-brand) #navbarSupportedContent > .uzz-auth{
     display: none !important;
 }
 
@@ -1058,6 +1064,10 @@ nav:not(.az-navbar):has(.profile-nav-brand) #navbarSupportedContent{
 
 @media (max-width: 480px){
 
+    nav:not(.az-navbar):has(.profile-nav-brand){
+        padding:.7rem 12px;
+    }
+
     .profile-page{
         padding: 90px 14px 40px;
     }
@@ -1099,7 +1109,7 @@ nav:not(.az-navbar):has(.profile-nav-brand) #navbarSupportedContent{
         <h1 class="profile-heading">My <span>Profile</span></h1>
 
         <p class="profile-subtitle">
-            Your ratings, reviews and watchlist — all in one place.
+            Your ratings, reviews and watchlist, all in one place.
         </p>
 
     </div>
