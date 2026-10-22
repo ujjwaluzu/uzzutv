@@ -11,41 +11,46 @@
 .profile-nav-brand{
     display: flex;
     align-items: center;
-    gap: 8px;
+    justify-content: center;
+    gap: clamp(6px, 1.5vw, 12px);
+    min-width: 0;
+    white-space: nowrap;
 }
 
 .profile-nav-brand .navbar-brand{
+    display: inline-flex;
+    align-items: center;
     margin-right: 0;
+    min-height: 44px;
+    padding: .4rem .15rem;
+    font-size: clamp(18px, 5vw, 24px);
+    text-decoration: none;
 }
 
 nav:not(.az-navbar):has(.profile-nav-brand){
     min-height:64px;
-    padding:.8rem clamp(1rem,3vw,2rem);
-}
-
-/* The profile navbar is intentionally reduced to the two application brands. */
-nav:not(.az-navbar):has(.profile-nav-brand) .navbar-toggler,
-nav:not(.az-navbar):has(.profile-nav-brand) #navbarSupportedContent > .navbar-nav,
-nav:not(.az-navbar):has(.profile-nav-brand) #navbarSupportedContent > .uzz-search,
-nav:not(.az-navbar):has(.profile-nav-brand) #navbarSupportedContent > .uzz-auth{
-    display: none !important;
+    width:100%;
+    padding:.55rem clamp(12px,3vw,32px);
 }
 
 nav:not(.az-navbar):has(.profile-nav-brand) .container-fluid{
-    position: relative;
+    width:100%;
+    max-width:100%;
+    padding:0;
+    display:flex;
     justify-content: center;
 }
 
+nav:not(.az-navbar):has(.profile-nav-brand) .navbar-toggler{
+    display:none !important;
+}
+
 nav:not(.az-navbar):has(.profile-nav-brand) .profile-nav-brand{
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
+    flex:0 1 auto;
 }
 
 nav:not(.az-navbar):has(.profile-nav-brand) #navbarSupportedContent{
-    display: flex !important;
-    justify-content: flex-end;
-    flex: 1 1 auto;
+    display:none !important;
 }
 
 .profile-page{
@@ -1065,7 +1070,8 @@ nav:not(.az-navbar):has(.profile-nav-brand) #navbarSupportedContent{
 @media (max-width: 480px){
 
     nav:not(.az-navbar):has(.profile-nav-brand){
-        padding:.7rem 12px;
+        min-height:58px;
+        padding:.45rem 10px;
     }
 
     .profile-page{
