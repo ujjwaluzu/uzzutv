@@ -519,6 +519,13 @@ body{
   gap:0;
 }
 
+/* Bootstrap's default link underline shows as a blue bar beneath the logo on mobile. */
+.footer-bottom > a{
+  display:block;
+  color:inherit;
+  text-decoration:none;
+}
+
 .footer-copy{
   order:2;
   margin-bottom:16px;
