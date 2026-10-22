@@ -154,7 +154,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
 document.addEventListener("click", async (event) => {
 
-    if (event.target.id !== "logout-btn") {
+    if (!event.target.closest || !event.target.closest("#logout-btn")) {
         return;
     }
 

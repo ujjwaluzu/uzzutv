@@ -97,6 +97,37 @@ nav:not(.az-navbar):has(.profile-nav-brand) #navbarSupportedContent{
     margin-bottom: 18px;
 }
 
+.profile-hero-top{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:16px;
+}
+
+.profile-logout-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    padding:9px 13px;
+    border:1px solid rgba(255,255,255,.14);
+    border-radius:10px;
+    background:rgba(255,255,255,.045);
+    color:#d8dbe0;
+    font-size:13px;
+    font-weight:600;
+    cursor:pointer;
+    transition:background .2s ease,border-color .2s ease,color .2s ease;
+}
+.profile-logout-btn[hidden]{display:none}
+
+.profile-logout-btn:hover{
+    border-color:rgba(255,60,60,.5);
+    background:rgba(255,60,60,.1);
+    color:#fff;
+}
+
+.profile-logout-btn .material-icons{font-size:18px}
+
 .profile-badge .material-icons{
     font-size: 16px;
     color: #ff3c3c;
@@ -1054,10 +1085,16 @@ nav:not(.az-navbar):has(.profile-nav-brand) #navbarSupportedContent{
 
     <div id="profile-hero">
 
-        <span class="profile-badge">
-            <span class="material-icons" aria-hidden="true">person</span>
-            Your Space
-        </span>
+        <div class="profile-hero-top">
+            <span class="profile-badge">
+                <span class="material-icons" aria-hidden="true">person</span>
+                Your Space
+            </span>
+            <button type="button" id="logout-btn" class="profile-logout-btn" hidden>
+                <span class="material-icons" aria-hidden="true">logout</span>
+                Logout
+            </button>
+        </div>
 
         <h1 class="profile-heading">My <span>Profile</span></h1>
 
@@ -2946,6 +2983,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         return;
     }
+
+    document.getElementById("logout-btn").hidden = false;
 
     const profile = await ensureUserProfile(user);
 
